@@ -1,6 +1,5 @@
-<div align="center">
-# 📖 Literary EPUB Translator
-
+<div align="center">  
+  <h1 align="center">📖 Literary EPUB Translator</h1>
   
 ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg?style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)
