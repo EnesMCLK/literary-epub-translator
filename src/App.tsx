@@ -403,7 +403,27 @@ export default function App() {
         onClose={() => setIsLeftDrawerOpen(false)}
         history={history}
         onClearHistory={() => {setHistory([]); localStorage.removeItem(STORAGE_KEY_HISTORY)}}
-        onRestoreSettings={(savedSettings) => { setSettings(savedSettings); setIsLeftDrawerOpen(false); setIsRightDrawerOpen(true); }}
+        onRestoreSettings={(item) => { 
+          setSettings(item.settingsSnapshot); 
+          setIsLeftDrawerOpen(false); 
+          
+          // Check for resume data
+          const savedResume = localStorage.getItem(STORAGE_KEY_RESUME);
+          if (savedResume) {
+            try {
+              const parsed = JSON.parse(savedResume);
+              if (parsed.filename === item.filename) {
+                setResumeData(parsed);
+              }
+            } catch (e) {
+              console.error("Resume data parse error", e);
+            }
+          }
+          
+          // Do not open API key drawer automatically.
+          // Show a visual confirmation via toast-like error state (temporary UX)
+          // or rely on the UI updating the settings.
+        }}
         t={t}
       />
 
