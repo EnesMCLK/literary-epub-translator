@@ -8,7 +8,7 @@ interface HistoryDrawerProps {
   onClose: () => void;
   history: HistoryItem[];
   onClearHistory: () => void;
-  onRestoreSettings: (settings: TranslationSettings) => void;
+  onRestoreSettings: (item: HistoryItem) => void;
   t: any; // UI Strings
 }
 
@@ -48,7 +48,7 @@ export const HistoryDrawer: React.FC<HistoryDrawerProps> = ({
               {history.map(item => (
                 <div 
                   key={item.id} 
-                  onClick={() => onRestoreSettings(item.settingsSnapshot)} 
+                  onClick={() => onRestoreSettings(item)} 
                   className="p-4 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-indigo-400 cursor-pointer group relative"
                 >
                   <p className="text-[11px] font-black truncate text-slate-700 dark:text-slate-200">{item.filename}</p>
