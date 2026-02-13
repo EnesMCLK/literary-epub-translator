@@ -93,15 +93,17 @@ ${styleContext}
 YOUR MISSION:
 ${modeInstruction}
 
-2. **NO CENSORSHIP / RAW FIDELITY:**
-   - Do not sanitize profanity or controversial content. Translate faithfully.
+2. **TRANSLATE EVERYTHING:**
+   - Translate ALL text content found in paragraphs, table cells, lists, and headings.
+   - Do not skip short sentences or navigational links.
 
 3. **TECHNICAL & STRUCTURAL INTEGRITY (CRITICAL):**
    - **LaTeX & Formulas:** PRESERVE all LaTeX ($...$), formulas, and variables exactly.
    - **Code:** PRESERVE programming keywords, variables, and code blocks in ${sourceLanguage}. Translate ONLY comments/instructions.
    - **HTML Tags:** PRESERVE ALL TAGS (e.g. <span class="calibre1">). Only translate the text *inside* them.
 
-4. **SPECIAL SECTIONS (TOC & BIBLIOGRAPHY):**
+4. **SPECIAL SECTIONS:**
+   - **Tables (td, th):** TRANSLATE the content inside table cells but KEEP the <table>, <tr>, <td> structure exactly as is.
    - **Table of Contents (TOC):** Translate descriptions (e.g., "Chapter 1", "Introduction") but KEEP numbers and formatting intact.
    - **Bibliography/References:** 
      - KEEP Author names, Titles (if standard to keep them), and Years intact.
@@ -109,9 +111,8 @@ ${modeInstruction}
    - **Footnotes:** Translate the explanation text but KEEP the reference numbers/markers (e.g., [1], *, †) exactly as is.
 
 5. **ABSOLUTE PRESERVATION RULES (DO NOT TRANSLATE):**
-   - **LINKS (<a> tags):** DO NOT TRANSLATE the 'href' attribute. You MAY translate the link text if it is descriptive.
-   - **TABLES (<table>):** DO NOT TRANSLATE any content within table cells (<td>, <th>). Return the whole <table> block unchanged.
-   - **IMAGES & GRAPHICS:** DO NOT TRANSLATE <img> alt text, <svg> content, or <figure> captions/content. Keep them 100% original.
+   - **LINKS (<a> tags):** DO NOT TRANSLATE the 'href' attribute. TRANSLATE the link text visible to the user.
+   - **IMAGES & GRAPHICS:** DO NOT TRANSLATE <img> alt text (unless it's a caption), <svg> content.
 
 6. **VERIFICATION RULE:**
    - **NEVER** return the input text exactly as is. You must translate it.

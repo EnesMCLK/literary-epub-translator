@@ -13,6 +13,7 @@ import { HistoryDrawer } from './components/HistoryDrawer';
 import { SettingsDrawer } from './components/SettingsDrawer';
 import { DownloadActions } from './components/DownloadActions';
 import { StatsModal } from './components/StatsModal';
+import { OnboardingTour } from './components/OnboardingTour';
 import { 
     UILanguage, TranslationSettings, HistoryItem, 
     LANGUAGES_DATA, DEFAULT_TAGS, LANG_CODE_TO_LABEL, AI_MODELS, BookStats, STORAGE_KEY_API 
@@ -21,6 +22,7 @@ import { STRINGS_UI } from './lang/ui';
 
 const STORAGE_KEY_HISTORY = 'lit-trans-history';
 const STORAGE_KEY_RESUME = 'lit-trans-resume-v2';
+const STORAGE_KEY_TOUR = 'lit-trans-tour-seen';
 
 function formatDuration(seconds?: number): string {
   if (seconds === undefined || seconds < 0) return '--';
@@ -57,6 +59,7 @@ export default function App() {
   const [resumeData, setResumeData] = useState<any | null>(null);
   const [isLegalExpanded, setIsLegalExpanded] = useState(false);
   const [isCreativityOptimized, setIsCreativityOptimized] = useState(false);
+  const [isTourOpen, setIsTourOpen] = useState(false);
   
   // Analiz ve İstatistik State'leri
   const [analyzedModelId, setAnalyzedModelId] = useState<string | null>(null);
@@ -76,7 +79,7 @@ export default function App() {
     targetTags: DEFAULT_TAGS,
     sourceLanguage: 'Automatic',
     targetLanguage: LANG_CODE_TO_LABEL['en'],
-    modelId: 'gemini-flash-lite-latest',
+    modelId: 'gemini-2.0-flash',
     uiLang: 'en'
   });
 
@@ -156,7 +159,13 @@ export default function App() {
         } catch(e) {}
     }
 
-    setSettings(prev => ({ ...prev, modelId: 'gemini-flash-lite-latest' }));
+    // Check tour status
+    const tourSeen = localStorage.getItem(STORAGE_KEY_TOUR);
+    if (!tourSeen) {
+      setTimeout(() => setIsTourOpen(true), 1000); // Slight delay for smoother UX
+    }
+
+    setSettings(prev => ({ ...prev, modelId: 'gemini-2.0-flash' }));
     
     setIsInitializing(false);
   };
@@ -182,7 +191,7 @@ export default function App() {
 
     try {
       const ai = new GoogleGenAI({ apiKey: finalKey });
-      const response = await ai.models.generateContent({ model: 'gemini-flash-lite-latest', contents: 'ping' });
+      const response = await ai.models.generateContent({ model: 'gemini-2.0-flash', contents: 'ping' });
       if (response.text) {
         setHasPaidKey(true);
       }
@@ -197,7 +206,7 @@ export default function App() {
     (window as any).manualApiKey = null;
     setManualKey('');
     setHasPaidKey(false);
-    setSettings(prev => ({ ...prev, modelId: 'gemini-flash-lite-latest' }));
+    setSettings(prev => ({ ...prev, modelId: 'gemini-2.0-flash' }));
   };
 
   const handleConnectAiStudio = async () => {
@@ -218,10 +227,10 @@ export default function App() {
   const handleAnalyzeAndStats = async () => {
     if (!file) return;
 
-    let effectiveModelId = settings.modelId;
+    // GUARD: Require API Key for all actions
     if (!hasPaidKey) {
-         effectiveModelId = 'gemini-flash-lite-latest';
-         setSettings(prev => ({ ...prev, modelId: effectiveModelId }));
+        handleMissingKey();
+        return;
     }
 
     setIsAnalyzing(true);
@@ -229,7 +238,7 @@ export default function App() {
     setBookStats(null);
     
     try {
-      const effectiveSettings = { ...settings, modelId: effectiveModelId, uiLang, hasPaidKey };
+      const effectiveSettings = { ...settings, modelId: settings.modelId, uiLang, hasPaidKey };
 
       const [strategy, stats] = await Promise.all([
           analyzeEpubOnly(file, effectiveSettings),
@@ -237,7 +246,7 @@ export default function App() {
       ]);
       
       setProgress(prev => ({ ...prev, strategy: strategy }));
-      setAnalyzedModelId(effectiveModelId || 'unknown');
+      setAnalyzedModelId(settings.modelId || 'unknown');
       setBookStats(stats);
       
       if (strategy && strategy.detected_creativity_level) {
@@ -283,10 +292,10 @@ export default function App() {
   const startTranslation = async (isResuming = false) => {
     if (!file) return;
 
-    let effectiveModelId = settings.modelId;
+    // GUARD: Require API Key for all actions
     if (!hasPaidKey) {
-        effectiveModelId = 'gemini-flash-lite-latest';
-        setSettings(prev => ({ ...prev, modelId: effectiveModelId }));
+        handleMissingKey();
+        return;
     }
 
     setIsProcessing(true);
@@ -296,8 +305,8 @@ export default function App() {
     abortControllerRef.current = new AbortController();
     try {
       const effectiveSettings = isResuming && resumeData 
-        ? { ...resumeData.settings, hasPaidKey, modelId: hasPaidKey ? resumeData.settings.modelId : effectiveModelId } 
-        : { ...settings, modelId: effectiveModelId, uiLang, hasPaidKey };
+        ? { ...resumeData.settings, hasPaidKey, modelId: resumeData.settings.modelId } 
+        : { ...settings, modelId: settings.modelId, uiLang, hasPaidKey };
 
       const { epubBlob } = await processEpub(
         file, 
@@ -331,8 +340,8 @@ export default function App() {
       );
       setDownloadUrl(URL.createObjectURL(epubBlob));
 
-      const newHistoryItem: HistoryItem = { id: Date.now().toString(), filename: file.name, sourceLang: settings.sourceLanguage, targetLang: settings.targetLanguage, modelId: effectiveModelId || 'gemini', timestamp: new Date().toLocaleString(), status: 'completed', settingsSnapshot: { ...effectiveSettings } };
-      const updatedHistory = [newHistoryItem, ...history].slice(0, 20);
+      const newHistoryItem: HistoryItem = { id: Date.now().toString(), filename: file.name, sourceLang: settings.sourceLanguage, targetLang: settings.targetLanguage, modelId: effectiveSettings.modelId || 'gemini', timestamp: new Date().toLocaleString(), status: 'completed', settingsSnapshot: { ...effectiveSettings } };
+      const updatedHistory = [newHistoryItem, ...history].slice(20);
       setHistory(updatedHistory);
       localStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(updatedHistory));
       localStorage.removeItem(STORAGE_KEY_RESUME);
@@ -368,6 +377,13 @@ export default function App() {
       {(isLeftDrawerOpen || isRightDrawerOpen) && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[70] transition-opacity" onClick={() => { setIsLeftDrawerOpen(false); setIsRightDrawerOpen(false); }} />
       )}
+
+      {/* Onboarding Tour */}
+      <OnboardingTour 
+        isOpen={isTourOpen} 
+        onClose={() => { setIsTourOpen(false); localStorage.setItem(STORAGE_KEY_TOUR, 'seen'); }}
+        t={t}
+      />
 
       {/* Stats Modal */}
       <StatsModal 
@@ -413,6 +429,7 @@ export default function App() {
       <Navigation 
         onOpenLeftDrawer={() => setIsLeftDrawerOpen(true)}
         onOpenRightDrawer={() => setIsRightDrawerOpen(true)}
+        onOpenTour={() => setIsTourOpen(true)}
         title={t.title}
         description={t.description}
       />
@@ -433,13 +450,13 @@ export default function App() {
                      {isWaiting ? <Timer size={12} className="text-amber-500 animate-pulse md:w-3.5 md:h-3.5"/> : <Activity size={12} className="text-blue-500 md:w-3.5 md:h-3.5" />}
                      <span className={`text-[8px] md:text-[9px] font-black uppercase ${isWaiting ? 'text-amber-500' : 'text-slate-400'}`}>{t.speed}:</span>
                      <span className={`text-[10px] md:text-xs font-black italic whitespace-nowrap ${isWaiting ? 'text-amber-600 dark:text-amber-400' : ''}`}>
-                        {isProcessing || isWaiting ? `${progress.wordsPerSecond?.toFixed(1)} w/s` : '--'}
+                        {isProcessing || isWaiting ? `${progress.wordsPerSecond?.toFixed(1)} ${t.wordsPerSec || 'w/s'}` : '--'}
                      </span>
                   </div>
                   <div className="flex items-center gap-1.5 md:gap-2">
                      <Clock size={12} className={`${isWaiting ? 'text-amber-500' : 'text-amber-500'} md:w-3.5 md:h-3.5`} />
                      <span className={`text-[8px] md:text-[9px] font-black uppercase ${isWaiting ? 'text-amber-500' : 'text-slate-400'}`}>
-                        {isWaiting ? `WAITING (${progress.waitCountdown}s)` : t.eta}:
+                        {isWaiting ? `${t.waiting || 'WAITING'} (${progress.waitCountdown}s)` : t.eta}:
                      </span>
                      <span className={`text-[10px] md:text-xs font-black italic whitespace-nowrap ${isWaiting ? 'text-amber-600 dark:text-amber-400' : ''}`}>
                         {isProcessing || isWaiting ? formatDuration(progress.etaSeconds) : '--'}

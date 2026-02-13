@@ -97,7 +97,7 @@ export const StatsModal: React.FC<StatsModalProps> = ({
                               </h4>
                               <p className="text-xs text-amber-800/80 dark:text-amber-200/60 leading-relaxed text-justify mb-2">{t.statHighLoadDesc}</p>
                               <div className="text-[10px] font-black text-amber-600 dark:text-amber-400 bg-amber-100/50 dark:bg-amber-900/20 px-3 py-2 rounded-lg inline-block border border-amber-200/50 dark:border-amber-800/30">
-                                 💡 TIP: Add your own API Key to speed this up by ~4x!
+                                 {t.tipApiKey || "💡 TIP: Add your own API Key to speed this up by ~4x!"}
                               </div>
                           </div>
                       </div>

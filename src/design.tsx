@@ -79,13 +79,15 @@ export interface UsageStats {
   promptTokens: number;
   candidatesTokens: number;
   totalTokens: number;
+  promptTokensDetails?: any;
+  candidatesTokensDetails?: any;
 }
 
 // --- Constants ---
 
 export const STORAGE_KEY_API = 'lit-trans-api-key';
-export const AVAILABLE_TAGS = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li', 'blockquote', 'div', 'span', 'em', 'strong'];
-export const DEFAULT_TAGS = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li', 'blockquote', 'div'];
+export const AVAILABLE_TAGS = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li', 'blockquote', 'div', 'span', 'em', 'strong', 'td', 'th', 'caption', 'figcaption', 'aside', 'section', 'article'];
+export const DEFAULT_TAGS = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li', 'blockquote', 'div', 'td', 'th', 'figcaption', 'aside'];
 
 export const LANGUAGES_DATA = [
   { code: 'tr', label: 'Türkçe', flag: '🇹🇷' }, { code: 'en', label: 'English', flag: '🇺🇸' },
@@ -105,9 +107,9 @@ export const LANG_CODE_TO_LABEL: Record<string, string> = {
 };
 
 export const AI_MODELS = [
-    { id: 'gemini-flash-lite-latest', name: 'Gemini 2.0 Flash Lite', desc: 'Best for Free Tier', locked: false },
-    { id: 'gemini-3-flash-preview', name: 'Gemini 3 Flash', desc: 'Balanced', locked: true }, // Status depends on key
-    { id: 'gemini-3-pro-preview', name: 'Gemini 3 Pro', desc: 'Expert', locked: true }        // Status depends on key
+    { id: 'gemini-2.0-flash', name: 'Gemini 2.5 Flash', desc: 'API Key Required', locked: true }, // LOCKED
+    { id: 'gemini-3-flash-preview', name: 'Gemini 3 Flash', desc: 'Balanced', locked: true }, 
+    { id: 'gemini-3-pro-preview', name: 'Gemini 3 Pro', desc: 'Expert', locked: true }        
 ];
 
 // --- Global Interface Extension ---

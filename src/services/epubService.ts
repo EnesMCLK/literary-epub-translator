@@ -190,7 +190,8 @@ export async function processEpub(
     triggerProgress({});
   };
 
-  const isFreeTier = !settings.hasPaidKey && (settings.modelId === 'gemini-flash-lite-latest' || settings.modelId === 'gemini-2.0-flash-lite-preview');
+  // UPDATED: Check for the new model ID or any generic flash-lite id
+  const isFreeTier = !settings.hasPaidKey && (settings.modelId === 'gemini-2.0-flash' || settings.modelId?.includes('flash-lite'));
   const minInterval = isFreeTier ? 4000 : 0; 
   
   if (isFreeTier) {

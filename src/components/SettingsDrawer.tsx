@@ -46,8 +46,8 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
 
   // Model ID'ye göre çeviri anahtarını eşleştir
   const getModelDesc = (modelId: string) => {
-    if (modelId === 'gemini-flash-lite-latest') return t.modelDescFree || 'Free';
-    if (modelId === 'gemini-3-flash-preview') return t.modelDescBalanced || 'Balanced';
+    if (modelId === 'gemini-2.0-flash' || modelId === 'gemini-flash-lite-latest') return t.modelDescFree || 'Fast & Smart';
+    if (modelId === 'gemini-3-flash-preview') return t.modelDescBalanced || 'Fast & Balanced';
     if (modelId === 'gemini-3-pro-preview') return t.modelDescExpert || 'Expert';
     return '';
   };
@@ -75,7 +75,7 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
             <div className="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-3xl border border-slate-100 dark:border-slate-700/50 space-y-5">
               <div className="flex items-center justify-between">
                   <span className="text-[10px] font-black text-slate-400 uppercase">{t.themeMode}</span>
-                  <button onClick={onToggleTheme} className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm text-indigo-600 transition-all hover:scale-105 active:scale-95">
+                  <button onClick={onToggleTheme} className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm text-indigo-600 dark:text-indigo-400 transition-all hover:scale-105 active:scale-95">
                     {isDarkMode ? <Sun size={14} /> : <Moon size={14} />}
                     <span className="text-[10px] font-black uppercase">{isDarkMode ? t.themeLight : t.themeDark}</span>
                   </button>

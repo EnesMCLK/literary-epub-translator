@@ -1,16 +1,18 @@
 import React from 'react';
-import { History, Settings, Github } from 'lucide-react';
+import { History, Settings, Github, HelpCircle } from 'lucide-react';
 
 interface NavigationProps {
   onOpenLeftDrawer: () => void;
   onOpenRightDrawer: () => void;
+  onOpenTour: () => void;
   title: string;
   description: string;
 }
 
 export const Navigation: React.FC<NavigationProps> = ({ 
   onOpenLeftDrawer, 
-  onOpenRightDrawer, 
+  onOpenRightDrawer,
+  onOpenTour,
   title, 
   description 
 }) => {
@@ -38,6 +40,13 @@ export const Navigation: React.FC<NavigationProps> = ({
         </div>
       </div>
       <div className="flex-1 flex justify-end items-center gap-2">
+        <button 
+          onClick={onOpenTour}
+          className="hidden sm:flex p-2 md:p-3 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl md:rounded-2xl transition-all text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 active:scale-90 shrink-0"
+          title="Help / Tour"
+        >
+          <HelpCircle size={20} className="md:w-6 md:h-6" />
+        </button>
         <a 
           href="https://github.com/EnesMCLK/literary-epub-translator"
           target="_blank"
