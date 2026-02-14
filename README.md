@@ -15,8 +15,8 @@
 [Tech Stack](#%EF%B8%8F-tech-stack)
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="dark-dashboard.png">
-  <source media="(prefers-color-scheme: light)" srcset="light-dashboard.png">
+  <source media="(prefers-color-scheme: dark)" srcset="img/dark-dashboard.png">
+  <source media="(prefers-color-scheme: light)" srcset="img/light-dashboard.png">
   <img alt="Uygulama Kontrol Paneli (Dashboard) Ekran Görüntüsü" src="light-dashboard.png">
 </picture>
 
