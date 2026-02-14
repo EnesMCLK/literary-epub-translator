@@ -3,10 +3,11 @@ import React, { useState, useRef, useEffect } from 'react';
 import { 
   Upload, Play, AlertCircle, Loader2, Clock, 
   Sparkles, Shield, ChevronDown, RefreshCw, Settings as SettingsIcon,
-  BarChart3, Activity, StepForward, BrainCircuit, Check, X, Timer
+  BarChart3, Activity, StepForward, BrainCircuit, Check, X, Timer, FileUp, Database
 } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
 import { processEpub, analyzeEpubOnly, calculateEpubStats, TranslationProgress } from './services/epubService';
+import { fileStorage } from './services/storageService';
 import { ProgressBar } from './components/ProgressBar';
 import { LogViewer } from './components/LogViewer';
 import { Navigation } from './components/Navigation';
@@ -17,7 +18,7 @@ import { StatsModal } from './components/StatsModal';
 import { OnboardingTour } from './components/OnboardingTour';
 import { 
     UILanguage, TranslationSettings, HistoryItem, 
-    LANGUAGES_DATA, DEFAULT_TAGS, LANG_CODE_TO_LABEL, AI_MODELS, BookStats, STORAGE_KEY_API 
+    LANGUAGES_DATA, DEFAULT_TAGS, LANG_CODE_TO_LABEL, AI_MODELS, BookStats, STORAGE_KEY_API, BookStrategy
 } from './design';
 import { STRINGS_UI } from './lang/ui';
 
@@ -53,13 +54,12 @@ const DEFAULT_MODEL_ID = 'gemini-2.0-flash';
 export default function App() {
   const [uiLang, setUiLang] = useState<UILanguage>('en');
   
-  // Tema Başlatma Mantığı: Önce kayıtlı ayara bak, yoksa sistem tercihini kontrol et
+  // Tema Başlatma Mantığı
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const savedTheme = localStorage.getItem(STORAGE_KEY_THEME);
     if (savedTheme) {
         return savedTheme === 'dark';
     }
-    // Sistem tercihi kontrolü
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
         return true;
     }
@@ -73,10 +73,15 @@ export default function App() {
   const [manualKey, setManualKey] = useState('');
   const [isLeftDrawerOpen, setIsLeftDrawerOpen] = useState(false);
   const [isRightDrawerOpen, setIsRightDrawerOpen] = useState(false);
+  
+  // Resume Data State
   const [resumeData, setResumeData] = useState<any | null>(null);
+  
   const [isLegalExpanded, setIsLegalExpanded] = useState(false);
   const [isCreativityOptimized, setIsCreativityOptimized] = useState(false);
   const [isTourOpen, setIsTourOpen] = useState(false);
+  const [expectedFilename, setExpectedFilename] = useState<string | null>(null);
+  const [isRestoringFile, setIsRestoringFile] = useState(false);
   
   // Analiz ve İstatistik State'leri
   const [analyzedModelId, setAnalyzedModelId] = useState<string | null>(null);
@@ -104,6 +109,8 @@ export default function App() {
     currentFile: 0, totalFiles: 0, currentPercent: 0, status: 'idle',
     logs: [], wordsPerSecond: 0, totalProcessedWords: 0
   });
+  
+  const progressRef = useRef<TranslationProgress | null>(null);
 
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [error, setError] = useState<{title: string, message: string} | null>(null);
@@ -114,7 +121,6 @@ export default function App() {
     setSettings(prev => ({ ...prev, uiLang, targetLanguage: targetLabel }));
   }, [uiLang]);
 
-  // Tema değiştiğinde HTML class'ı güncelle ve tercihi kaydet
   useEffect(() => {
     if (isDarkMode) {
         document.documentElement.classList.add('dark');
@@ -125,7 +131,6 @@ export default function App() {
     }
   }, [isDarkMode]);
 
-  // IP Tabanlı Dil Algılama
   const detectLanguageFromIP = async (): Promise<UILanguage | null> => {
     try {
       const controller = new AbortController();
@@ -168,6 +173,7 @@ export default function App() {
         }
     }
     
+    // Check local storage for quick resume (legacy or last session)
     const savedResume = localStorage.getItem(STORAGE_KEY_RESUME);
     if (savedResume) {
       try { setResumeData(JSON.parse(savedResume)); } catch {}
@@ -189,14 +195,13 @@ export default function App() {
         } catch(e) {}
     }
 
-    // Check tour status
     const tourSeen = localStorage.getItem(STORAGE_KEY_TOUR);
     if (!tourSeen) {
-      setTimeout(() => setIsTourOpen(true), 1000); // Slight delay for smoother UX
+      setTimeout(() => setIsTourOpen(true), 1000);
     }
 
     setSettings(prev => ({ ...prev, modelId: DEFAULT_MODEL_ID }));
-    
+    fileStorage.init().catch(console.error);
     setIsInitializing(false);
   };
 
@@ -227,12 +232,10 @@ export default function App() {
       }
     } catch (e: any) {
       console.warn("API Verification Warning:", e);
-      // Even if ping fails (e.g. model limit), we generally consider non-empty key as potentially valid until explicit error
-      // But for better UX, let's keep hasPaidKey logic strictly for valid responses or simple presence in non-strict envs
       if (e.message?.includes('403') || e.message?.includes('API_KEY_INVALID')) {
            setHasPaidKey(false);
       } else {
-           setHasPaidKey(true); // Network error etc might still mean key is valid
+           setHasPaidKey(true); 
       }
     } finally { setIsVerifying(false); }
   };
@@ -260,10 +263,15 @@ export default function App() {
      setIsRightDrawerOpen(true);
   };
 
+  const handleClearHistory = async () => {
+      setHistory([]);
+      localStorage.removeItem(STORAGE_KEY_HISTORY);
+      await fileStorage.clearAll();
+  };
+
   const handleAnalyzeAndStats = async () => {
     if (!file) return;
 
-    // GUARD: Require API Key for all actions
     if (!hasPaidKey) {
         handleMissingKey();
         return;
@@ -325,6 +333,23 @@ export default function App() {
     }
   };
 
+  const addToHistory = (item: HistoryItem) => {
+    try {
+      const rawHistory = localStorage.getItem(STORAGE_KEY_HISTORY);
+      let currentHistory: HistoryItem[] = [];
+      if (rawHistory) {
+         currentHistory = JSON.parse(rawHistory);
+      }
+      // Remove item with same ID if exists (to update it)
+      const filtered = currentHistory.filter(h => h.id !== item.id);
+      const updatedHistory = [item, ...filtered].slice(0, 20); 
+      localStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(updatedHistory));
+      setHistory(updatedHistory);
+    } catch (e) {
+      console.error("Failed to save history", e);
+    }
+  };
+
   const startTranslation = async (isResuming = false) => {
     if (!file) return;
 
@@ -336,10 +361,21 @@ export default function App() {
     setIsProcessing(true);
     setDownloadUrl(null);
     setIsStatsModalOpen(false);
+    setExpectedFilename(null); 
+    
+    // Reuse session ID if resuming to update the same history item, otherwise generate new
+    const sessionId = (isResuming && resumeData && resumeData.sessionId) ? resumeData.sessionId : Date.now().toString();
+
+    // 1. Save SOURCE file to IndexedDB if not already there
+    try {
+        await fileStorage.saveFile(sessionId, file);
+    } catch (e) {
+        console.warn("Failed to save file to local memory:", e);
+    }
     
     abortControllerRef.current = new AbortController();
+    progressRef.current = null; 
     
-    // Create a snapshot of settings for history
     const effectiveSettings = isResuming && resumeData 
       ? { ...resumeData.settings, hasPaidKey, modelId: resumeData.settings.modelId } 
       : { ...settings, modelId: settings.modelId, uiLang, hasPaidKey };
@@ -349,6 +385,7 @@ export default function App() {
         file, 
         effectiveSettings, 
         (p) => {
+          progressRef.current = p; 
           setProgress(prev => {
             if (p.strategy && !prev.strategy) {
                const recommendedTemp = p.strategy.detected_creativity_level;
@@ -358,8 +395,11 @@ export default function App() {
             }
             return { ...p, logs: p.logs.length > 0 ? p.logs : prev.logs };
           });
+          
+          // Update Resume Data in LocalStorage (Fast access)
           if (p.lastZipPathIndex !== undefined && p.lastNodeIndex !== undefined && p.translatedNodes) {
              const res = { 
+                 sessionId, // Important for linking
                  filename: file.name, 
                  zipPathIndex: p.lastZipPathIndex, 
                  nodeIndex: p.lastNodeIndex, 
@@ -375,53 +415,81 @@ export default function App() {
         progress.strategy,
         bookStats || undefined 
       );
-      setDownloadUrl(URL.createObjectURL(epubBlob));
+      
+      const resultUrl = URL.createObjectURL(epubBlob);
+      setDownloadUrl(resultUrl);
 
-      // SUCCESS HISTORY ITEM
-      const newHistoryItem: HistoryItem = { 
-          id: Date.now().toString(), 
+      // Save RESULT file to IndexedDB for instant download later
+      try {
+        await fileStorage.saveFile(sessionId + '_result', epubBlob);
+        // Clean up resume data since we are done
+        await fileStorage.deleteFile(sessionId + '_resume');
+      } catch (e) {
+        console.warn("Failed to save result file to memory:", e);
+      }
+
+      // Save success history
+      const successItem: HistoryItem = { 
+          id: sessionId, 
           filename: file.name, 
           sourceLang: settings.sourceLanguage, 
           targetLang: settings.targetLanguage, 
           modelId: effectiveSettings.modelId || 'gemini', 
           timestamp: new Date().toLocaleString(), 
           status: 'completed', 
-          settingsSnapshot: { ...effectiveSettings } 
+          settingsSnapshot: { ...effectiveSettings },
+          strategySnapshot: progressRef.current?.strategy,
+          statsSnapshot: bookStats || undefined,
+          wordCount: progressRef.current?.totalProcessedWords || 0,
+          hasSavedFile: true,
+          hasResultFile: true 
       };
-
-      // CRITICAL FIX: Use functional update to ensure state is fresh even after long async operations
-      setHistory(prevHistory => {
-          const updatedHistory = [newHistoryItem, ...prevHistory].slice(20);
-          localStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(updatedHistory));
-          return updatedHistory;
-      });
+      addToHistory(successItem);
 
       localStorage.removeItem(STORAGE_KEY_RESUME);
       setResumeData(null);
 
     } catch (err: any) {
-      if (err.name !== 'AbortError') {
-        
-        // FAILED HISTORY ITEM
-        const failedItem: HistoryItem = { 
-            id: Date.now().toString(), 
-            filename: file.name, 
-            sourceLang: settings.sourceLanguage, 
-            targetLang: settings.targetLanguage, 
-            modelId: effectiveSettings.modelId || 'gemini', 
-            timestamp: new Date().toLocaleString(), 
-            status: 'failed', 
-            settingsSnapshot: { ...effectiveSettings },
-            errorMessage: err.message || "Unknown error"
-        };
-        
-        // Save failed attempt to history so user knows what happened
-        setHistory(prevHistory => {
-            const updatedHistory = [failedItem, ...prevHistory].slice(20);
-            localStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(updatedHistory));
-            return updatedHistory;
-        });
+      const isAborted = err.name === 'AbortError' || err.message === 'Stopped.';
+      const status = isAborted ? 'partial' : 'failed';
+      const errorMsg = isAborted ? 'Stopped by user' : (err.message || "Unknown error");
+      
+      // CRITICAL: Save Resume Data to IndexedDB for long-term storage
+      if (progressRef.current && progressRef.current.translatedNodes) {
+         const fullResumeState = {
+             sessionId,
+             filename: file.name,
+             zipPathIndex: progressRef.current.lastZipPathIndex,
+             nodeIndex: progressRef.current.lastNodeIndex,
+             translatedNodes: progressRef.current.translatedNodes,
+             settings: effectiveSettings,
+             totalProcessedSentences: progressRef.current.totalProcessedSentences
+         };
+         try {
+             // Save JSON as a Blob to reuse the file storage service
+             const resumeBlob = new Blob([JSON.stringify(fullResumeState)], { type: 'application/json' });
+             await fileStorage.saveFile(sessionId + '_resume', resumeBlob);
+         } catch(e) { console.error("Failed to save resume data", e); }
+      }
 
+      const historyItem: HistoryItem = { 
+          id: sessionId, 
+          filename: file.name, 
+          sourceLang: settings.sourceLanguage, 
+          targetLang: settings.targetLanguage, 
+          modelId: effectiveSettings.modelId || 'gemini', 
+          timestamp: new Date().toLocaleString(), 
+          status: status, 
+          settingsSnapshot: { ...effectiveSettings },
+          strategySnapshot: progressRef.current?.strategy, 
+          statsSnapshot: bookStats || undefined,
+          errorMessage: errorMsg,
+          wordCount: progressRef.current?.totalProcessedWords || 0,
+          hasSavedFile: true
+      };
+      addToHistory(historyItem);
+
+      if (!isAborted) {
         if (err.message === "MISSING_KEY_REDIRECT") {
             handleMissingKey();
         } else if (err.message?.includes('429') || err.message?.includes('quota')) {
@@ -440,6 +508,104 @@ export default function App() {
       setIsStatsModalOpen(true);
     }
   };
+
+  const onRestoreHistoryItem = async (item: HistoryItem) => {
+    // 1. Restore UI State
+    setSettings(item.settingsSnapshot);
+    setIsLeftDrawerOpen(false);
+
+    if (item.strategySnapshot) {
+        setProgress(prev => ({ ...prev, strategy: item.strategySnapshot }));
+        setAnalyzedModelId(item.modelId);
+    }
+    if (item.statsSnapshot) {
+        setBookStats(item.statsSnapshot);
+    }
+
+    // 2. Try to load file from Storage
+    setIsRestoringFile(true);
+    setDownloadUrl(null);
+    setFile(null);
+    setResumeData(null); // Reset resume data initially
+
+    try {
+        const blob = await fileStorage.getFile(item.id);
+        if (blob) {
+            // Restore Source File
+            const fileObj = new File([blob], item.filename, { type: blob.type });
+            setFile(fileObj);
+            setExpectedFilename(null);
+            
+            // 3. CHECK FOR SAVED RESUME DATA IN INDEXEDDB
+            if (item.status === 'partial' || item.status === 'failed') {
+               try {
+                   const resumeBlob = await fileStorage.getFile(item.id + '_resume');
+                   if (resumeBlob) {
+                       const text = await resumeBlob.text();
+                       const parsedResume = JSON.parse(text);
+                       setResumeData(parsedResume);
+                       
+                       // Calculate percentage for UI
+                       if (item.statsSnapshot && parsedResume.totalProcessedSentences) {
+                           const percent = Math.min(99, Math.round((parsedResume.totalProcessedSentences / item.statsSnapshot.totalSentences) * 100));
+                           setProgress(prev => ({
+                               ...prev,
+                               currentPercent: percent,
+                               status: 'resuming', // Visual state
+                               logs: [{ timestamp: new Date().toLocaleTimeString(), text: `Progress restored at ${percent}%. Ready to resume.`, type: 'info' }]
+                           }));
+                       }
+                   }
+               } catch(e) { console.warn("Could not load resume data", e); }
+            }
+            
+            // If completed and result file exists
+            if (item.status === 'completed' && item.hasResultFile) {
+                try {
+                    const resultBlob = await fileStorage.getFile(item.id + '_result');
+                    if (resultBlob) {
+                        const resultUrl = URL.createObjectURL(resultBlob);
+                        setDownloadUrl(resultUrl);
+                        setProgress(prev => ({ 
+                           ...prev, 
+                           status: 'completed', 
+                           currentPercent: 100,
+                           logs: [{ timestamp: new Date().toLocaleTimeString(), text: 'Translation restored from memory.', type: 'success' }] 
+                        }));
+                    }
+                } catch (resErr) { console.warn("Could not restore result file:", resErr); }
+            }
+            
+        } else {
+            setExpectedFilename(item.filename);
+            setDownloadUrl(null);
+        }
+    } catch (e) {
+        console.error("Storage restore error", e);
+        setExpectedFilename(item.filename);
+    } finally {
+        setIsRestoringFile(false);
+    }
+  };
+
+  const handleFileSelect = (f: File) => {
+    setFile(f);
+    setDownloadUrl(null);
+    
+    if (expectedFilename && f.name === expectedFilename) {
+        // Matched!
+    } else {
+        setIsCreativityOptimized(false); 
+        setAnalyzedModelId(null); 
+        setProgress(p => ({...p, strategy: undefined})); 
+        setBookStats(null);
+        setExpectedFilename(null);
+        setResumeData(null);
+    }
+  };
+
+  // Check if we should show Resume Button
+  const canResume = resumeData && file && resumeData.filename === file.name && !isProcessing && !downloadUrl;
 
   const isWaiting = progress.status === 'waiting';
 
@@ -462,7 +628,7 @@ export default function App() {
       <StatsModal 
         isOpen={isStatsModalOpen}
         onClose={() => setIsStatsModalOpen(false)}
-        onConfirm={() => startTranslation(false)}
+        onConfirm={() => startTranslation(canResume ? true : false)}
         stats={bookStats}
         strategy={progress.strategy}
         uiLang={uiLang}
@@ -475,23 +641,8 @@ export default function App() {
         isOpen={isLeftDrawerOpen}
         onClose={() => setIsLeftDrawerOpen(false)}
         history={history}
-        onClearHistory={() => {setHistory([]); localStorage.removeItem(STORAGE_KEY_HISTORY)}}
-        onRestoreSettings={(item) => { 
-          setSettings(item.settingsSnapshot); 
-          setIsLeftDrawerOpen(false); 
-          
-          const savedResume = localStorage.getItem(STORAGE_KEY_RESUME);
-          if (savedResume) {
-            try {
-              const parsed = JSON.parse(savedResume);
-              if (parsed.filename === item.filename) {
-                setResumeData(parsed);
-              }
-            } catch (e) {
-              console.error("Resume data parse error", e);
-            }
-          }
-        }}
+        onClearHistory={handleClearHistory}
+        onRestoreSettings={onRestoreHistoryItem}
         t={t}
       />
 
@@ -560,12 +711,33 @@ export default function App() {
                 <div className="space-y-4">
                   <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] pl-2">{t.uploadLabel}</label>
                   <div className="relative group cursor-pointer">
-                    <input type="file" accept=".epub" onChange={(e) => { const f = e.target.files?.[0]; if(f) { setFile(f); setDownloadUrl(null); setIsCreativityOptimized(false); setAnalyzedModelId(null); setProgress(p => ({...p, strategy: undefined})); setBookStats(null); } }} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
-                    <div className={`py-12 md:py-16 border-3 border-dashed rounded-[2rem] md:rounded-[2.5rem] flex flex-col items-center justify-center gap-4 transition-all duration-500 shadow-inner ${file ? 'bg-indigo-50/20 dark:bg-indigo-500/10 border-indigo-500 scale-[1.01]' : 'bg-slate-50/50 dark:bg-slate-950/60 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'}`}>
-                      <Upload size={32} className={`transition-colors duration-300 ${file ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-300 dark:text-slate-600 group-hover:text-indigo-500'}`} />
-                      <span className={`text-sm md:text-base font-black px-6 text-center leading-tight transition-colors duration-300 ${file ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-600'}`}>
-                        {file ? file.name : t.uploadPlaceholder}
-                      </span>
+                    <input type="file" accept=".epub" onChange={(e) => { const f = e.target.files?.[0]; if(f) handleFileSelect(f); }} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                    <div className={`py-12 md:py-16 border-3 border-dashed rounded-[2rem] md:rounded-[2.5rem] flex flex-col items-center justify-center gap-4 transition-all duration-500 shadow-inner ${file ? 'bg-indigo-50/20 dark:bg-indigo-500/10 border-indigo-500 scale-[1.01]' : (expectedFilename ? 'bg-amber-50/30 dark:bg-amber-900/10 border-amber-300 dark:border-amber-600/50 animate-pulse' : 'bg-slate-50/50 dark:bg-slate-950/60 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700')}`}>
+                      {isRestoringFile ? (
+                        <div className="flex flex-col items-center gap-3">
+                           <Loader2 size={32} className="animate-spin text-indigo-500"/>
+                           <span className="text-sm font-black text-slate-500">Restoring from memory...</span>
+                        </div>
+                      ) : expectedFilename && !file ? (
+                          <>
+                             <FileUp size={32} className="text-amber-500" />
+                             <div className="flex flex-col items-center">
+                                <span className="text-sm md:text-base font-black px-6 text-center leading-tight text-amber-700 dark:text-amber-400">
+                                   {t.restoreSettings || "Settings Restored"}
+                                </span>
+                                <span className="text-xs text-amber-600/70 dark:text-amber-500/70 mt-1">
+                                    File not in memory. Please re-select: {expectedFilename}
+                                </span>
+                             </div>
+                          </>
+                      ) : (
+                          <>
+                            <Upload size={32} className={`transition-colors duration-300 ${file ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-300 dark:text-slate-600 group-hover:text-indigo-500'}`} />
+                            <span className={`text-sm md:text-base font-black px-6 text-center leading-tight transition-colors duration-300 ${file ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-600'}`}>
+                                {file ? file.name : t.uploadPlaceholder}
+                            </span>
+                          </>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -578,23 +750,25 @@ export default function App() {
                 <div className="flex flex-col items-center gap-6">
                   {!isProcessing && !downloadUrl && (
                     <div className="w-full flex flex-col gap-4">
-                        <button 
-                          onClick={handleMainAction} 
-                          disabled={!file || isAnalyzing} 
-                          className={`w-full py-5 md:py-7 text-white rounded-2xl md:rounded-[2rem] font-black text-lg md:text-xl shadow-2xl shadow-indigo-500/30 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-40 flex items-center justify-center gap-3 ${progress.strategy ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-slate-800 hover:bg-slate-900 dark:bg-indigo-600 dark:hover:bg-indigo-700'}`}
-                        >
-                          {isAnalyzing ? (
-                            <Loader2 className="animate-spin" size={24} /> 
-                          ) : progress.strategy ? (
-                            <Play size={24} fill="currentColor"/>
-                          ) : (
-                            <Sparkles size={24} /> 
-                          )}
-                          {isAnalyzing ? t.analyzingBtn : (progress.strategy ? t.startBtn : t.analyzeBtn)}
-                        </button>
-
-                        {resumeData && resumeData.filename === file?.name && !progress.strategy && (
-                          <button onClick={() => startTranslation(true)} className="w-full py-4 md:py-5 bg-slate-800 hover:bg-slate-900 text-white rounded-2xl md:rounded-[1.5rem] font-black text-xs md:text-sm shadow-xl transition-all flex items-center justify-center gap-3"><StepForward size={18}/> {t.resumeBtn}</button>
+                        {canResume ? (
+                           <button onClick={() => startTranslation(true)} className="w-full py-5 md:py-7 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl md:rounded-[2rem] font-black text-lg md:text-xl shadow-2xl shadow-indigo-500/30 active:scale-95 transition-all flex items-center justify-center gap-3">
+                              <StepForward size={24}/> {t.resumeBtn} ({progress.currentPercent}%)
+                           </button>
+                        ) : (
+                           <button 
+                             onClick={handleMainAction} 
+                             disabled={!file || isAnalyzing} 
+                             className={`w-full py-5 md:py-7 text-white rounded-2xl md:rounded-[2rem] font-black text-lg md:text-xl shadow-2xl shadow-indigo-500/30 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-40 flex items-center justify-center gap-3 ${progress.strategy ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-slate-800 hover:bg-slate-900 dark:bg-indigo-600 dark:hover:bg-indigo-700'}`}
+                           >
+                             {isAnalyzing ? (
+                               <Loader2 className="animate-spin" size={24} /> 
+                             ) : progress.strategy ? (
+                               <Play size={24} fill="currentColor"/>
+                             ) : (
+                               <Sparkles size={24} /> 
+                             )}
+                             {isAnalyzing ? t.analyzingBtn : (progress.strategy ? t.startBtn : t.analyzeBtn)}
+                           </button>
                         )}
                     </div>
                   )}
@@ -616,6 +790,7 @@ export default function App() {
                     <Sparkles size={18}/>
                     <h3 className="text-[10px] md:text-[12px] font-black uppercase tracking-[0.2em]">{t.aiAnalysis}</h3>
                   </div>
+                  {/* Show actions if file is present AND we have strategy (either analyzed or restored) */}
                   {file && progress.strategy && !isProcessing && (
                      <div className="flex gap-2">
                         <button onClick={handleAnalyzeAndStats} disabled={isAnalyzing} className="p-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors" title={t.reAnalyze}>
