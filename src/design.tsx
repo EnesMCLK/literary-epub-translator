@@ -1,3 +1,4 @@
+
 import { 
   Upload, Download, Play, Pause, AlertCircle, CheckCircle2, 
   Settings, Sliders, Tags, Loader2, Clock, CircleDot, 
@@ -42,6 +43,7 @@ export interface HistoryItem {
   wordCount?: number;
   status: 'completed' | 'partial' | 'failed';
   settingsSnapshot: TranslationSettings;
+  errorMessage?: string;
 }
 
 export interface BookStats {
@@ -107,7 +109,7 @@ export const LANG_CODE_TO_LABEL: Record<string, string> = {
 };
 
 export const AI_MODELS = [
-    { id: 'gemini-2.0-flash', name: 'Gemini 2.5 Flash', desc: 'API Key Required', locked: true }, // LOCKED
+    { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash', desc: 'Fast', locked: true },
     { id: 'gemini-3-flash-preview', name: 'Gemini 3 Flash', desc: 'Balanced', locked: true }, 
     { id: 'gemini-3-pro-preview', name: 'Gemini 3 Pro', desc: 'Expert', locked: true }        
 ];
@@ -116,5 +118,6 @@ export const AI_MODELS = [
 declare global {
   interface Window {
     manualApiKey: string;
+    // aistudio property is already declared in global environment with type AIStudio
   }
 }
