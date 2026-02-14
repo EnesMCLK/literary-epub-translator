@@ -23,6 +23,7 @@ import { STRINGS_UI } from './lang/ui';
 const STORAGE_KEY_HISTORY = 'lit-trans-history';
 const STORAGE_KEY_RESUME = 'lit-trans-resume-v2';
 const STORAGE_KEY_TOUR = 'lit-trans-tour-seen';
+const STORAGE_KEY_THEME = 'lit-trans-theme';
 
 function formatDuration(seconds?: number): string {
   if (seconds === undefined || seconds < 0) return '--';
@@ -48,7 +49,20 @@ const COUNTRY_TO_LANG: Record<string, UILanguage> = {
 
 export default function App() {
   const [uiLang, setUiLang] = useState<UILanguage>('en');
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  
+  // Tema Başlatma Mantığı: Önce kayıtlı ayara bak, yoksa sistem tercihini kontrol et
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const savedTheme = localStorage.getItem(STORAGE_KEY_THEME);
+    if (savedTheme) {
+        return savedTheme === 'dark';
+    }
+    // Sistem tercihi kontrolü
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        return true;
+    }
+    return false;
+  });
+
   const [isLangModalOpen, setIsLangModalOpen] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
   const [hasPaidKey, setHasPaidKey] = useState(false);
@@ -97,9 +111,15 @@ export default function App() {
     setSettings(prev => ({ ...prev, uiLang, targetLanguage: targetLabel }));
   }, [uiLang]);
 
+  // Tema değiştiğinde HTML class'ı güncelle ve tercihi kaydet
   useEffect(() => {
-    if (isDarkMode) document.documentElement.classList.add('dark');
-    else document.documentElement.classList.remove('dark');
+    if (isDarkMode) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem(STORAGE_KEY_THEME, 'dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem(STORAGE_KEY_THEME, 'light');
+    }
   }, [isDarkMode]);
 
   // IP Tabanlı Dil Algılama
