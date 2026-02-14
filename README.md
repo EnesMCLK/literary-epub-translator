@@ -15,6 +15,7 @@
 [Tech Stack](#%EF%B8%8F-tech-stack)
 
 <div align="center">
+  <a href="https://enesmclk.github.io/literary-epub-translator/" target="_blank">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="./img/dark-dashboard.png">
     <source media="(prefers-color-scheme: light)" srcset="./img/light-dashboard.png">
