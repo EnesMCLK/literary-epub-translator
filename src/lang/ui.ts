@@ -116,7 +116,6 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     legalWarningText: "Ce logiciel est un utilitaire expérimental. En l'utilisant, vous acceptez :",
     legalPoints: ["PI : L'utilisateur est responsable de l'impression, de la reproduction et du partage. Tous les droits appartiennent à l'éditeur.", "Usage personnel : Éducation ou loisir uniquement.", "Responsabilité : Les développeurs ne sont pas responsables.", "Accord : L'utilisation vaut acceptation."],
     autoDetect: "Détection auto", localMemory: "MÉMOIRE LOCALE", booksCached: "{0} livres en cache",
-    tourSteps: [{ title: "Bienvenue au Traducteur EPUB Littéraire", desc: "Un moteur alimenté par l'IA qui traduit vos livres EPUB tout en préservant la voix de l'auteur." }],
     creativity: "CRÉATIVITÉ", htmlTags: "BALISES HTML", processing: "Traitement", idle: "Prêt", restoreSettings: "Restaurer",
     selectLang: "CHOISIR LA LANGUE", error: "ERREUR", apiStatus: "ÉTAT API", connectAiStudio: "CONNECTER AI STUDIO",
     billingInfo: "Clé API obligatoire pour tous les modèles.", lockedModel: "Connexion Requise", manualKeyLabel: "CLÉ MANUELLE",
@@ -128,7 +127,13 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     feedbackPlaceholder: "Ex: C'est une satire...", regenerateBtn: "RÉGÉNÉRER", statRequests: "BLOCS",
     statHighLoadTitle: "AVERTISSEMENT DURÉE", statHighLoadDesc: "Le temps dépend de votre quota API.", statReady: "PRÊT À TRADUIRE",
     statFreeInfo: "Veuillez entrer une clé API.", statPaidInfo: "Clé API active.", getApiKeyLink: "Obtenir clé API", removeKey: "SUPPRIMER CLÉ",
-    analysisQuotaExceededTitle: "Quota d'analyse dépassé", analysisQuotaExceededDesc: "Utilisation de la stratégie par défaut.", getApiKeyBtn: "OBTENIR CLÉ API GRATUITE"
+    analysisQuotaExceededTitle: "Quota d'analyse dépassé", analysisQuotaExceededDesc: "Utilisation de la stratégie par défaut.", getApiKeyBtn: "OBTENIR CLÉ API GRATUITE",
+    tourSteps: [
+      { title: "Bienvenue sur le Traducteur Littéraire EPUB", desc: "Un moteur alimenté par l'IA qui traduit vos livres EPUB tout en préservant la voix de l'auteur, le genre et le style littéraire." },
+      { title: "Clé API Requise", desc: "Vous pouvez créer une clé gratuite via Google AI Studio en quelques secondes. Aucune carte de crédit requise." },
+      { title: "Analyse Intelligente", desc: "Avant de traduire, l'IA lit votre livre pour détecter les métadonnées comme 'Satire' ou 'Noir', adaptant sa stratégie spécifiquement à votre contenu." },
+      { title: "100% Confidentialité", desc: "Tout s'exécute dans votre navigateur. Votre livre n'est jamais téléchargé sur un serveur ; il communique directement avec l'API de Google." }
+    ]
   },
   de: {
     modelDescFree: "Schnell & Intelligent", modelDescBalanced: "Schnell & Ausgewogen", modelDescExpert: "Experte",
@@ -151,7 +156,6 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     legalWarningText: "Diese Software ist ein experimentelles Hilfsmittel. Durch die Nutzung stimmen Sie zu:",
     legalPoints: ["IP: Der Benutzer haftet für Druck, Vervielfältigung und Weitergabe. Alle Rechte liegen beim Verlag.", "Privat: Nur für Bildung/Hobby.", "Haftung: Entwickler haften nicht für Schäden.", "Zustimmung: Nutzung bedeutet volle Zustimmung."],
     autoDetect: "Automatisch", localMemory: "LOKALER SPEICHER", booksCached: "{0} Bücher im Cache",
-    tourSteps: [{ title: "Willkommen beim Literarischen EPUB-Übersetzer", desc: "Eine KI-gestützte Engine, die Ihre EPUB-Bücher unter Wahrung der Autorenstimme übersetzt." }],
     creativity: "KREATIVITÄT", htmlTags: "HTML-TAGS", processing: "Verarbeite", idle: "Bereit", restoreSettings: "Wiederherstellen",
     selectLang: "SPRACHE WÄHLEN", error: "FEHLER", apiStatus: "API-STATUS", connectAiStudio: "AI STUDIO VERBINDEN",
     billingInfo: "API-Schlüssel für alle Modelle erforderlich.", lockedModel: "Verbindung erforderlich", manualKeyLabel: "MANUELLER SCHLÜSSEL",
@@ -163,7 +167,13 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     feedbackPlaceholder: "Z.B. Dies ist eine Satire...", regenerateBtn: "REGENERIEREN", statRequests: "TEILE",
     statHighLoadTitle: "WARNUNG LANGE DAUER", statHighLoadDesc: "Die Zeit hängt von Ihren API-Quoten ab.", statReady: "BEREIT ZUM ÜBERSETZEN",
     statFreeInfo: "Bitte API-Schlüssel eingeben.", statPaidInfo: "API-Schlüssel aktiv.", getApiKeyLink: "API-Schlüssel holen", removeKey: "SCHLÜSSEL ENTFERNEN",
-    analysisQuotaExceededTitle: "Analysequote überschritten", analysisQuotaExceededDesc: "Standardstrategie wird verwendet.", getApiKeyBtn: "GRATIS API-SCHLÜSSEL"
+    analysisQuotaExceededTitle: "Analysequote überschritten", analysisQuotaExceededDesc: "Standardstrategie wird verwendet.", getApiKeyBtn: "GRATIS API-SCHLÜSSEL",
+    tourSteps: [
+      { title: "Willkommen beim Literarischen EPUB-Übersetzer", desc: "Eine KI-gestützte Engine, die Ihre EPUB-Bücher unter Wahrung der Autorenstimme, des Genres und des literarischen Stils übersetzt." },
+      { title: "API-Schlüssel Erforderlich", desc: "Sie können in Sekunden einen kostenlosen Schlüssel über Google AI Studio erstellen. Keine Kreditkarte erforderlich." },
+      { title: "Intelligente Analyse", desc: "Vor der Übersetzung liest die KI Ihr Buch, um Metadaten wie 'Satire' oder 'Noir' zu erkennen und ihre Strategie speziell an Ihren Inhalt anzupassen. " },
+      { title: "100% Datenschutz", desc: "Alles läuft in Ihrem Browser. Ihr Buch wird niemals auf einen Server hochgeladen; es kommuniziert direkt mit der Google-API." }
+    ]
   },
   es: {
     modelDescFree: "Rápido e Inteligente", modelDescBalanced: "Rápido y Equilibrado", modelDescExpert: "Experto",
@@ -186,7 +196,6 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     legalWarningText: "Este software es una utilidad experimental. Al usarlo, aceptas:",
     legalPoints: ["PI: El usuario es responsable de la impresión, reproducción y distribución. Todos los derechos pertenecen a la editorial.", "Uso Personal: Solo educativo/hobby.", "Responsabilidad: Desarrolladores no responsables.", "Acuerdo: El uso implica aceptación."],
     autoDetect: "Automático", localMemory: "MEMORIA LOCAL", booksCached: "{0} libros en caché",
-    tourSteps: [{ title: "Bienvenido al Traductor Literario EPUB", desc: "Un motor impulsado por IA que traduce sus libros EPUB preservando la voz del autor." }],
     creativity: "CREATIVIDAD", htmlTags: "ETIQUETAS HTML", processing: "Procesando", idle: "Listo", restoreSettings: "Restaurar",
     selectLang: "SELECCIONAR IDIOMA", error: "ERROR", apiStatus: "ESTADO API", connectAiStudio: "CONECTAR AI STUDIO",
     billingInfo: "La clave API es obligatoria para todos los modelos.", lockedModel: "Conexión Requerida", manualKeyLabel: "CLAVE MANUAL",
@@ -198,7 +207,13 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     feedbackPlaceholder: "Ej. Es una sátira...", regenerateBtn: "REGENERAR", statRequests: "FRAGMENTOS",
     statHighLoadTitle: "ADVERTENCIA DE DURACIÓN", statHighLoadDesc: "El tiempo depende de los límites de su clave API.", statReady: "LISTO PARA TRADUCIR",
     statFreeInfo: "Por favor ingrese una clave API.", statPaidInfo: "Clave API activa.", getApiKeyLink: "Obtener clave API", removeKey: "ELIMINAR CLAVE",
-    analysisQuotaExceededTitle: "Cuota de análisis excedida", analysisQuotaExceededDesc: "Usando estrategia predeterminada.", getApiKeyBtn: "CLAVE API GRATIS"
+    analysisQuotaExceededTitle: "Cuota de análisis excedida", analysisQuotaExceededDesc: "Usando estrategia predeterminada.", getApiKeyBtn: "CLAVE API GRATIS",
+    tourSteps: [
+      { title: "Bienvenido al Traductor Literario EPUB", desc: "Un motor impulsado por IA que traduce sus libros EPUB preservando la voz del autor, el género y el estilo literario." },
+      { title: "Clave API Requerida", desc: "Puede crear una clave gratuita a través de Google AI Studio en segundos. No se requiere tarjeta de crédito." },
+      { title: "Análisis Inteligente", desc: "Antes de traducir, la IA lee su libro para detectar metadatos como 'Sátira' o 'Noir', adaptando su estrategia específicamente para su contenido." },
+      { title: "100% Privacidad", desc: "Todo se ejecuta en su navegador. Su libro nunca se sube a un servidor; se comunica directamente con la API de Google." }
+    ]
   },
   it: {
     modelDescFree: "Veloce & Intelligente", modelDescBalanced: "Veloce & Equilibrato", modelDescExpert: "Esperto",
@@ -221,7 +236,6 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     legalWarningText: "Questo software è un'utilità sperimentale. Usandolo accetti:",
     legalPoints: ["PI: L'utente è responsabile della stampa, riproduzione e condivisione. Tutti i diritti appartengono all'editore.", "Uso Personale: Solo hobby/educazione.", "Responsabilità: Sviluppatori non responsabili.", "Accordo: L'uso implica consenso."],
     autoDetect: "Automatico", localMemory: "MEMORIA LOCALE", booksCached: "{0} libri nella cache",
-    tourSteps: [{ title: "Benvenuto nel Traduttore Letterario EPUB", desc: "Un motore basato sull'IA che traduce i tuoi libri EPUB preservando la voce dell'autore." }],
     creativity: "CREATIVITÀ", htmlTags: "TAG HTML", processing: "Elaborazione", idle: "Pronto", restoreSettings: "Ripristina",
     selectLang: "SELEZIONA LINGUA", error: "ERRORE", apiStatus: "STATO API", connectAiStudio: "CONNETTI AI STUDIO",
     billingInfo: "Chiave API obbligatoria per tutti i modelli.", lockedModel: "Connessione Richiesta", manualKeyLabel: "CHIAVE MANUALE",
@@ -233,7 +247,13 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     feedbackPlaceholder: "Es. Questa è una satira...", regenerateBtn: "RIGENERA", statRequests: "BLOCCHI",
     statHighLoadTitle: "AVVISO LUNGA DURATA", statHighLoadDesc: "Il tempo dipende dai limiti della tua chiave API.", statReady: "PRONTO A TRADURRE",
     statFreeInfo: "Inserisci una chiave API.", statPaidInfo: "Chiave API attiva.", getApiKeyLink: "Ottieni chiave API", removeKey: "RIMUOVI CHIAVE",
-    analysisQuotaExceededTitle: "Quota analisi superata", analysisQuotaExceededDesc: "Uso strategia predefinita.", getApiKeyBtn: "CHIAVE API GRATIS"
+    analysisQuotaExceededTitle: "Quota analisi superata", analysisQuotaExceededDesc: "Uso strategia predefinita.", getApiKeyBtn: "CHIAVE API GRATIS",
+    tourSteps: [
+      { title: "Benvenuto nel Traduttore Letterario EPUB", desc: "Un motore basato sull'IA che traduce i tuoi libri EPUB preservando la voce dell'autore, il genere e lo stile letterario." },
+      { title: "Chiave API Richiesta", desc: "Puoi creare una chiave gratuita tramite Google AI Studio in pochi secondi. Nessuna carta di credito richiesta." },
+      { title: "Analisi Intelligente", desc: "Prima di tradurre, l'IA legge il tuo libro per rilevare metadati come 'Satira' o 'Noir', adattando la sua strategia specificamente per il tuo contenuto." },
+      { title: "100% Privacy", desc: "Tutto viene eseguito nel tuo browser. Il tuo libro non viene mai caricato su un server; comunica direttamente con l'API di Google." }
+    ]
   },
   ru: {
     modelDescFree: "Быстрый и Умный", modelDescBalanced: "Быстрый и Сбалансированный", modelDescExpert: "Эксперт",
@@ -256,7 +276,6 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     legalWarningText: "Это ПО является экспериментальным. Используя его, вы соглашаетесь:",
     legalPoints: ["ИС: Пользователь отвечает за печать, копирование и распространение. Все права принадлежат издателю.", "Личное: Только для обучения.", "Ответственность: Разработчики не отвечают.", "Согласие: Использование означает согласие."],
     autoDetect: "Автоматически", localMemory: "ЛОКАЛЬНАЯ ПАМЯТЬ", booksCached: "{0} книг в кэше",
-    tourSteps: [{ title: "Добро пожаловать в Литературный EPUB Переводчик", desc: "ИИ-движок, который переводит ваши книги, сохраняя стиль автора." }],
     creativity: "ТВОРЧЕСТВО", htmlTags: "HTML ТЕГИ", processing: "Обработка", idle: "Готов", restoreSettings: "Восстановить",
     selectLang: "ВЫБРАТЬ ЯЗЫК", error: "ОШИБКА", apiStatus: "СТАТУС API", connectAiStudio: "ПОДКЛЮЧИТЬ AI STUDIO",
     billingInfo: "API ключ обязателен для всех моделей.", lockedModel: "Требуется подключение", manualKeyLabel: "ВРУЧНУЮ",
@@ -268,7 +287,13 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     feedbackPlaceholder: "Напр. Это сатира...", regenerateBtn: "РЕГЕНЕРИРОВАТЬ", statRequests: "БЛОКИ",
     statHighLoadTitle: "ПРЕДУПРЕЖДЕНИЕ О ДЛИТЕЛЬНОСТИ", statHighLoadDesc: "Время зависит от лимитов вашего API ключа.", statReady: "ГОТОВ К ПЕРЕВОДУ",
     statFreeInfo: "Пожалуйста, введите API ключ.", statPaidInfo: "API ключ активен.", getApiKeyLink: "Получить API ключ", removeKey: "УДАЛИТЬ КЛЮЧ",
-    analysisQuotaExceededTitle: "Квота анализа превышена", analysisQuotaExceededDesc: "Используется стандартная стратегия.", getApiKeyBtn: "БЕСПЛАТНЫЙ API КЛЮЧ"
+    analysisQuotaExceededTitle: "Квота анализа превышена", analysisQuotaExceededDesc: "Используется стандартная стратегия.", getApiKeyBtn: "БЕСПЛАТНЫЙ API КЛЮЧ",
+    tourSteps: [
+      { title: "Добро пожаловать в Литературный EPUB Переводчик", desc: "ИИ-движок, который переводит ваши EPUB книги, сохраняя голос автора, жанр и литературный стиль." },
+      { title: "Требуется API Ключ", desc: "Вы можете создать бесплатный ключ через Google AI Studio за считанные секунды. Кредитная карта не требуется." },
+      { title: "Умный Анализ", desc: "Перед переводом ИИ читает вашу книгу, чтобы определить метаданные, такие как «Сатира» или «Нуар», адаптируя стратегию специально для вашего контента." },
+      { title: "100% Конфиденциальность", desc: "Все работает в вашем браузере. Ваша книга никогда не загружается на сервер; она общается напрямую с Google API." }
+    ]
   },
   zh: {
     modelDescFree: "快速且智能", modelDescBalanced: "快速且平衡", modelDescExpert: "专家",
@@ -291,7 +316,6 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     legalWarningText: "本软件（“工具”）是一个实验性实用程序。使用即表示您同意：",
     legalPoints: ["知识产权：用户对印刷、复制和分享负责。所有权利归出版社所有。", "个人使用：仅限业余爱好或教育。", "责任：开发者不对数据丢失负责。", "约束力：使用即构成完全同意。"],
     autoDetect: "自动检测", localMemory: "本地存储", booksCached: "缓存 {0} 本书",
-    tourSteps: [{ title: "欢迎使用文学 EPUB 翻译器", desc: "一个由人工智能驱动的引擎，在保留作者风格的同时翻译您的 EPUB 书籍。" }],
     creativity: "创造力", htmlTags: "HTML 标签", processing: "处理中", idle: "就绪", restoreSettings: "恢复",
     selectLang: "选择语言", error: "错误", apiStatus: "API 状态", connectAiStudio: "连接 AI STUDIO",
     billingInfo: "所有模型都需要 API 密钥。", lockedModel: "需要连接", manualKeyLabel: "手动密钥",
@@ -303,7 +327,13 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     feedbackPlaceholder: "例如：这是一部讽刺作品...", regenerateBtn: "重新生成", statRequests: "块",
     statHighLoadTitle: "长时间警告", statHighLoadDesc: "翻译时间取决于您的 API 密钥配额限制。", statReady: "准备翻译",
     statFreeInfo: "请输入 API 密钥。", statPaidInfo: "API 密钥有效。", getApiKeyLink: "获取 API 密钥", removeKey: "删除密钥",
-    analysisQuotaExceededTitle: "分析配额超限", analysisQuotaExceededDesc: "使用默认策略。", getApiKeyBtn: "获取免费 API 密钥"
+    analysisQuotaExceededTitle: "分析配额超限", analysisQuotaExceededDesc: "使用默认策略。", getApiKeyBtn: "获取免费 API 密钥",
+    tourSteps: [
+      { title: "欢迎使用文学 EPUB 翻译器", desc: "一个由人工智能驱动的引擎，在保留作者风格、流派和文学格调的同时翻译您的 EPUB 书籍。" },
+      { title: "需要 API 密钥", desc: "您可以在几秒钟内通过 Google AI Studio 创建免费密钥。无需信用卡。" },
+      { title: "智能分析", desc: "在翻译之前，人工智能会阅读您的书以检测元数据（如“讽刺”或“黑色小说”），并专门针对您的内容调整策略。" },
+      { title: "100% 隐私", desc: "一切都在您的浏览器中运行。您的书从未上传到服务器；它直接与 Google API 通信。" }
+    ]
   },
   ja: {
     modelDescFree: "高速＆スマート", modelDescBalanced: "高速＆バランス", modelDescExpert: "エキスパート",
@@ -326,7 +356,6 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     legalWarningText: "このソフトウェア（「ツール」）は実験的なユーティリティです。使用することにより、以下に同意したことになります：",
     legalPoints: ["知的財産：印刷、複製、共有はユーザーの責任です。全権利は出版社に帰属します。", "個人使用：趣味または教育のみ。", "責任：開発者は損害に対して責任を負いません。", "拘束力：使用は完全な同意を構成します。"],
     autoDetect: "自動検出", localMemory: "ローカルメモリ", booksCached: "{0} 冊キャッシュ済",
-    tourSteps: [{ title: "文学 EPUB 翻訳へようこそ", desc: "著者の声を保持しながら EPUB 書籍を翻訳する AI 駆動のエンジンです。" }],
     creativity: "創造性", htmlTags: "HTMLタグ", processing: "処理中", idle: "準備完了", restoreSettings: "復元",
     selectLang: "言語を選択", error: "エラー", apiStatus: "APIステータス", connectAiStudio: "AI STUDIOに接続",
     billingInfo: "すべてのモデルでAPIキーが必須です。", lockedModel: "接続が必要", manualKeyLabel: "手動キー",
@@ -338,7 +367,13 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     feedbackPlaceholder: "例：これは風刺です...", regenerateBtn: "再生成", statRequests: "チャンク",
     statHighLoadTitle: "長時間警告", statHighLoadDesc: "翻訳時間はAPIキーのクォータ制限に依存します。", statReady: "翻訳準備完了",
     statFreeInfo: "APIキーを入力してください。", statPaidInfo: "APIキー有効。", getApiKeyLink: "APIキーを取得", removeKey: "キーを削除",
-    analysisQuotaExceededTitle: "分析クォータ超過", analysisQuotaExceededDesc: "デフォルト戦略を使用します。", getApiKeyBtn: "無料APIキーを取得"
+    analysisQuotaExceededTitle: "分析クォータ超過", analysisQuotaExceededDesc: "デフォルト戦略を使用します。", getApiKeyBtn: "無料APIキーを取得",
+    tourSteps: [
+      { title: "文学 EPUB 翻訳へようこそ", desc: "著者の声、ジャンル、文学スタイルを保持しながら EPUB 書籍を翻訳する AI 駆動のエンジンです。" },
+      { title: "APIキーが必要", desc: "Google AI Studio 経由で数秒で無料キーを作成できます。クレジットカードは不要です。" },
+      { title: "スマート分析", desc: "翻訳前に AI が本を読み、「風刺」や「ノワール」などのメタデータを検出し、コンテンツに合わせて戦略を適応させます。" },
+      { title: "100% プライバシー", desc: "すべてブラウザ内で実行されます。書籍がサーバーにアップロードされることはなく、Google API と直接通信します。" }
+    ]
   },
   ko: {
     modelDescFree: "빠르고 스마트함", modelDescBalanced: "빠르고 균형 잡힘", modelDescExpert: "전문가",
@@ -361,7 +396,6 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     legalWarningText: "이 소프트웨어('도구')는 실험적인 유틸리티입니다. 사용 시 다음 사항에 동의하게 됩니다:",
     legalPoints: ["지적 재산권: 인쇄, 복제, 공유 책임은 사용자에게 있습니다. 모든 권리는 출판사에 있습니다.", "개인 사용: 취미 또는 교육용으로만 사용 가능.", "책임: 개발자는 데이터 손실에 대해 책임지지 않습니다.", "동의: 사용은 완전한 동의를 구성합니다."],
     autoDetect: "자동 감지", localMemory: "로컬 메모리", booksCached: "{0}권 캐시됨",
-    tourSteps: [{ title: "문학 EPUB 번역기에 오신 것을 환영합니다", desc: "작가의 문체를 보존하며 EPUB 책을 번역하는 AI 기반 엔진입니다." }],
     creativity: "창의성", htmlTags: "HTML 태그", processing: "처리 중", idle: "준비됨", restoreSettings: "복원",
     selectLang: "언어 선택", error: "오류", apiStatus: "API 상태", connectAiStudio: "AI STUDIO 연결",
     billingInfo: "모든 모델에 API 키가 필수입니다.", lockedModel: "연결 필요", manualKeyLabel: "수동 키",
@@ -373,7 +407,13 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     feedbackPlaceholder: "예: 이것은 풍자입니다...", regenerateBtn: "재생성", statRequests: "청크",
     statHighLoadTitle: "장시간 경고", statHighLoadDesc: "번역 시간은 API 키 할당량 제한에 따라 다릅니다.", statReady: "번역 준비 완료",
     statFreeInfo: "API 키를 입력하세요.", statPaidInfo: "API 키 활성.", getApiKeyLink: "API 키 받기", removeKey: "키 제거",
-    analysisQuotaExceededTitle: "분석 할당량 초과", analysisQuotaExceededDesc: "기본 전략 사용.", getApiKeyBtn: "무료 API 키 받기"
+    analysisQuotaExceededTitle: "분석 할당량 초과", analysisQuotaExceededDesc: "기본 전략 사용.", getApiKeyBtn: "무료 API 키 받기",
+    tourSteps: [
+      { title: "문학 EPUB 번역기에 오신 것을 환영합니다", desc: "작가의 문체, 장르 및 문학적 스타일을 보존하면서 EPUB 책을 번역하는 AI 기반 엔진입니다." },
+      { title: "API 키 필요", desc: "Google AI Studio를 통해 몇 초 만에 무료 키를 만들 수 있습니다. 신용 카드는 필요하지 않습니다." },
+      { title: "스마트 분석", desc: "번역하기 전에 AI가 책을 읽어 '풍자'나 '누아르'와 같은 메타데이터를 감지하고 콘텐츠에 맞게 전략을 조정합니다." },
+      { title: "100% 개인정보 보호", desc: "모든 것은 브라우저에서 실행됩니다. 책은 서버에 업로드되지 않으며 Google API와 직접 통신합니다." }
+    ]
   },
   pt: {
     modelDescFree: "Rápido e Inteligente", modelDescBalanced: "Rápido e Equilibrado", modelDescExpert: "Especialista",
@@ -396,7 +436,6 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     legalWarningText: "Este software é um utilitário experimental. Ao usá-lo, você concorda:",
     legalPoints: ["PI: O usuário é responsável pela impressão, reprodução e compartilhamento. Todos os direitos pertencem à editora.", "Uso Pessoal: Apenas hobby/educação.", "Responsabilidade: Desenvolvedores não são responsáveis.", "Acordo: O uso constitui consentimento."],
     autoDetect: "Automático", localMemory: "MEMÓRIA LOCAL", booksCached: "{0} livros em cache",
-    tourSteps: [{ title: "Bem-vindo ao Tradutor Literário de EPUB", desc: "Um motor alimentado por IA que traduz seus livros EPUB preservando a voz do autor." }],
     creativity: "CRIATIVIDADE", htmlTags: "TAGS HTML", processing: "Processando", idle: "Pronto", restoreSettings: "Restaurar",
     selectLang: "SELECIONAR IDIOMA", error: "ERRO", apiStatus: "STATUS DA API", connectAiStudio: "CONECTAR AI STUDIO",
     billingInfo: "Chave API é obrigatória para todos os modelos.", lockedModel: "Conexão Necessária", manualKeyLabel: "CHAVE MANUAL",
@@ -408,7 +447,13 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     feedbackPlaceholder: "Ex: Isso é uma sátira...", regenerateBtn: "REGENERAR", statRequests: "BLOCOS",
     statHighLoadTitle: "AVISO DE LONGA DURAÇÃO", statHighLoadDesc: "O tempo depende da sua cota API.", statReady: "PRONTO PARA TRADUZIR",
     statFreeInfo: "Por favor, insira uma chave API.", statPaidInfo: "Chave API ativa.", getApiKeyLink: "Obter Chave API", removeKey: "REMOVER CHAVE",
-    analysisQuotaExceededTitle: "Cota de análise excedida", analysisQuotaExceededDesc: "Usando estratégia padrão.", getApiKeyBtn: "OBTER CHAVE GRÁTIS"
+    analysisQuotaExceededTitle: "Cota de análise excedida", analysisQuotaExceededDesc: "Usando estratégia padrão.", getApiKeyBtn: "OBTER CHAVE GRÁTIS",
+    tourSteps: [
+      { title: "Bem-vindo ao Tradutor Literário de EPUB", desc: "Um motor alimentado por IA que traduz seus livros EPUB preservando a voz do autor, gênero e estilo literário." },
+      { title: "Chave API Necessária", desc: "Você pode criar uma chave gratuita via Google AI Studio em segundos. Não é necessário cartão de crédito." },
+      { title: "Análise Inteligente", desc: "Antes de traduzir, a IA lê seu livro para detectar metadados como 'Sátira' ou 'Noir', adaptando sua estratégia especificamente para seu conteúdo." },
+      { title: "100% Privacidade", desc: "Tudo roda no seu navegador. Seu livro nunca é enviado para um servidor; ele se comunica diretamente com a API do Google." }
+    ]
   },
   ar: {
     modelDescFree: "سريع وذكي", modelDescBalanced: "سريع ومتوازن", modelDescExpert: "خبير",
@@ -431,7 +476,6 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     legalWarningText: "هذا البرنامج هو أداة تجريبية. باستخدامها فإنك توافق على:",
     legalPoints: ["الملكية الفكرية: المستخدم مسؤول عن الطباعة والاستنساخ والمشاركة. جميع الحقوق للناشر.", "الاستخدام الشخصي: للهواية أو التعليم فقط.", "المسؤولية: المطورون غير مسؤولين.", "الموافقة: الاستخدام يعني الموافقة الكاملة."],
     autoDetect: "كشف تلقائي", localMemory: "الذاكرة المحلية", booksCached: "{0} كتب مخزنة",
-    tourSteps: [{ title: "مرحبًا بكم في مترجم EPUB الأدبي", desc: "محرك مدعوم بالذكاء الاصطناعي يترجم كتب EPUB الخاصة بك مع الحفاظ على صوت المؤلف." }],
     creativity: "الإبداع", htmlTags: "وسوم HTML", processing: "جاري المعالجة", idle: "جاهز", restoreSettings: "استعادة",
     selectLang: "اختر اللغة", error: "خطأ", apiStatus: "حالة API", connectAiStudio: "اتصال AI STUDIO",
     billingInfo: "مفتاح API إلزامي لجميع النماذج.", lockedModel: "الاتصال مطلوب", manualKeyLabel: "مفتاح يدوي",
@@ -443,7 +487,13 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     feedbackPlaceholder: "مثال: هذه هجاء...", regenerateBtn: "إعادة إنشاء", statRequests: "أجزاء",
     statHighLoadTitle: "تحذير مدة طويلة", statHighLoadDesc: "وقت الترجمة يعتمد على حدود مفتاح API.", statReady: "جاهز للترجمة",
     statFreeInfo: "يرجى إدخال مفتاح API.", statPaidInfo: "مفتاح API نشط.", getApiKeyLink: "احصل على مفتاح API", removeKey: "إزالة المفتاح",
-    analysisQuotaExceededTitle: "تجاوز حصة التحليل", analysisQuotaExceededDesc: "استخدام الاستراتيجية الافتراضية.", getApiKeyBtn: "احصل على مفتاح مجاني"
+    analysisQuotaExceededTitle: "تجاوز حصة التحليل", analysisQuotaExceededDesc: "استخدام الاستراتيجية الافتراضية.", getApiKeyBtn: "احصل على مفتاح مجاني",
+    tourSteps: [
+      { title: "مرحبًا بكم في مترجم EPUB الأدبي", desc: "محرك مدعوم بالذكاء الاصطناعي يترجم كتب EPUB الخاصة بك مع الحفاظ على صوت المؤلف والنوع والأسلوب الأدبي." },
+      { title: "مفتاح API مطلوب", desc: "يمكنك إنشاء مفتاح مجاني عبر Google AI Studio في ثوانٍ. لا حاجة لبطاقة ائتمان." },
+      { title: "تحليل ذكي", desc: "قبل الترجمة، يقرأ الذكاء الاصطناعي كتابك لاكتشاف البيانات الوصفية مثل \"هجاء\" أو \"نوار\"، ويكيف استراتيجيته خصيصًا للمحتوى الخاص بك." },
+      { title: "خصوصية 100%", desc: "كل شيء يعمل في متصفحك. لا يتم تحميل كتابك أبدًا على خادم؛ يتواصل مباشرة مع Google API." }
+    ]
   },
   nl: {
     modelDescFree: "Snel & Slim", modelDescBalanced: "Snel & Evenwichtig", modelDescExpert: "Expert",
@@ -460,7 +510,6 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     legalWarningText: "Deze software is experimenteel. Door gebruik ga je akkoord met:",
     legalPoints: ["IE: Gebruiker verantwoordelijk voor druk, reproductie en delen. Alle rechten bij de uitgever.", "Prive: Alleen hobby/educatie.", "Aansprakelijkheid: Devs niet aansprakelijk.", "Akkoord: Gebruik is instemming."],
     autoDetect: "Automatisch", localMemory: "LOKALE GEHEUGEN", booksCached: "{0} boeken in cache",
-    tourSteps: [{ title: "Welkom bij de Literaire EPUB Vertaler", desc: "Een AI-aangedreven machine die uw EPUB-boeken vertaalt met behoud van de stem van de auteur." }],
     creativity: "CREATIVITEIT", htmlTags: "HTML TAGS", processing: "Verwerken", idle: "Gereed", restoreSettings: "Herstellen",
     selectLang: "SELECTEER TAAL", error: "FOUT", apiStatus: "API STATUS", connectAiStudio: "VERBIND AI STUDIO",
     billingInfo: "API-sleutel is verplicht voor alle modellen.", lockedModel: "Verbinding Vereist", manualKeyLabel: "HANDMATIGE SLEUTEL",
@@ -472,7 +521,13 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     feedbackPlaceholder: "Bijv. Dit is satire...", regenerateBtn: "OPNIEUW", statRequests: "BLOKKEN",
     statHighLoadTitle: "WAARSCHUWING LANGE DUUR", statHighLoadDesc: "Vertaaltijd hangt af van uw quota.", statReady: "KLAAR OM TE VERTALEN",
     statFreeInfo: "Voer een API-sleutel in.", statPaidInfo: "API-sleutel actief.", getApiKeyLink: "Krijg API-sleutel", removeKey: "VERWIJDER SLEUTEL",
-    analysisQuotaExceededTitle: "Analysequota overschreden", analysisQuotaExceededDesc: "Standaardstrategie wordt gebruikt.", getApiKeyBtn: "GRATIS API SLEUTEL"
+    analysisQuotaExceededTitle: "Analysequota overschreden", analysisQuotaExceededDesc: "Standaardstrategie wordt gebruikt.", getApiKeyBtn: "GRATIS API SLEUTEL",
+    tourSteps: [
+      { title: "Welkom bij de Literaire EPUB Vertaler", desc: "Een AI-aangedreven machine die uw EPUB-boeken vertaalt met behoud van de stem van de auteur, genre en literaire stijl." },
+      { title: "API-sleutel Vereist", desc: "U kunt binnen enkele seconden een gratis sleutel maken via Google AI Studio. Geen creditcard vereist." },
+      { title: "Slimme Analyse", desc: "Voor het vertalen leest de AI uw boek om metadata zoals 'Satire' of 'Noir' te detecteren en de strategie specifiek aan te passen aan uw inhoud." },
+      { title: "100% Privacy", desc: "Alles draait in uw browser. Uw boek wordt nooit geüpload naar een server; het communiceert rechtstreeks met de Google API." }
+    ]
   },
   pl: {
     modelDescFree: "Szybki i Inteligentny", modelDescBalanced: "Szybki i Zrównoważony", modelDescExpert: "Ekspert",
@@ -489,7 +544,6 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     legalWarningText: "To oprogramowanie jest eksperymentalne. Używając go zgadzasz się na:",
     legalPoints: ["IP: Użytkownik odpowiada za druk, powielanie i udostępnianie. Wszelkie prawa należą do wydawcy.", "Prywatne: Tylko edukacja/hobby.", "Odpowiedzialność: Devs nie odpowiadają.", "Zgoda: Użycie oznacza zgodę."],
     autoDetect: "Wykryj", localMemory: "PAMIĘĆ LOKALNA", booksCached: "{0} książek w pamięci",
-    tourSteps: [{ title: "Witamy w Literackim Tłumaczu EPUB", desc: "Silnik oparty na AI, który tłumaczy książki EPUB zachowując styl autora." }],
     creativity: "KREATYWNOŚĆ", htmlTags: "TAGI HTML", processing: "Przetwarzanie", idle: "Gotowy", restoreSettings: "Przywróć",
     selectLang: "WYBIERZ JĘZYK", error: "BŁĄD", apiStatus: "STAN API", connectAiStudio: "POŁĄCZ AI STUDIO",
     billingInfo: "Klucz API jest wymagany dla wszystkich modeli.", lockedModel: "Wymagane Połączenie", manualKeyLabel: "RĘCZNY KLUCZ",
@@ -501,7 +555,13 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     feedbackPlaceholder: "Np. To satyra...", regenerateBtn: "REGENERUJ", statRequests: "CZĘŚCI",
     statHighLoadTitle: "OSTRZEŻENIE O DŁUGIM CZASIE", statHighLoadDesc: "Czas zależy od limitów twojego klucza API.", statReady: "GOTOWY DO TŁUMACZENIA",
     statFreeInfo: "Proszę wprowadzić klucz API.", statPaidInfo: "Klucz API aktywny.", getApiKeyLink: "Pobierz klucz API", removeKey: "USUŃ KLUCZ",
-    analysisQuotaExceededTitle: "Przekroczono limit analizy", analysisQuotaExceededDesc: "Używanie domyślnej strategii.", getApiKeyBtn: "DARMOWY KLUCZ API"
+    analysisQuotaExceededTitle: "Przekroczono limit analizy", analysisQuotaExceededDesc: "Używanie domyślnej strategii.", getApiKeyBtn: "DARMOWY KLUCZ API",
+    tourSteps: [
+      { title: "Witamy w Literackim Tłumaczu EPUB", desc: "Silnik oparty na AI, który tłumaczy książki EPUB zachowując głos autora, gatunek i styl literacki." },
+      { title: "Wymagany Klucz API", desc: "Możesz utworzyć darmowy klucz przez Google AI Studio w kilka sekund. Karta kredytowa nie jest wymagana." },
+      { title: "Inteligentna Analiza", desc: "Przed tłumaczeniem AI czyta twoją książkę, aby wykryć metadane, takie jak „Satyra” lub „Noir”, dostosowując strategię do twoich treści." },
+      { title: "100% Prywatności", desc: "Wszystko działa w przeglądarce. Twoja książka nigdy nie jest przesyłana na serwer; komunikuje się bezpośrednio z Google API." }
+    ]
   },
   hi: {
     modelDescFree: "तेज और स्मार्ट", modelDescBalanced: "तेज और संतुलित", modelDescExpert: "विशेषज्ञ",
@@ -509,6 +569,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     title: "साहित्यिक EPUB अनुवादक", description: "पेशेवर साहित्यिक अनुवाद इंजन",
     historyTitle: "अनुवाद इतिहास", clearHistory: "सभी साफ़ करें", noHistory: "कोई रिकॉर्ड नहीं",
     modelLabel: "मॉडल चयन", uploadLabel: "EPUB अपलोड करें", uploadPlaceholder: "फ़ाइल खींचें या चुनें",
+    sourceLang: "स्रोत भाषा", targetLang: "लक्ष्य भाषा", systemMonitor: "सिस्टम मॉनिटर",
     startBtn: "अनुवाद शुरू करें", analyzeBtn: "विश्लेषण करें", downloadBtn: "EPUB डाउनलोड करें",
     settingsTitle: "सेटिंग्स", themeMode: "थीम मोड", paidMode: "प्रो मोड", freeMode: "कुंजी आवश्यक",
     tipApiKey: "सुझाव: ~4x गति बढ़ाने के लिए अपनी API कुंजी जोड़ें!",
@@ -518,7 +579,6 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     legalWarningText: "यह सॉफ्टवेयर प्रायोगिक है। इसका उपयोग करके आप सहमत हैं:",
     legalPoints: ["बौद्धिक संपदा: मुद्रण, पुनरुत्पादन और साझा करने के लिए उपयोगकर्ता जिम्मेदार है। सभी अधिकार प्रकाशक के हैं।", "निजी: केवल शिक्षा/शौक।", "दायित्व: डेवलपर्स जिम्मेदार नहीं।", "सहमति: उपयोग पूर्ण सहमति है।"],
     autoDetect: "स्वत: पता", localMemory: "स्थानीय मेमोरी", booksCached: "{0} किताबें कैश्ड",
-    tourSteps: [{ title: "साहित्यिक EPUB अनुवादक में आपका स्वागत है", desc: "एक AI-संचालित इंजन जो लेखक की आवाज को संरक्षित करते हुए आपकी EPUB पुस्तकों का अनुवाद करता है।" }],
     creativity: "रचनात्मकता", htmlTags: "HTML टैग", processing: "प्रसंस्करण", idle: "तैयार", restoreSettings: "पुनर्स्थापित करें",
     selectLang: "भाषा चुनें", error: "त्रुटि", apiStatus: "API स्थिति", connectAiStudio: "AI STUDIO कनेक्ट करें",
     billingInfo: "सभी मॉडलों के लिए API कुंजी अनिवार्य है।", lockedModel: "कनेक्शन आवश्यक", manualKeyLabel: "मैनुअल कुंजी",
@@ -530,7 +590,13 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     feedbackPlaceholder: "उदा. यह एक व्यंग्य है...", regenerateBtn: "पुन: उत्पन्न करें", statRequests: "भाग",
     statHighLoadTitle: "लंबी अवधि की चेतावनी", statHighLoadDesc: "अनुवाद का समय आपकी API कुंजी कोटा पर निर्भर करता है।", statReady: "अनुवाद के लिए तैयार",
     statFreeInfo: "कृपया API कुंजी दर्ज करें।", statPaidInfo: "API कुंजी सक्रिय।", getApiKeyLink: "API कुंजी प्राप्त करें", removeKey: "कुंजी हटाएं",
-    analysisQuotaExceededTitle: "विश्लेषण कोटा पार हो गया", analysisQuotaExceededDesc: "डिफ़ॉल्ट रणनीति का उपयोग कर रहा है।", getApiKeyBtn: "मुफ्त API कुंजी"
+    analysisQuotaExceededTitle: "विश्लेषण कोटा पार हो गया", analysisQuotaExceededDesc: "डिफ़ॉल्ट रणनीति का उपयोग कर रहा है।", getApiKeyBtn: "मुफ्त API कुंजी",
+    tourSteps: [
+      { title: "साहित्यिक EPUB अनुवादक में आपका स्वागत है", desc: "एक AI-संचालित इंजन जो लेखक की आवाज, शैली और साहित्यिक अंदाज को संरक्षित करते हुए आपकी EPUB पुस्तकों का अनुवाद करता है।" },
+      { title: "API कुंजी आवश्यक", desc: "आप Google AI Studio के माध्यम से सेकंडों में एक निःशुल्क कुंजी बना सकते हैं। क्रेडिट कार्ड की आवश्यकता नहीं है।" },
+      { title: "स्मार्ट विश्लेषण", desc: "अनुवाद करने से पहले, AI आपकी सामग्री के लिए अपनी रणनीति को अनुकूलित करने के लिए 'व्यंग्य' या 'नॉयर' जैसे मेटाडेटा का पता लगाने के लिए आपकी पुस्तक पढ़ता है।" },
+      { title: "100% गोपनीयता", desc: "सब कुछ आपके ब्राउज़र में चलता है। आपकी पुस्तक कभी भी सर्वर पर अपलोड नहीं की जाती है; यह सीधे Google API के साथ संचार करता है।" }
+    ]
   },
   vi: {
     modelDescFree: "Nhanh & Thông minh", modelDescBalanced: "Nhanh & Cân bằng", modelDescExpert: "Chuyên gia",
@@ -538,6 +604,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     title: "Dịch giả EPUB Văn học", description: "Công cụ dịch thuật văn học chuyên nghiệp",
     historyTitle: "LỊCH SỬ", clearHistory: "Xóa tất cả", noHistory: "Không có bản ghi",
     modelLabel: "CHỌN MÔ HÌNH", uploadLabel: "TẢI LÊN EPUB", uploadPlaceholder: "Kéo hoặc chọn tệp",
+    sourceLang: "NGÔN NGỮ NGUỒN", targetLang: "NGÔN NGỮ ĐÍCH", systemMonitor: "Màn hình hệ thống",
     startBtn: "Bắt đầu dịch", analyzeBtn: "Phân tích", downloadBtn: "TẢI XUỐNG EPUB",
     settingsTitle: "CÀI ĐẶT", themeMode: "CHẾ ĐỘ GIAO DIỆN", paidMode: "CHẾ ĐỘ PRO", freeMode: "CẦN KHÓA",
     tipApiKey: "MẸO: Thêm khóa API để tăng tốc ~4x!",
@@ -547,7 +614,6 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     legalWarningText: "Phần mềm này là thử nghiệm. Bằng cách sử dụng, bạn đồng ý:",
     legalPoints: ["SHTT: Người dùng chịu trách nhiệm in ấn, sao chép và chia sẻ. Mọi quyền thuộc về nhà xuất bản.", "Cá nhân: Chỉ giáo dục/sở thích.", "Trách nhiệm: Dev không chịu trách nhiệm.", "Đồng ý: Sử dụng là đồng ý."],
     autoDetect: "Tự động", localMemory: "BỘ NHỚ CỤC BỘ", booksCached: "{0} sách đã lưu",
-    tourSteps: [{ title: "Chào mừng đến với Trình dịch EPUB Văn học", desc: "Một công cụ hỗ trợ AI dịch sách EPUB của bạn trong khi vẫn giữ nguyên giọng văn của tác giả." }],
     creativity: "SÁNG TẠO", htmlTags: "THẺ HTML", processing: "Đang xử lý", idle: "Sẵn sàng", restoreSettings: "Khôi phục",
     selectLang: "CHỌN NGÔN NGỮ", error: "LỖI", apiStatus: "TRẠNG THÁI API", connectAiStudio: "KẾT NỐI AI STUDIO",
     billingInfo: "Khóa API là bắt buộc cho tất cả các mô hình.", lockedModel: "Yêu cầu kết nối", manualKeyLabel: "KHÓA THỦ CÔNG",
@@ -559,7 +625,13 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     feedbackPlaceholder: "Vd: Đây là châm biếm...", regenerateBtn: "TẠO LẠI", statRequests: "PHẦN",
     statHighLoadTitle: "CẢNH BÁO THỜI GIAN DÀI", statHighLoadDesc: "Thời gian dịch phụ thuộc vào giới hạn hạn ngạch khóa API.", statReady: "SẴN SÀNG DỊCH",
     statFreeInfo: "Vui lòng nhập khóa API.", statPaidInfo: "Khóa API đang hoạt động.", getApiKeyLink: "Nhận khóa API", removeKey: "XÓA KHÓA",
-    analysisQuotaExceededTitle: "Vượt quá hạn ngạch phân tích", analysisQuotaExceededDesc: "Sử dụng chiến lược mặc định.", getApiKeyBtn: "KHÓA API MIỄN PHÍ"
+    analysisQuotaExceededTitle: "Vượt quá hạn ngạch phân tích", analysisQuotaExceededDesc: "Sử dụng chiến lược mặc định.", getApiKeyBtn: "KHÓA API MIỄN PHÍ",
+    tourSteps: [
+      { title: "Chào mừng đến với Trình dịch EPUB Văn học", desc: "Một công cụ hỗ trợ AI dịch sách EPUB của bạn trong khi vẫn giữ nguyên giọng văn, thể loại và phong cách văn học của tác giả." },
+      { title: "Yêu cầu khóa API", desc: "Bạn có thể tạo khóa miễn phí qua Google AI Studio trong vài giây. Không cần thẻ tín dụng." },
+      { title: "Phân tích thông minh", desc: "Trước khi dịch, AI sẽ đọc sách của bạn để phát hiện siêu dữ liệu như 'Châm biếm' hoặc 'Noir', điều chỉnh chiến lược cụ thể cho nội dung của bạn." },
+      { title: "Riêng tư 100%", desc: "Mọi thứ chạy trong trình duyệt của bạn. Sách của bạn không bao giờ được tải lên máy chủ; nó giao tiếp trực tiếp với Google API." }
+    ]
   }
 };
 
@@ -574,14 +646,6 @@ SUPPORTED_LANGS.forEach(lang => {
     // Varsa kısmi çevirileri üzerine yaz
     if (PARTIAL_TRANSLATIONS[lang]) {
        STRINGS_UI[lang] = { ...STRINGS_UI[lang], ...PARTIAL_TRANSLATIONS[lang] };
-       
-       // Tur başlığını güncelle (Eğer kısmi çeviride varsa)
-       if (PARTIAL_TRANSLATIONS[lang].tourSteps) {
-          STRINGS_UI[lang].tourSteps = [
-             ...PARTIAL_TRANSLATIONS[lang].tourSteps,
-             ...STRINGS_UI['en'].tourSteps.slice(1) // İlk adım dışındakileri İngilizce'den al
-          ];
-       }
     }
   }
 });
