@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   Upload, Play, AlertCircle, Loader2, Clock, 
@@ -47,6 +48,8 @@ const COUNTRY_TO_LANG: Record<string, UILanguage> = {
   'IN': 'hi', 'VN': 'vi'
 };
 
+const DEFAULT_MODEL_ID = 'gemini-2.0-flash';
+
 export default function App() {
   const [uiLang, setUiLang] = useState<UILanguage>('en');
   
@@ -93,7 +96,7 @@ export default function App() {
     targetTags: DEFAULT_TAGS,
     sourceLanguage: 'Automatic',
     targetLanguage: LANG_CODE_TO_LABEL['en'],
-    modelId: 'gemini-2.0-flash',
+    modelId: DEFAULT_MODEL_ID,
     uiLang: 'en'
   });
 
@@ -156,7 +159,14 @@ export default function App() {
     setUiLang(langToUse);
 
     const savedHistory = localStorage.getItem(STORAGE_KEY_HISTORY);
-    if (savedHistory) setHistory(JSON.parse(savedHistory));
+    if (savedHistory) {
+        try {
+            setHistory(JSON.parse(savedHistory));
+        } catch (e) {
+            console.error("Failed to parse history", e);
+            localStorage.removeItem(STORAGE_KEY_HISTORY);
+        }
+    }
     
     const savedResume = localStorage.getItem(STORAGE_KEY_RESUME);
     if (savedResume) {
@@ -185,7 +195,7 @@ export default function App() {
       setTimeout(() => setIsTourOpen(true), 1000); // Slight delay for smoother UX
     }
 
-    setSettings(prev => ({ ...prev, modelId: 'gemini-2.0-flash' }));
+    setSettings(prev => ({ ...prev, modelId: DEFAULT_MODEL_ID }));
     
     setIsInitializing(false);
   };
@@ -211,13 +221,19 @@ export default function App() {
 
     try {
       const ai = new GoogleGenAI({ apiKey: finalKey });
-      const response = await ai.models.generateContent({ model: 'gemini-2.0-flash', contents: 'ping' });
+      const response = await ai.models.generateContent({ model: DEFAULT_MODEL_ID, contents: 'ping' });
       if (response.text) {
         setHasPaidKey(true);
       }
     } catch (e: any) {
       console.warn("API Verification Warning:", e);
-      setHasPaidKey(false); 
+      // Even if ping fails (e.g. model limit), we generally consider non-empty key as potentially valid until explicit error
+      // But for better UX, let's keep hasPaidKey logic strictly for valid responses or simple presence in non-strict envs
+      if (e.message?.includes('403') || e.message?.includes('API_KEY_INVALID')) {
+           setHasPaidKey(false);
+      } else {
+           setHasPaidKey(true); // Network error etc might still mean key is valid
+      }
     } finally { setIsVerifying(false); }
   };
 
@@ -226,7 +242,7 @@ export default function App() {
     (window as any).manualApiKey = null;
     setManualKey('');
     setHasPaidKey(false);
-    setSettings(prev => ({ ...prev, modelId: 'gemini-2.0-flash' }));
+    setSettings(prev => ({ ...prev, modelId: DEFAULT_MODEL_ID }));
   };
 
   const handleConnectAiStudio = async () => {
@@ -312,7 +328,6 @@ export default function App() {
   const startTranslation = async (isResuming = false) => {
     if (!file) return;
 
-    // GUARD: Require API Key for all actions
     if (!hasPaidKey) {
         handleMissingKey();
         return;
@@ -323,11 +338,13 @@ export default function App() {
     setIsStatsModalOpen(false);
     
     abortControllerRef.current = new AbortController();
-    try {
-      const effectiveSettings = isResuming && resumeData 
-        ? { ...resumeData.settings, hasPaidKey, modelId: resumeData.settings.modelId } 
-        : { ...settings, modelId: settings.modelId, uiLang, hasPaidKey };
+    
+    // Create a snapshot of settings for history
+    const effectiveSettings = isResuming && resumeData 
+      ? { ...resumeData.settings, hasPaidKey, modelId: resumeData.settings.modelId } 
+      : { ...settings, modelId: settings.modelId, uiLang, hasPaidKey };
 
+    try {
       const { epubBlob } = await processEpub(
         file, 
         effectiveSettings, 
@@ -360,18 +377,54 @@ export default function App() {
       );
       setDownloadUrl(URL.createObjectURL(epubBlob));
 
-      const newHistoryItem: HistoryItem = { id: Date.now().toString(), filename: file.name, sourceLang: settings.sourceLanguage, targetLang: settings.targetLanguage, modelId: effectiveSettings.modelId || 'gemini', timestamp: new Date().toLocaleString(), status: 'completed', settingsSnapshot: { ...effectiveSettings } };
-      const updatedHistory = [newHistoryItem, ...history].slice(20);
-      setHistory(updatedHistory);
-      localStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(updatedHistory));
+      // SUCCESS HISTORY ITEM
+      const newHistoryItem: HistoryItem = { 
+          id: Date.now().toString(), 
+          filename: file.name, 
+          sourceLang: settings.sourceLanguage, 
+          targetLang: settings.targetLanguage, 
+          modelId: effectiveSettings.modelId || 'gemini', 
+          timestamp: new Date().toLocaleString(), 
+          status: 'completed', 
+          settingsSnapshot: { ...effectiveSettings } 
+      };
+
+      // CRITICAL FIX: Use functional update to ensure state is fresh even after long async operations
+      setHistory(prevHistory => {
+          const updatedHistory = [newHistoryItem, ...prevHistory].slice(20);
+          localStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(updatedHistory));
+          return updatedHistory;
+      });
+
       localStorage.removeItem(STORAGE_KEY_RESUME);
       setResumeData(null);
+
     } catch (err: any) {
       if (err.name !== 'AbortError') {
+        
+        // FAILED HISTORY ITEM
+        const failedItem: HistoryItem = { 
+            id: Date.now().toString(), 
+            filename: file.name, 
+            sourceLang: settings.sourceLanguage, 
+            targetLang: settings.targetLanguage, 
+            modelId: effectiveSettings.modelId || 'gemini', 
+            timestamp: new Date().toLocaleString(), 
+            status: 'failed', 
+            settingsSnapshot: { ...effectiveSettings },
+            errorMessage: err.message || "Unknown error"
+        };
+        
+        // Save failed attempt to history so user knows what happened
+        setHistory(prevHistory => {
+            const updatedHistory = [failedItem, ...prevHistory].slice(20);
+            localStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(updatedHistory));
+            return updatedHistory;
+        });
+
         if (err.message === "MISSING_KEY_REDIRECT") {
             handleMissingKey();
         } else if (err.message?.includes('429') || err.message?.includes('quota')) {
-          // 429 zaten processEpub içinde yönetiliyor, buraya düşerse beklenmeyen bir durumdur
           setError({ title: t.error, message: t.quotaError });
         } else {
           setError({ title: t.error, message: err.message });
@@ -427,7 +480,6 @@ export default function App() {
           setSettings(item.settingsSnapshot); 
           setIsLeftDrawerOpen(false); 
           
-          // Check for resume data
           const savedResume = localStorage.getItem(STORAGE_KEY_RESUME);
           if (savedResume) {
             try {
@@ -439,10 +491,6 @@ export default function App() {
               console.error("Resume data parse error", e);
             }
           }
-          
-          // Do not open API key drawer automatically.
-          // Show a visual confirmation via toast-like error state (temporary UX)
-          // or rely on the UI updating the settings.
         }}
         t={t}
       />
