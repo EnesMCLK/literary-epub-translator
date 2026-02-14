@@ -20,7 +20,7 @@ export const STRINGS_UI: Record<string, any> = {
     reAnalyze: "YENİDEN ANALİZ ET", changeModel: "MODEL DEĞİŞTİR", analyzedWith: "ANALİZ EDİLEN MODEL",
     themeLight: "AYDINLIK", themeDark: "KARANLIK", autoDetect: "Otomatik",
     analyzingBtn: "ANALİZ EDİLİYOR...", noAnalysisData: "Analiz verisi bulunamadı.",
-    modelDescFree: "Anahtar Gerekli", modelDescBalanced: "Hızlı ve Dengeli", modelDescExpert: "Uzman",
+    modelDescFree: "Hızlı ve Akıllı", modelDescBalanced: "Hızlı ve Dengeli", modelDescExpert: "Uzman",
     statsTitle: "ANALİZ VE İSTATİSTİKLER", statsTabStats: "İSTATİSTİKLER", statsTabAnalysis: "YAPAY ZEKA STRATEJİSİ",
     analysisGenre: "TÜR", analysisTone: "TON", analysisStyle: "ÜSLUP", analysisStrategy: "ÇEVİRİ STRATEJİSİ",
     feedbackLabel: "GERİ BİLDİRİM VE YENİDEN OLUŞTURMA", feedbackPlaceholder: "Örn: Bu bir hiciv kitabıdır, dili daha esprili hale getir...",
@@ -65,7 +65,7 @@ export const STRINGS_UI: Record<string, any> = {
     reAnalyze: "RE-ANALYZE", changeModel: "CHANGE MODEL", analyzedWith: "ANALYZED WITH",
     themeLight: "LIGHT", themeDark: "DARK", autoDetect: "Automatic",
     analyzingBtn: "ANALYZING...", noAnalysisData: "No analysis data available.",
-    modelDescFree: "Key Required", modelDescBalanced: "Fast & Balanced", modelDescExpert: "Expert",
+    modelDescFree: "Fast & Smart", modelDescBalanced: "Fast & Balanced", modelDescExpert: "Expert",
     statsTitle: "ANALYSIS & STATISTICS", statsTabStats: "STATISTICS", statsTabAnalysis: "AI STRATEGY",
     analysisGenre: "GENRE", analysisTone: "TONE", analysisStyle: "STYLE", analysisStrategy: "TRANSLATION STRATEGY",
     feedbackLabel: "FEEDBACK & REGENERATE", feedbackPlaceholder: "E.g. This is a satire, make the tone more humorous...",
@@ -94,6 +94,7 @@ export const STRINGS_UI: Record<string, any> = {
 
 const PARTIAL_TRANSLATIONS: Record<string, any> = {
   fr: {
+    modelDescFree: "Rapide & Intelligent", modelDescBalanced: "Rapide & Équilibré", modelDescExpert: "Expert",
     tokens: "JETONS", speed: "VITESSE", eta: "RESTANT", waiting: "ATTENTE", wordsPerSec: "m/s",
     title: "Traducteur EPUB Littéraire", description: "Moteur de Traduction Littéraire Professionnel",
     historyTitle: "HISTORIQUE", clearHistory: "Effacer tout", noHistory: "Aucun enregistrement",
@@ -116,6 +117,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     tourSteps: [{ title: "Bienvenue au Traducteur EPUB Littéraire", desc: "Un moteur alimenté par l'IA qui traduit vos livres EPUB tout en préservant la voix de l'auteur." }]
   },
   de: {
+    modelDescFree: "Schnell & Intelligent", modelDescBalanced: "Schnell & Ausgewogen", modelDescExpert: "Experte",
     tokens: "TOKEN", speed: "TEMPO", eta: "VERBLEIBEND", waiting: "WARTEN", wordsPerSec: "W/s",
     title: "Literarischer EPUB-Übersetzer", description: "Professionelle Literarische Übersetzungsmaschine",
     historyTitle: "VERLAUF", clearHistory: "Alles löschen", noHistory: "Keine Einträge",
@@ -138,6 +140,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     tourSteps: [{ title: "Willkommen beim Literarischen EPUB-Übersetzer", desc: "Eine KI-gestützte Engine, die Ihre EPUB-Bücher unter Wahrung der Autorenstimme übersetzt." }]
   },
   es: {
+    modelDescFree: "Rápido e Inteligente", modelDescBalanced: "Rápido y Equilibrado", modelDescExpert: "Experto",
     tokens: "TOKENS", speed: "VELOCIDAD", eta: "RESTANTE", waiting: "ESPERANDO", wordsPerSec: "pal/s",
     title: "Traductor Literario EPUB", description: "Motor de Traducción Literaria Profesional",
     historyTitle: "HISTORIAL", clearHistory: "Borrar todo", noHistory: "Sin registros",
@@ -160,6 +163,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     tourSteps: [{ title: "Bienvenido al Traductor Literario EPUB", desc: "Un motor impulsado por IA que traduce sus libros EPUB preservando la voz del autor." }]
   },
   it: {
+    modelDescFree: "Veloce & Intelligente", modelDescBalanced: "Veloce & Equilibrato", modelDescExpert: "Esperto",
     tokens: "TOKEN", speed: "VELOCITÀ", eta: "RIMANENTE", waiting: "ATTESA", wordsPerSec: "par/s",
     title: "Traduttore Letterario EPUB", description: "Motore di Traduzione Letteraria Professionale",
     historyTitle: "CRONOLOGIA", clearHistory: "Cancella tutto", noHistory: "Nessun record",
@@ -182,6 +186,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     tourSteps: [{ title: "Benvenuto nel Traduttore Letterario EPUB", desc: "Un motore basato sull'IA che traduce i tuoi libri EPUB preservando la voce dell'autore." }]
   },
   ru: {
+    modelDescFree: "Быстрый и Умный", modelDescBalanced: "Быстрый и Сбалансированный", modelDescExpert: "Эксперт",
     tokens: "ТОКЕНЫ", speed: "СКОРОСТЬ", eta: "ОСТАЛОСЬ", waiting: "ОЖИДАНИЕ", wordsPerSec: "слов/с",
     title: "Литературный EPUB Переводчик", description: "Профессиональный движок перевода",
     historyTitle: "ИСТОРИЯ", clearHistory: "Очистить все", noHistory: "Нет записей",
@@ -204,6 +209,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     tourSteps: [{ title: "Добро пожаловать в Литературный EPUB Переводчик", desc: "ИИ-движок, который переводит ваши книги, сохраняя стиль автора." }]
   },
   zh: {
+    modelDescFree: "快速且智能", modelDescBalanced: "快速且平衡", modelDescExpert: "专家",
     tokens: "代币", speed: "速度", eta: "剩余", waiting: "等待", wordsPerSec: "字/秒",
     title: "文学 EPUB 翻译器", description: "专业文学翻译引擎",
     historyTitle: "翻译历史", clearHistory: "全部清除", noHistory: "无记录",
@@ -226,6 +232,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     tourSteps: [{ title: "欢迎使用文学 EPUB 翻译器", desc: "一个由人工智能驱动的引擎，在保留作者风格的同时翻译您的 EPUB 书籍。" }]
   },
   ja: {
+    modelDescFree: "高速＆スマート", modelDescBalanced: "高速＆バランス", modelDescExpert: "エキスパート",
     tokens: "トークン", speed: "速度", eta: "残り", waiting: "待機中", wordsPerSec: "語/秒",
     title: "文学 EPUB 翻訳機", description: "プロフェッショナル文学翻訳エンジン",
     historyTitle: "翻訳履歴", clearHistory: "すべて消去", noHistory: "記録なし",
@@ -248,6 +255,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     tourSteps: [{ title: "文学 EPUB 翻訳へようこそ", desc: "著者の声を保持しながら EPUB 書籍を翻訳する AI 駆動のエンジンです。" }]
   },
   ko: {
+    modelDescFree: "빠르고 스마트함", modelDescBalanced: "빠르고 균형 잡힘", modelDescExpert: "전문가",
     tokens: "토큰", speed: "속도", eta: "남음", waiting: "대기 중", wordsPerSec: "단어/초",
     title: "문학 EPUB 번역기", description: "전문 문학 번역 엔진",
     historyTitle: "번역 기록", clearHistory: "모두 지우기", noHistory: "기록 없음",
@@ -270,6 +278,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     tourSteps: [{ title: "문학 EPUB 번역기에 오신 것을 환영합니다", desc: "작가의 문체를 보존하며 EPUB 책을 번역하는 AI 기반 엔진입니다." }]
   },
   pt: {
+    modelDescFree: "Rápido e Inteligente", modelDescBalanced: "Rápido e Equilibrado", modelDescExpert: "Especialista",
     tokens: "TOKENS", speed: "VELOCIDADE", eta: "RESTANTE", waiting: "AGUARDANDO", wordsPerSec: "pal/s",
     title: "Tradutor Literário EPUB", description: "Motor de Tradução Literária Profissional",
     historyTitle: "HISTÓRICO", clearHistory: "Limpar tudo", noHistory: "Sem registros",
@@ -292,6 +301,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     tourSteps: [{ title: "Bem-vindo ao Tradutor Literário de EPUB", desc: "Um motor alimentado por IA que traduz seus livros EPUB preservando a voz do autor." }]
   },
   ar: {
+    modelDescFree: "سريع وذكي", modelDescBalanced: "سريع ومتوازن", modelDescExpert: "خبير",
     tokens: "الرموز", speed: "السرعة", eta: "المتبقي", waiting: "انتظار", wordsPerSec: "كلمة/ث",
     title: "مترجم EPUB الأدبي", description: "محرك ترجمة أدبي محترف",
     historyTitle: "سجل الترجمة", clearHistory: "مسح الكل", noHistory: "لا توجد سجلات",
@@ -314,6 +324,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     tourSteps: [{ title: "مرحبًا بكم في مترجم EPUB الأدبي", desc: "محرك مدعوم بالذكاء الاصطناعي يترجم كتب EPUB الخاصة بك مع الحفاظ على صوت المؤلف." }]
   },
   nl: {
+    modelDescFree: "Snel & Slim", modelDescBalanced: "Snel & Evenwichtig", modelDescExpert: "Expert",
     tokens: "TOKENS", speed: "SNELHEID", eta: "RESTEREND", waiting: "WACHTEN", wordsPerSec: "w/s",
     title: "Literaire EPUB Vertaler", description: "Professionele Literaire Vertaalmachine",
     historyTitle: "GESCHIEDENIS", clearHistory: "Alles wissen", noHistory: "Geen records",
@@ -330,6 +341,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     tourSteps: [{ title: "Welkom bij de Literaire EPUB Vertaler", desc: "Een AI-aangedreven machine die uw EPUB-boeken vertaalt met behoud van de stem van de auteur." }]
   },
   pl: {
+    modelDescFree: "Szybki i Inteligentny", modelDescBalanced: "Szybki i Zrównoważony", modelDescExpert: "Ekspert",
     tokens: "TOKENY", speed: "PRĘDKOŚĆ", eta: "POZOSTAŁO", waiting: "OCZEKIWANIE", wordsPerSec: "sł./s",
     title: "Literacki Tłumacz EPUB", description: "Profesjonalny Silnik Tłumaczeń Literackich",
     historyTitle: "HISTORIA", clearHistory: "Wyczyść wszystko", noHistory: "Brak wpisów",
@@ -346,6 +358,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     tourSteps: [{ title: "Witamy w Literackim Tłumaczu EPUB", desc: "Silnik oparty na AI, który tłumaczy książki EPUB zachowując styl autora." }]
   },
   hi: {
+    modelDescFree: "तेज और स्मार्ट", modelDescBalanced: "तेज और संतुलित", modelDescExpert: "विशेषज्ञ",
     tokens: "टोकन", speed: "गति", eta: "शेष", waiting: "प्रतीक्षा", wordsPerSec: "शब्द/से",
     title: "साहित्यिक EPUB अनुवादक", description: "पेशेवर साहित्यिक अनुवाद इंजन",
     historyTitle: "अनुवाद इतिहास", clearHistory: "सभी साफ़ करें", noHistory: "कोई रिकॉर्ड नहीं",
@@ -362,6 +375,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     tourSteps: [{ title: "साहित्यिक EPUB अनुवादक में आपका स्वागत है", desc: "एक AI-संचालित इंजन जो लेखक की आवाज को संरक्षित करते हुए आपकी EPUB पुस्तकों का अनुवाद करता है।" }]
   },
   vi: {
+    modelDescFree: "Nhanh & Thông minh", modelDescBalanced: "Nhanh & Cân bằng", modelDescExpert: "Chuyên gia",
     tokens: "TOKEN", speed: "TỐC ĐỘ", eta: "CÒN LẠI", waiting: "ĐANG CHỜ", wordsPerSec: "từ/s",
     title: "Dịch giả EPUB Văn học", description: "Công cụ dịch thuật văn học chuyên nghiệp",
     historyTitle: "LỊCH SỬ", clearHistory: "Xóa tất cả", noHistory: "Không có bản ghi",
