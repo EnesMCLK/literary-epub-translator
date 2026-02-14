@@ -1,3 +1,4 @@
+
 import JSZip from 'jszip';
 import { GeminiTranslator } from './geminiService';
 import { UILanguage, TranslationSettings, ResumeInfo, BookStats, LogEntry, UsageStats, BookStrategy } from '../design';
@@ -150,6 +151,7 @@ export async function processEpub(
   let accumulatedSentences = resumeFrom && resumeFrom.totalProcessedSentences ? resumeFrom.totalProcessedSentences : 0;
   
   let processList: string[] = [];
+  // Use a fresh copy of translated nodes if resuming, so we have the full history
   const translatedNodes: Record<string, string[]> = resumeFrom ? { ...resumeFrom.translatedNodes } : {};
   let strategy: BookStrategy | undefined = precomputedStrategy;
 
@@ -190,7 +192,6 @@ export async function processEpub(
     triggerProgress({});
   };
 
-  // UPDATED: Check for the new model ID or any generic flash-lite id
   const isFreeTier = !settings.hasPaidKey && (settings.modelId === 'gemini-2.0-flash' || settings.modelId?.includes('flash-lite'));
   const minInterval = isFreeTier ? 4000 : 0; 
   
@@ -206,6 +207,7 @@ export async function processEpub(
   const opfDoc = parser.parseFromString(opfContent || "", "application/xml");
   const opfFolder = opfPath.includes('/') ? opfPath.substring(0, opfPath.lastIndexOf('/')) : '';
 
+  // STRATEGY
   if (!strategy) {
     triggerProgress({ status: 'analyzing' });
     const metadata = {
@@ -229,6 +231,7 @@ export async function processEpub(
   
   translator.setStrategy(strategy);
 
+  // MANIFEST / SPINE
   const manifestItems = Array.from(opfDoc.querySelectorAll("manifest > item"));
   const idToHref: Record<string, string> = {};
   manifestItems.forEach(item => idToHref[item.getAttribute("id") || ""] = item.getAttribute("href") || "");
@@ -239,6 +242,37 @@ export async function processEpub(
     const path = opfFolder ? `${opfFolder}/${href}` : href;
     return decodeURIComponent(path);
   }).filter(p => epubZip.file(p)) as string[];
+
+  // --- CRITICAL RESTORATION PHASE ---
+  // If resuming, we have loaded a fresh 'epubZip' from the source file. 
+  // We MUST apply the previously translated segments to it BEFORE starting the main loop.
+  if (resumeFrom && Object.keys(translatedNodes).length > 0) {
+     addLog(getLogStr(ui, 'restoringContent') || "Restoring previous translations...", 'info');
+     
+     for (const path of Object.keys(translatedNodes)) {
+        const content = await epubZip.file(path)?.async("string");
+        if (!content) continue;
+
+        const doc = parser.parseFromString(content, "text/html");
+        const nodes = Array.from(doc.querySelectorAll(settings.targetTags.join(',')));
+        const fileTranslations = translatedNodes[path];
+        
+        let modified = false;
+        fileTranslations.forEach((trans, idx) => {
+             // Only restore if translation exists and matches structure
+             if (trans && nodes[idx]) {
+                 nodes[idx].innerHTML = trans;
+                 modified = true;
+             }
+        });
+
+        if (modified) {
+            const serializer = new XMLSerializer();
+            epubZip.file(path, serializer.serializeToString(doc));
+        }
+     }
+  }
+  // --- END RESTORATION ---
 
   addLog(getLogStr(ui, 'found').replace('{0}', processList.length.toString()), 'success');
 
@@ -267,6 +301,7 @@ export async function processEpub(
 
         const nodeSentences = countSentences(original);
 
+        // Even though we restored above, we check here for the *current* resuming file logic.
         if (translatedNodes[path][nodeIdx]) {
           node.innerHTML = translatedNodes[path][nodeIdx];
         } else {
