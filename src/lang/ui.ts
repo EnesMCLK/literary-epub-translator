@@ -31,7 +31,7 @@ export const STRINGS_UI: Record<string, any> = {
     statCancel: "VAZGEÇ", statProceed: "ONAYLA VE BAŞLA",
     legalWarningTitle: "YASAL SORUMLULUK REDDİ VE KULLANIM KOŞULLARI",
     legalWarningText: "Bu yazılım ('Araç'), kullanıcıların EPUB içeriklerini yerelleştirmesine olanak tanıyan deneysel bir yardımcı programdır. Kullanarak şunları kabul edersiniz:",
-    legalPoints: ["Fikri Mülkiyet: Telif haklarından kullanıcı sorumludur.", "Kişisel Kullanım: Sadece kişisel ve eğitim amaçlıdır.", "Sorumluluk: Geliştiriciler veri kaybından sorumlu değildir.", "Onay: Kullanım, şartların kabulü anlamına gelir."],
+    legalPoints: ["Fikri Mülkiyet: Basım, çoğaltım ve paylaşımın tümünden kullanıcı sorumludur. Kitabın tüm hakları yayıncı kuruluşa aittir.", "Kişisel Kullanım: Sadece kişisel ve eğitim amaçlıdır.", "Sorumluluk: Geliştiriciler veri kaybından sorumlu değildir.", "Onay: Kullanım, şartların kabulü anlamına gelir."],
     getApiKeyLink: "Anahtar Alın", removeKey: "ANAHTARI SİL",
     analysisQuotaExceededTitle: "Analiz Kotası Aşıldı",
     analysisQuotaExceededDesc: "Varsayılan strateji kullanılıyor. Çeviriye devam edebilirsiniz.",
@@ -76,7 +76,7 @@ export const STRINGS_UI: Record<string, any> = {
     statCancel: "CANCEL", statProceed: "CONFIRM & START",
     legalWarningTitle: "LEGAL DISCLAIMER & TERMS OF USE",
     legalWarningText: "This software ('Tool') is an experimental utility. By using it, you agree to:",
-    legalPoints: ["IP: User is responsible for copyright compliance.", "Personal Use: Hobby or education only.", "Liability: Developers are not responsible for damages.", "Binding: Usage constitutes full consent."],
+    legalPoints: ["IP: User is responsible for printing, reproduction, and sharing. All rights belong to the publisher.", "Personal Use: Hobby or education only.", "Liability: Developers are not responsible for damages.", "Binding: Usage constitutes full consent."],
     getApiKeyLink: "Get API Key", removeKey: "REMOVE KEY",
     analysisQuotaExceededTitle: "Analysis Quota Exceeded",
     analysisQuotaExceededDesc: "Using default strategy. You can still translate.",
@@ -111,7 +111,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     aiAnalysis: "ANALYSE IA", preparing: "EN ATTENTE", systemLogsReady: "Attente des journaux...",
     legalWarningTitle: "AVIS DE NON-RESPONSABILITÉ",
     legalWarningText: "Ce logiciel est un utilitaire expérimental. En l'utilisant, vous acceptez :",
-    legalPoints: ["IP : L'utilisateur est responsable des droits d'auteur.", "Usage personnel : Éducation ou loisir uniquement.", "Responsabilité : Les développeurs ne sont pas responsables.", "Accord : L'utilisation vaut acceptation."],
+    legalPoints: ["PI : L'utilisateur est responsable de l'impression, de la reproduction et du partage. Tous les droits appartiennent à l'éditeur.", "Usage personnel : Éducation ou loisir uniquement.", "Responsabilité : Les développeurs ne sont pas responsables.", "Accord : L'utilisation vaut acceptation."],
     autoDetect: "Détection auto",
     tourSteps: [{ title: "Bienvenue au Traducteur EPUB Littéraire", desc: "Un moteur alimenté par l'IA qui traduit vos livres EPUB tout en préservant la voix de l'auteur." }]
   },
@@ -133,7 +133,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     aiAnalysis: "KI-ANALYSE", preparing: "VORBEREITUNG", systemLogsReady: "Warte auf Systemprotokolle...",
     legalWarningTitle: "RECHTLICHER HINWEIS & NUTZUNGSBEDINGUNGEN",
     legalWarningText: "Diese Software ist ein experimentelles Hilfsmittel. Durch die Nutzung stimmen Sie zu:",
-    legalPoints: ["IP: Benutzer haftet für Urheberrechte.", "Privat: Nur für Bildung/Hobby.", "Haftung: Entwickler haften nicht für Schäden.", "Zustimmung: Nutzung bedeutet volle Zustimmung."],
+    legalPoints: ["IP: Der Benutzer haftet für Druck, Vervielfältigung und Weitergabe. Alle Rechte liegen beim Verlag.", "Privat: Nur für Bildung/Hobby.", "Haftung: Entwickler haften nicht für Schäden.", "Zustimmung: Nutzung bedeutet volle Zustimmung."],
     autoDetect: "Automatisch",
     tourSteps: [{ title: "Willkommen beim Literarischen EPUB-Übersetzer", desc: "Eine KI-gestützte Engine, die Ihre EPUB-Bücher unter Wahrung der Autorenstimme übersetzt." }]
   },
@@ -155,7 +155,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     aiAnalysis: "ANÁLISIS IA", preparing: "EN ESPERA", systemLogsReady: "Esperando registros...",
     legalWarningTitle: "AVISO LEGAL Y TÉRMINOS",
     legalWarningText: "Este software es una utilidad experimental. Al usarlo, aceptas:",
-    legalPoints: ["IP: Usuario responsable de derechos de autor.", "Uso Personal: Solo educativo/hobby.", "Responsabilidad: Desarrolladores no responsables.", "Acuerdo: El uso implica aceptación."],
+    legalPoints: ["PI: El usuario es responsable de la impresión, reproducción y distribución. Todos los derechos pertenecen a la editorial.", "Uso Personal: Solo educativo/hobby.", "Responsabilidad: Desarrolladores no responsables.", "Acuerdo: El uso implica aceptación."],
     autoDetect: "Automático",
     tourSteps: [{ title: "Bienvenido al Traductor Literario EPUB", desc: "Un motor impulsado por IA que traduce sus libros EPUB preservando la voz del autor." }]
   },
@@ -177,7 +177,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     aiAnalysis: "ANALISI IA", preparing: "IN ATTESA", systemLogsReady: "Attesa log di sistema...",
     legalWarningTitle: "DISCLAIMER LEGALE",
     legalWarningText: "Questo software è un'utilità sperimentale. Usandolo accetti:",
-    legalPoints: ["IP: Utente responsabile del copyright.", "Uso Personale: Solo hobby/educazione.", "Responsabilità: Sviluppatori non responsabili.", "Accordo: L'uso implica consenso."],
+    legalPoints: ["PI: L'utente è responsabile della stampa, riproduzione e condivisione. Tutti i diritti appartengono all'editore.", "Uso Personale: Solo hobby/educazione.", "Responsabilità: Sviluppatori non responsabili.", "Accordo: L'uso implica consenso."],
     autoDetect: "Automatico",
     tourSteps: [{ title: "Benvenuto nel Traduttore Letterario EPUB", desc: "Un motore basato sull'IA che traduce i tuoi libri EPUB preservando la voce dell'autore." }]
   },
@@ -199,7 +199,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     aiAnalysis: "ИИ АНАЛИЗ", preparing: "ОЖИДАНИЕ", systemLogsReady: "Ожидание логов...",
     legalWarningTitle: "ЮРИДИЧЕСКИЙ ОТКАЗ",
     legalWarningText: "Это ПО является экспериментальным. Используя его, вы соглашаетесь:",
-    legalPoints: ["IP: Пользователь отвечает за копирайт.", "Личное: Только для обучения.", "Ответственность: Разработчики не отвечают.", "Согласие: Использование означает согласие."],
+    legalPoints: ["ИС: Пользователь отвечает за печать, копирование и распространение. Все права принадлежат издателю.", "Личное: Только для обучения.", "Ответственность: Разработчики не отвечают.", "Согласие: Использование означает согласие."],
     autoDetect: "Автоматически",
     tourSteps: [{ title: "Добро пожаловать в Литературный EPUB Переводчик", desc: "ИИ-движок, который переводит ваши книги, сохраняя стиль автора." }]
   },
@@ -221,7 +221,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     aiAnalysis: "AI 分析", preparing: "等待准备", systemLogsReady: "等待系统日志...",
     legalWarningTitle: "法律免责声明和使用条款",
     legalWarningText: "本软件（“工具”）是一个实验性实用程序。使用即表示您同意：",
-    legalPoints: ["知识产权：用户负责版权合规。", "个人使用：仅限业余爱好或教育。", "责任：开发者不对数据丢失负责。", "约束力：使用即构成完全同意。"],
+    legalPoints: ["知识产权：用户对印刷、复制和分享负责。所有权利归出版社所有。", "个人使用：仅限业余爱好或教育。", "责任：开发者不对数据丢失负责。", "约束力：使用即构成完全同意。"],
     autoDetect: "自动检测",
     tourSteps: [{ title: "欢迎使用文学 EPUB 翻译器", desc: "一个由人工智能驱动的引擎，在保留作者风格的同时翻译您的 EPUB 书籍。" }]
   },
@@ -243,7 +243,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     aiAnalysis: "AI分析", preparing: "準備中", systemLogsReady: "システムログ待機中...",
     legalWarningTitle: "法的免責事項と利用規約",
     legalWarningText: "このソフトウェア（「ツール」）は実験的なユーティリティです。使用することにより、以下に同意したことになります：",
-    legalPoints: ["知的財産：著作権の遵守はユーザーの責任です。", "個人使用：趣味または教育のみ。", "責任：開発者は損害に対して責任を負いません。", "拘束力：使用は完全な同意を構成します。"],
+    legalPoints: ["知的財産：印刷、複製、共有はユーザーの責任です。全権利は出版社に帰属します。", "個人使用：趣味または教育のみ。", "責任：開発者は損害に対して責任を負いません。", "拘束力：使用は完全な同意を構成します。"],
     autoDetect: "自動検出",
     tourSteps: [{ title: "文学 EPUB 翻訳へようこそ", desc: "著者の声を保持しながら EPUB 書籍を翻訳する AI 駆動のエンジンです。" }]
   },
@@ -265,7 +265,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     aiAnalysis: "AI 분석", preparing: "준비 대기 중", systemLogsReady: "시스템 로그 대기 중...",
     legalWarningTitle: "법적 면책 조항 및 이용 약관",
     legalWarningText: "이 소프트웨어('도구')는 실험적인 유틸리티입니다. 사용 시 다음 사항에 동의하게 됩니다:",
-    legalPoints: ["IP: 저작권 준수 책임은 사용자에게 있습니다.", "개인 사용: 취미 또는 교육용으로만 사용 가능.", "책임: 개발자는 데이터 손실에 대해 책임지지 않습니다.", "동의: 사용은 완전한 동의를 구성합니다."],
+    legalPoints: ["지적 재산권: 인쇄, 복제, 공유 책임은 사용자에게 있습니다. 모든 권리는 출판사에 있습니다.", "개인 사용: 취미 또는 교육용으로만 사용 가능.", "책임: 개발자는 데이터 손실에 대해 책임지지 않습니다.", "동의: 사용은 완전한 동의를 구성합니다."],
     autoDetect: "자동 감지",
     tourSteps: [{ title: "문학 EPUB 번역기에 오신 것을 환영합니다", desc: "작가의 문체를 보존하며 EPUB 책을 번역하는 AI 기반 엔진입니다." }]
   },
@@ -287,7 +287,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     aiAnalysis: "ANÁLISE IA", preparing: "AGUARDANDO", systemLogsReady: "Aguardando logs...",
     legalWarningTitle: "AVISO LEGAL E TERMOS",
     legalWarningText: "Este software é um utilitário experimental. Ao usá-lo, você concorda:",
-    legalPoints: ["IP: Usuário responsável pelos direitos autorais.", "Uso Pessoal: Apenas hobby/educação.", "Responsabilidade: Desenvolvedores não são responsáveis.", "Acordo: O uso constitui consentimento."],
+    legalPoints: ["PI: O usuário é responsável pela impressão, reprodução e compartilhamento. Todos os direitos pertencem à editora.", "Uso Pessoal: Apenas hobby/educação.", "Responsabilidade: Desenvolvedores não são responsáveis.", "Acordo: O uso constitui consentimento."],
     autoDetect: "Automático",
     tourSteps: [{ title: "Bem-vindo ao Tradutor Literário de EPUB", desc: "Um motor alimentado por IA que traduz seus livros EPUB preservando a voz do autor." }]
   },
@@ -309,7 +309,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     aiAnalysis: "تحليل AI", preparing: "في الانتظار", systemLogsReady: "انتظار السجلات...",
     legalWarningTitle: "إخلاء المسؤولية القانونية",
     legalWarningText: "هذا البرنامج هو أداة تجريبية. باستخدامها فإنك توافق على:",
-    legalPoints: ["الملكية الفكرية: المستخدم مسؤول عن الحقوق.", "الاستخدام الشخصي: للهواية أو التعليم فقط.", "المسؤولية: المطورون غير مسؤولين.", "الموافقة: الاستخدام يعني الموافقة الكاملة."],
+    legalPoints: ["الملكية الفكرية: المستخدم مسؤول عن الطباعة والاستنساخ والمشاركة. جميع الحقوق للناشر.", "الاستخدام الشخصي: للهواية أو التعليم فقط.", "المسؤولية: المطورون غير مسؤولين.", "الموافقة: الاستخدام يعني الموافقة الكاملة."],
     autoDetect: "كشف تلقائي",
     tourSteps: [{ title: "مرحبًا بكم في مترجم EPUB الأدبي", desc: "محرك مدعوم بالذكاء الاصطناعي يترجم كتب EPUB الخاصة بك مع الحفاظ على صوت المؤلف." }]
   },
@@ -325,7 +325,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     aiAnalysis: "AI ANALYSE", preparing: "WACHTEN", systemLogsReady: "Wachten op logs...",
     legalWarningTitle: "JURIDISCHE DISCLAIMER",
     legalWarningText: "Deze software is experimenteel. Door gebruik ga je akkoord met:",
-    legalPoints: ["IP: Gebruiker verantwoordelijk voor auteursrecht.", "Prive: Alleen hobby/educatie.", "Aansprakelijkheid: Devs niet aansprakelijk.", "Akkoord: Gebruik is instemming."],
+    legalPoints: ["IE: Gebruiker verantwoordelijk voor druk, reproductie en delen. Alle rechten bij de uitgever.", "Prive: Alleen hobby/educatie.", "Aansprakelijkheid: Devs niet aansprakelijk.", "Akkoord: Gebruik is instemming."],
     autoDetect: "Automatisch",
     tourSteps: [{ title: "Welkom bij de Literaire EPUB Vertaler", desc: "Een AI-aangedreven machine die uw EPUB-boeken vertaalt met behoud van de stem van de auteur." }]
   },
@@ -341,7 +341,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     aiAnalysis: "ANALIZA AI", preparing: "OCZEKIWANIE", systemLogsReady: "Czekam na logi...",
     legalWarningTitle: "ZASADY PRAWNE",
     legalWarningText: "To oprogramowanie jest eksperymentalne. Używając go zgadzasz się na:",
-    legalPoints: ["IP: Użytkownik odpowiada za prawa autorskie.", "Prywatne: Tylko edukacja/hobby.", "Odpowiedzialność: Devs nie odpowiadają.", "Zgoda: Użycie oznacza zgodę."],
+    legalPoints: ["IP: Użytkownik odpowiada za druk, powielanie i udostępnianie. Wszelkie prawa należą do wydawcy.", "Prywatne: Tylko edukacja/hobby.", "Odpowiedzialność: Devs nie odpowiadają.", "Zgoda: Użycie oznacza zgodę."],
     autoDetect: "Wykryj",
     tourSteps: [{ title: "Witamy w Literackim Tłumaczu EPUB", desc: "Silnik oparty na AI, który tłumaczy książki EPUB zachowując styl autora." }]
   },
@@ -357,7 +357,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     aiAnalysis: "AI विश्लेषण", preparing: "प्रतीक्षा", systemLogsReady: "लॉग की प्रतीक्षा...",
     legalWarningTitle: "कानूनी अस्वीकरण",
     legalWarningText: "यह सॉफ्टवेयर प्रायोगिक है। इसका उपयोग करके आप सहमत हैं:",
-    legalPoints: ["IP: कॉपीराइट के लिए उपयोगकर्ता जिम्मेदार।", "निजी: केवल शिक्षा/शौक।", "दायित्व: डेवलपर्स जिम्मेदार नहीं।", "सहमति: उपयोग पूर्ण सहमति है।"],
+    legalPoints: ["बौद्धिक संपदा: मुद्रण, पुनरुत्पादन और साझा करने के लिए उपयोगकर्ता जिम्मेदार है। सभी अधिकार प्रकाशक के हैं।", "निजी: केवल शिक्षा/शौक।", "दायित्व: डेवलपर्स जिम्मेदार नहीं।", "सहमति: उपयोग पूर्ण सहमति है।"],
     autoDetect: "स्वत: पता",
     tourSteps: [{ title: "साहित्यिक EPUB अनुवादक में आपका स्वागत है", desc: "एक AI-संचालित इंजन जो लेखक की आवाज को संरक्षित करते हुए आपकी EPUB पुस्तकों का अनुवाद करता है।" }]
   },
@@ -373,7 +373,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     aiAnalysis: "PHÂN TÍCH AI", preparing: "ĐANG CHỜ", systemLogsReady: "Đợi nhật ký...",
     legalWarningTitle: "TUYÊN BỐ PHÁP LÝ",
     legalWarningText: "Phần mềm này là thử nghiệm. Bằng cách sử dụng, bạn đồng ý:",
-    legalPoints: ["IP: Người dùng chịu trách nhiệm bản quyền.", "Cá nhân: Chỉ giáo dục/sở thích.", "Trách nhiệm: Dev không chịu trách nhiệm.", "Đồng ý: Sử dụng là đồng ý."],
+    legalPoints: ["SHTT: Người dùng chịu trách nhiệm in ấn, sao chép và chia sẻ. Mọi quyền thuộc về nhà xuất bản.", "Cá nhân: Chỉ giáo dục/sở thích.", "Trách nhiệm: Dev không chịu trách nhiệm.", "Đồng ý: Sử dụng là đồng ý."],
     autoDetect: "Tự động",
     tourSteps: [{ title: "Chào mừng đến với Trình dịch EPUB Văn học", desc: "Một công cụ hỗ trợ AI dịch sách EPUB của bạn trong khi vẫn giữ nguyên giọng văn của tác giả." }]
   }
