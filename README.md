@@ -14,6 +14,12 @@
 [How It Works](#%EF%B8%8F-how-it-works) •
 [Tech Stack](#%EF%B8%8F-tech-stack)
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="dark-dashboard.png">
+  <source media="(prefers-color-scheme: light)" srcset="light-dashboard.png">
+  <img alt="Uygulama Kontrol Paneli (Dashboard) Ekran Görüntüsü" src="light-dashboard.png">
+</picture>
+
 </div>
 
 ---
