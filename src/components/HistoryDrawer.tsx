@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { History, X, Database } from 'lucide-react';
-import { HistoryItem, TranslationSettings } from '../design';
+import { History, X, Database, CheckCircle2, AlertCircle } from 'lucide-react';
+import { HistoryItem } from '../design';
 
 interface HistoryDrawerProps {
   isOpen: boolean;
@@ -41,23 +41,36 @@ export const HistoryDrawer: React.FC<HistoryDrawerProps> = ({
             <>
               <button 
                 onClick={onClearHistory} 
-                className="w-full py-2 text-[10px] font-black text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg uppercase transition-colors mb-2"
+                className="w-full py-3 text-[10px] font-black text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-xl uppercase transition-colors mb-2 border border-transparent hover:border-red-100 dark:hover:border-red-900/30"
               >
                 {t.clearHistory}
               </button>
-              {history.map(item => (
-                <div 
-                  key={item.id} 
-                  onClick={() => onRestoreSettings(item)} 
-                  className="p-4 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-indigo-400 cursor-pointer group relative"
-                >
-                  <p className="text-[11px] font-black truncate text-slate-700 dark:text-slate-200">{item.filename}</p>
-                  <div className="flex justify-between items-center mt-3 pt-2 border-t border-slate-200/50">
-                      <span className="text-[9px] font-bold text-slate-400">{item.sourceLang} → {item.targetLang}</span>
-                      <span className="text-[8px] font-black text-indigo-500 uppercase">{t.restoreSettings}</span>
+              {history.map(item => {
+                const isSuccess = item.status === 'completed';
+                return (
+                  <div 
+                    key={item.id} 
+                    onClick={() => onRestoreSettings(item)} 
+                    className={`p-4 bg-slate-50 dark:bg-slate-800/40 rounded-xl border cursor-pointer group relative transition-all active:scale-[0.98] ${isSuccess ? 'border-slate-100 dark:border-slate-800 hover:border-indigo-400' : 'border-red-100 dark:border-red-900/30 hover:border-red-400'}`}
+                  >
+                    <div className="flex justify-between items-start gap-2 mb-2">
+                         <p className="text-[11px] font-black truncate text-slate-700 dark:text-slate-200 leading-tight line-clamp-2" title={item.filename}>{item.filename}</p>
+                         {isSuccess ? <CheckCircle2 size={14} className="text-green-500 shrink-0" /> : <AlertCircle size={14} className="text-red-500 shrink-0" />}
+                    </div>
+                    
+                    <div className="flex items-center gap-2 mb-3 opacity-70">
+                        <span className="text-[9px] font-mono text-slate-500 dark:text-slate-400">{item.timestamp.split(',')[0]}</span>
+                        <div className="w-1 h-1 rounded-full bg-slate-300"></div>
+                        <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase">{item.modelId.replace('gemini-', '')}</span>
+                    </div>
+
+                    <div className="flex justify-between items-center pt-2 border-t border-slate-200/50 dark:border-slate-700/50">
+                        <span className="text-[9px] font-bold text-slate-400">{item.sourceLang} → {item.targetLang}</span>
+                        <span className="text-[8px] font-black text-indigo-500 uppercase opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-2 group-hover:translate-x-0">{t.restoreSettings}</span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </>
           )}
         </div>
