@@ -7,7 +7,7 @@ import {
   Zap, BarChart3, Scale, ShieldAlert, Activity, BookOpen, User, Trash2, StepForward,
   Key, LayoutDashboard, Database, Link2, Menu, Lock, Unlock, ExternalLink, Eye, EyeOff,
   BookType, Sun, Moon, Copyright, Heart, Shield, Gavel, ChevronDown, ChevronUp, Wand2,
-  Timer, Gauge
+  Timer, Gauge, HardDrive
 } from 'lucide-react';
 
 // --- Types ---
@@ -31,19 +31,6 @@ export interface ResumeInfo {
   translatedNodes: Record<string, string[]>;
   settings: TranslationSettings;
   totalProcessedSentences?: number; // Kaldığı yerden devam ederken cümle sayısını korumak için
-}
-
-export interface HistoryItem {
-  id: string;
-  timestamp: string;
-  filename: string;
-  sourceLang: string;
-  targetLang: string;
-  modelId: string;
-  wordCount?: number;
-  status: 'completed' | 'partial' | 'failed';
-  settingsSnapshot: TranslationSettings;
-  errorMessage?: string;
 }
 
 export interface BookStats {
@@ -75,6 +62,23 @@ export interface LogEntry {
   timestamp: string;
   text: string;
   type?: 'info' | 'success' | 'warning' | 'error' | 'live';
+}
+
+export interface HistoryItem {
+  id: string;
+  timestamp: string;
+  filename: string;
+  sourceLang: string;
+  targetLang: string;
+  modelId: string;
+  wordCount?: number;
+  status: 'completed' | 'partial' | 'failed';
+  settingsSnapshot: TranslationSettings;
+  strategySnapshot?: BookStrategy; 
+  statsSnapshot?: BookStats;       
+  errorMessage?: string;
+  hasSavedFile?: boolean; // Indicates if the SOURCE EPUB is cached
+  hasResultFile?: boolean; // NEW: Indicates if the TRANSLATED EPUB is cached
 }
 
 export interface UsageStats {
