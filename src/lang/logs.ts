@@ -16,7 +16,8 @@ export const STRINGS_LOGS: Record<string, any> = {
     verifying: "Çeviri bütünlüğü doğrulanıyor...",
     preComputed: "Önceden hesaplanmış analiz stratejisi kullanılıyor.",
     freeTierActive: "Ücretsiz Kota Aktif: Hız sınırlaması uygulanıyor (15 RPM).",
-    restoringContent: "Önceki çeviriler kitaba işleniyor..."
+    restoringContent: "Önceki çeviriler kitaba işleniyor...",
+    progressRestored: "İlerleme %{0} seviyesinde geri yüklendi. Devam etmeye hazır."
   },
   en: { 
     analyzing: "Analyzing...", 
@@ -32,7 +33,8 @@ export const STRINGS_LOGS: Record<string, any> = {
     verifying: "Verifying integrity...",
     preComputed: "Using pre-computed analysis strategy.",
     freeTierActive: "Free Tier Active: Throttling applied (15 RPM).",
-    restoringContent: "Restoring previous translations to book..."
+    restoringContent: "Restoring previous translations to book...",
+    progressRestored: "Progress restored at {0}%. Ready to resume."
   },
   fr: { 
     analyzing: "Analyse en cours...", 
@@ -48,7 +50,8 @@ export const STRINGS_LOGS: Record<string, any> = {
     verifying: "Vérification de l'intégrité...",
     preComputed: "Utilisation de la stratégie d'analyse pré-calculée.",
     freeTierActive: "Mode Gratuit : Limitation de vitesse (15 RPM).",
-    restoringContent: "Restauration des traductions précédentes..."
+    restoringContent: "Restauration des traductions précédentes...",
+    progressRestored: "Progression restaurée à {0}%. Prêt à reprendre."
   },
   de: { 
     analyzing: "Analysieren...", 
@@ -64,7 +67,8 @@ export const STRINGS_LOGS: Record<string, any> = {
     verifying: "Integrität wird überprüft...",
     preComputed: "Verwendung der vorberechneten Analysestrategie.",
     freeTierActive: "Kostenloser Modus: Geschwindigkeit begrenzt (15 RPM).",
-    restoringContent: "Vorherige Übersetzungen werden wiederhergestellt..."
+    restoringContent: "Vorherige Übersetzungen werden wiederhergestellt...",
+    progressRestored: "Fortschritt bei {0}% wiederhergestellt. Bereit zum Fortsetzen."
   },
   es: { 
     analyzing: "Analizando...", 
@@ -80,7 +84,8 @@ export const STRINGS_LOGS: Record<string, any> = {
     verifying: "Verificando integridad...",
     preComputed: "Usando estrategia de análisis precalculada.",
     freeTierActive: "Modo Gratuito: Limitación de velocidad (15 RPM).",
-    restoringContent: "Restaurando traducciones anteriores..."
+    restoringContent: "Restaurando traducciones anteriores...",
+    progressRestored: "Progreso restaurado al {0}%. Listo para continuar."
   },
   it: { 
     analyzing: "Analisi in corso...", 
@@ -96,7 +101,8 @@ export const STRINGS_LOGS: Record<string, any> = {
     verifying: "Verifica integrità...",
     preComputed: "Utilizzo della strategia di analisi pre-calcolata.",
     freeTierActive: "Modalità Gratuita: Limitazione velocità (15 RPM).",
-    restoringContent: "Ripristino traduzioni precedenti..."
+    restoringContent: "Ripristino traduzioni precedenti...",
+    progressRestored: "Avanzamento ripristinato al {0}%. Pronto a riprendere."
   },
   ru: { 
     analyzing: "Анализ...", 
@@ -112,7 +118,8 @@ export const STRINGS_LOGS: Record<string, any> = {
     verifying: "Проверка целостности...",
     preComputed: "Используется предварительно вычисленная стратегия.",
     freeTierActive: "Бесплатный режим: Ограничение скорости (15 RPM).",
-    restoringContent: "Восстановление предыдущих переводов..."
+    restoringContent: "Восстановление предыдущих переводов...",
+    progressRestored: "Прогресс восстановлен на {0}%. Готово к продолжению."
   },
   zh: { 
     analyzing: "正在分析...", 
@@ -128,7 +135,8 @@ export const STRINGS_LOGS: Record<string, any> = {
     verifying: "正在验证完整性...",
     preComputed: "使用预先计算的分析策略。",
     freeTierActive: "免费模式：速度限制 (15 RPM)。",
-    restoringContent: "正在恢复之前的翻译..."
+    restoringContent: "正在恢复之前的翻译...",
+    progressRestored: "进度已恢复至 {0}%。准备继续。"
   },
   ja: { 
     analyzing: "分析中...", 
@@ -144,7 +152,8 @@ export const STRINGS_LOGS: Record<string, any> = {
     verifying: "整合性を確認中...",
     preComputed: "事前計算された分析戦略を使用しています。",
     freeTierActive: "無料モード: 速度制限中 (15 RPM)。",
-    restoringContent: "以前の翻訳を復元中..."
+    restoringContent: "以前の翻訳を復元中...",
+    progressRestored: "進捗は {0}% で復元されました。再開準備完了。"
   },
   ko: { 
     analyzing: "분석 중...", 
@@ -160,7 +169,8 @@ export const STRINGS_LOGS: Record<string, any> = {
     verifying: "무결성 확인 중...",
     preComputed: "사전 계산된 분석 전략을 사용 중입니다.",
     freeTierActive: "무료 모드: 속도 제한 중 (15 RPM)。",
-    restoringContent: "이전 번역 복원 중..."
+    restoringContent: "이전 번역 복원 중...",
+    progressRestored: "진행 상황이 {0}%로 복원되었습니다. 계속할 준비가 되었습니다."
   },
   ar: { 
     analyzing: "جارٍ التحليل...", 
@@ -176,7 +186,8 @@ export const STRINGS_LOGS: Record<string, any> = {
     verifying: "التحقق من السلامة...",
     preComputed: "استخدام استراتيجية التحليل المحسوبة مسبقًا.",
     freeTierActive: "الوضع المجاني: تقييد السرعة (15 RPM).",
-    restoringContent: "استعادة الترجمات السابقة..."
+    restoringContent: "استعادة الترجمات السابقة...",
+    progressRestored: "تم استعادة التقدم بنسبة {0}%. جاهز للاستئناف."
   },
   pt: { 
     analyzing: "Analisando...", 
@@ -192,7 +203,8 @@ export const STRINGS_LOGS: Record<string, any> = {
     verifying: "Verificando integridade...",
     preComputed: "Usando estratégia de análise pré-calculada.",
     freeTierActive: "Modo Grátis: Velocidade limitada (15 RPM).",
-    restoringContent: "Restaurando traduções anteriores..."
+    restoringContent: "Restaurando traduções anteriores...",
+    progressRestored: "Progresso restaurado em {0}%. Pronto para continuar."
   },
   nl: { 
     analyzing: "Analyseren...", 
@@ -208,7 +220,8 @@ export const STRINGS_LOGS: Record<string, any> = {
     verifying: "Integriteit verifiëren...",
     preComputed: "Gebruik van vooraf berekende analysestrategie.",
     freeTierActive: "Gratis modus: Snelheid beperkt (15 RPM).",
-    restoringContent: "Vorige vertalingen herstellen..."
+    restoringContent: "Vorige vertalingen herstellen...",
+    progressRestored: "Voortgang hersteld op {0}%. Klaar om te hervatten."
   },
   pl: { 
     analyzing: "Analizowanie...", 
@@ -224,7 +237,8 @@ export const STRINGS_LOGS: Record<string, any> = {
     verifying: "Weryfikacja integralności...",
     preComputed: "Używanie wstępnie obliczonej strategii analizy.",
     freeTierActive: "Tryb darmowy: Ograniczenie prędkości (15 RPM).",
-    restoringContent: "Przywracanie poprzednich tłumaczeń..."
+    restoringContent: "Przywracanie poprzednich tłumaczeń...",
+    progressRestored: "Postęp przywrócony na poziomie {0}%. Gotowy do wznowienia."
   },
   hi: { 
     analyzing: "विश्लेषण कर रहा है...", 
@@ -240,7 +254,8 @@ export const STRINGS_LOGS: Record<string, any> = {
     verifying: "अखंडता की पुष्टि...",
     preComputed: "पूर्व-गणना विश्लेषण रणनीति का उपयोग करना।",
     freeTierActive: "निःशुल्क मोड: गति सीमा सक्रिय (15 RPM)।",
-    restoringContent: "पिछले अनुवादों को बहाल किया जा रहा है..."
+    restoringContent: "पिछले अनुवादों को बहाल किया जा रहा है...",
+    progressRestored: "प्रगति {0}% पर बहाल। फिर से शुरू करने के लिए तैयार।"
   },
   vi: { 
     analyzing: "Đang phân tích...", 
@@ -256,7 +271,8 @@ export const STRINGS_LOGS: Record<string, any> = {
     verifying: "Đang xác minh tính toàn vẹn...",
     preComputed: "Sử dụng chiến lược phân tích đã tính toán.",
     freeTierActive: "Chế độ miễn phí: Giới hạn tốc độ (15 RPM).",
-    restoringContent: "Đang khôi phục các bản dịch trước..."
+    restoringContent: "Đang khôi phục các bản dịch trước...",
+    progressRestored: "Tiến độ đã khôi phục ở mức {0}%. Sẵn sàng tiếp tục."
   }
 };
 
