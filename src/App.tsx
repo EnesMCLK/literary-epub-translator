@@ -21,6 +21,7 @@ import {
     LANGUAGES_DATA, DEFAULT_TAGS, LANG_CODE_TO_LABEL, AI_MODELS, BookStats, STORAGE_KEY_API, BookStrategy
 } from './design';
 import { STRINGS_UI } from './lang/ui';
+import { STRINGS_LOGS } from './lang/logs';
 
 const STORAGE_KEY_HISTORY = 'lit-trans-history';
 const STORAGE_KEY_RESUME = 'lit-trans-resume-v2';
@@ -548,11 +549,15 @@ export default function App() {
                        // Calculate percentage for UI
                        if (item.statsSnapshot && parsedResume.totalProcessedSentences) {
                            const percent = Math.min(99, Math.round((parsedResume.totalProcessedSentences / item.statsSnapshot.totalSentences) * 100));
+                           
+                           // LOCALIZED LOG MESSAGE
+                           const logText = (STRINGS_LOGS[uiLang]?.progressRestored || STRINGS_LOGS['en'].progressRestored).replace('{0}', percent.toString());
+
                            setProgress(prev => ({
                                ...prev,
                                currentPercent: percent,
                                status: 'resuming', // Visual state
-                               logs: [{ timestamp: new Date().toLocaleTimeString(), text: `Progress restored at ${percent}%. Ready to resume.`, type: 'info' }]
+                               logs: [{ timestamp: new Date().toLocaleTimeString(), text: logText, type: 'info' }]
                            }));
                        }
                    }
