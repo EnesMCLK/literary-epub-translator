@@ -19,7 +19,7 @@
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="./img/dark-dashboard.png">
     <source media="(prefers-color-scheme: light)" srcset="./img/light-dashboard.png">
-    <img alt="Kontrol Paneli (Dashboard) Ekran Görüntüsü" src="img/light-dashboard.png">
+    <img alt="Kontrol Paneli (Dashboard) Ekran Görüntüsü" src="./img/light-dashboard.png">
   </picture>
 </div>
 
