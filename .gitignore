@@ -25,3 +25,7 @@ dist-ssr
 
 # Ignore images to prevent corruption on GitHub sync
 img/
+./img
+/img
+./img/
+/img/
