@@ -115,7 +115,9 @@ export const LANG_CODE_TO_LABEL: Record<string, string> = {
 export const AI_MODELS = [
     { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash', desc: 'Fast', locked: true },
     { id: 'gemini-3-flash-preview', name: 'Gemini 3 Flash', desc: 'Balanced', locked: true }, 
-    { id: 'gemini-3-pro-preview', name: 'Gemini 3 Pro', desc: 'Expert', locked: true }        
+    { id: 'gemini-3-pro-preview', name: 'Gemini 3 Pro', desc: 'Expert', locked: true },
+    { id: 'gemini-3.1-flash-lite-preview', name: 'Gemini 3.1 Flash-Lite', desc: 'NewFast', locked: true },
+    { id: 'gemini-3.1-pro-preview', name: 'Gemini 3.1 Pro', desc: 'NewExpert', locked: true }
 ];
 
 // --- Global Interface Extension ---

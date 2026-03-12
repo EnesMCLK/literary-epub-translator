@@ -49,6 +49,8 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
     if (modelId === 'gemini-2.0-flash' || modelId === 'gemini-flash-lite-latest') return t.modelDescFree || 'Fast & Smart';
     if (modelId === 'gemini-3-flash-preview') return t.modelDescBalanced || 'Fast & Balanced';
     if (modelId === 'gemini-3-pro-preview') return t.modelDescExpert || 'Expert';
+    if (modelId === 'gemini-3.1-flash-lite-preview') return t.modelDescNewFast || 'New & Fast';
+    if (modelId === 'gemini-3.1-pro-preview') return t.modelDescNewExpert || 'New & Expert';
     return '';
   };
 
