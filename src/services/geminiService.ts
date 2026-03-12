@@ -242,11 +242,23 @@ export class GeminiTranslator {
     };
   }
 
+  private generateHash(str: string): string {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
+    }
+    const prefix = str.substring(0, 15).replace(/[^a-zA-Z0-9]/g, '');
+    const suffix = str.substring(str.length - 15).replace(/[^a-zA-Z0-9]/g, '');
+    return `${prefix}-${Math.abs(hash).toString(36)}-${str.length.toString(36)}-${suffix}`;
+  }
+
   async translateSingle(htmlSnippet: string, forceRetryMode: boolean = false): Promise<string> {
     const trimmed = htmlSnippet.trim();
     if (!trimmed || this.shouldSkipTranslation(trimmed)) return htmlSnippet;
 
-    const cacheKey = this.cachePrefix + btoa(encodeURIComponent(trimmed)).substring(0, 32);
+    const cacheKey = this.cachePrefix + this.generateHash(trimmed);
     if (!forceRetryMode) {
         const cached = localStorage.getItem(cacheKey);
         if (cached) return cached;

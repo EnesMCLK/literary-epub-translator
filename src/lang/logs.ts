@@ -17,7 +17,14 @@ export const STRINGS_LOGS: Record<string, any> = {
     preComputed: "Önceden hesaplanmış analiz stratejisi kullanılıyor.",
     freeTierActive: "Ücretsiz Kota Aktif: Hız sınırlaması uygulanıyor (15 RPM).",
     restoringContent: "Önceki çeviriler kitaba işleniyor...",
-    progressRestored: "İlerleme %{0} seviyesinde geri yüklendi. Devam etmeye hazır."
+    progressRestored: "İlerleme %{0} seviyesinde geri yüklendi. Devam etmeye hazır.",
+    error_container_xml_missing: "META-INF/container.xml bulunamadı. Geçersiz EPUB.",
+    error_container_xml_parse: "container.xml ayrıştırılamadı.",
+    error_opf_path_missing: "container.xml içinde OPF yolu bulunamadı.",
+    error_opf_file_missing: "OPF dosyası bulunamadı: {0}",
+    error_opf_parse: "OPF dosyası ayrıştırılamadı.",
+    error_spine_missing: "OPF içinde okuma sırası (spine) bulunamadı.",
+    error_no_html_files: "İşlenecek geçerli HTML/XHTML dosyası bulunamadı."
   },
   en: { 
     analyzing: "Analyzing...", 
@@ -34,7 +41,14 @@ export const STRINGS_LOGS: Record<string, any> = {
     preComputed: "Using pre-computed analysis strategy.",
     freeTierActive: "Free Tier Active: Throttling applied (15 RPM).",
     restoringContent: "Restoring previous translations to book...",
-    progressRestored: "Progress restored at {0}%. Ready to resume."
+    progressRestored: "Progress restored at {0}%. Ready to resume.",
+    error_container_xml_missing: "META-INF/container.xml not found. Invalid EPUB.",
+    error_container_xml_parse: "Failed to parse container.xml.",
+    error_opf_path_missing: "OPF path not found in container.xml.",
+    error_opf_file_missing: "OPF file not found: {0}",
+    error_opf_parse: "Failed to parse OPF file.",
+    error_spine_missing: "No reading order (spine) found in OPF.",
+    error_no_html_files: "No valid HTML/XHTML files found to process."
   },
   fr: { 
     analyzing: "Analyse en cours...", 

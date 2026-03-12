@@ -35,29 +35,121 @@ export function countSentences(text: string): number {
     return matches ? matches.length : 1;
 }
 
+export interface EpubStructure {
+  opfPath: string;
+  opfFolder: string;
+  processList: string[];
+  metadata: {
+    title: string;
+    creator: string;
+    description: string;
+  };
+}
+
+export function resolveRelativePath(basePath: string, relativePath: string): string {
+  if (!basePath) return relativePath;
+  const stack = basePath.split('/').filter(Boolean);
+  const parts = relativePath.split('/');
+  for (const part of parts) {
+    if (part === '.') continue;
+    if (part === '..') {
+      stack.pop();
+    } else {
+      stack.push(part);
+    }
+  }
+  return stack.join('/');
+}
+
+export async function parseEpubStructure(epubZip: JSZip, uiLang: string = 'en'): Promise<EpubStructure> {
+  const parser = new DOMParser();
+  
+  // 1. Rootfile Tespiti
+  const containerXml = await epubZip.file("META-INF/container.xml")?.async("string");
+  if (!containerXml) {
+    throw new Error(getLogStr(uiLang, 'error_container_xml_missing') || "META-INF/container.xml not found. Invalid EPUB.");
+  }
+  
+  const containerDoc = parser.parseFromString(containerXml, "application/xml");
+  const parseError = containerDoc.querySelector("parsererror");
+  if (parseError) {
+    throw new Error(getLogStr(uiLang, 'error_container_xml_parse') || "Failed to parse container.xml.");
+  }
+
+  const rootfile = containerDoc.querySelector("rootfile");
+  const opfPath = rootfile?.getAttribute("full-path");
+  if (!opfPath) {
+    throw new Error(getLogStr(uiLang, 'error_opf_path_missing') || "OPF path not found in container.xml.");
+  }
+
+  // 2. Harita ve Omurga (Manifest & Spine)
+  const opfContent = await epubZip.file(opfPath)?.async("string");
+  if (!opfContent) {
+    const msg = getLogStr(uiLang, 'error_opf_file_missing') || `OPF file not found: {0}`;
+    throw new Error(msg.replace('{0}', opfPath));
+  }
+
+  const opfDoc = parser.parseFromString(opfContent, "application/xml");
+  const opfParseError = opfDoc.querySelector("parsererror");
+  if (opfParseError) {
+    throw new Error(getLogStr(uiLang, 'error_opf_parse') || "Failed to parse OPF file.");
+  }
+
+  const opfFolder = opfPath.includes('/') ? opfPath.substring(0, opfPath.lastIndexOf('/')) : '';
+
+  const metadata = {
+    title: opfDoc.querySelector("dc\\:title, title")?.textContent || "Untitled",
+    creator: opfDoc.querySelector("dc\\:creator, creator")?.textContent || "Unknown",
+    description: opfDoc.querySelector("dc\\:description, description")?.textContent || "",
+  };
+
+  const manifestItems = Array.from(opfDoc.querySelectorAll("manifest > item"));
+  const idToHref: Record<string, string> = {};
+  manifestItems.forEach(item => {
+    const id = item.getAttribute("id");
+    const href = item.getAttribute("href");
+    if (id && href) {
+      idToHref[id] = href;
+    }
+  });
+
+  // 3. Dinamik Okuma Sırası
+  const spineItems = Array.from(opfDoc.querySelectorAll("spine > itemref"));
+  if (spineItems.length === 0) {
+    throw new Error(getLogStr(uiLang, 'error_spine_missing') || "No reading order (spine) found in OPF.");
+  }
+
+  // 4. Göreceli Yol (Relative Path) Çözümlemesi
+  const processList = spineItems.map(item => {
+    const idref = item.getAttribute("idref");
+    if (!idref) return null;
+    
+    const href = idToHref[idref];
+    if (!href) return null;
+
+    const decodedHref = decodeURIComponent(href);
+    const resolvedPath = resolveRelativePath(opfFolder, decodedHref);
+    return resolvedPath;
+  }).filter((p): p is string => p !== null && epubZip.file(p) !== null);
+
+  if (processList.length === 0) {
+    throw new Error(getLogStr(uiLang, 'error_no_html_files') || "No valid HTML/XHTML files found to process.");
+  }
+
+  return {
+    opfPath,
+    opfFolder,
+    processList,
+    metadata
+  };
+}
+
 export async function calculateEpubStats(file: File, targetTags: string[], hasUserKey: boolean): Promise<BookStats> {
   const epubBuffer = await file.arrayBuffer();
   const epubZip = await new JSZip().loadAsync(epubBuffer);
   const parser = new DOMParser();
 
-  const containerXml = await epubZip.file("META-INF/container.xml")?.async("string");
-  const containerDoc = parser.parseFromString(containerXml || "", "application/xml");
-  const opfPath = containerDoc.querySelector("rootfile")?.getAttribute("full-path") || "";
-  const opfContent = await epubZip.file(opfPath)?.async("string");
-  const opfDoc = parser.parseFromString(opfContent || "", "application/xml");
-  const opfFolder = opfPath.includes('/') ? opfPath.substring(0, opfPath.lastIndexOf('/')) : '';
-
-  const manifestItems = Array.from(opfDoc.querySelectorAll("manifest > item"));
-  const idToHref: Record<string, string> = {};
-  manifestItems.forEach(item => idToHref[item.getAttribute("id") || ""] = item.getAttribute("href") || "");
-
-  const spineItems = Array.from(opfDoc.querySelectorAll("spine > itemref"));
-  
-  const processList = spineItems.map(item => {
-    const href = idToHref[item.getAttribute("idref") || ""];
-    const path = opfFolder ? `${opfFolder}/${href}` : href;
-    return decodeURIComponent(path);
-  }).filter(p => epubZip.file(p));
+  const { processList } = await parseEpubStructure(epubZip, 'en');
 
   let totalChars = 0;
   let totalWords = 0;
@@ -116,18 +208,7 @@ export async function analyzeEpubOnly(
   const epubBuffer = await file.arrayBuffer();
   const epubZip = await new JSZip().loadAsync(epubBuffer);
   
-  const containerXml = await epubZip.file("META-INF/container.xml")?.async("string");
-  const parser = new DOMParser();
-  const containerDoc = parser.parseFromString(containerXml || "", "application/xml");
-  const opfPath = containerDoc.querySelector("rootfile")?.getAttribute("full-path") || "";
-  const opfContent = await epubZip.file(opfPath)?.async("string");
-  const opfDoc = parser.parseFromString(opfContent || "", "application/xml");
-
-  const metadata = {
-    title: opfDoc.querySelector("dc\\:title, title")?.textContent || "Untitled",
-    creator: opfDoc.querySelector("dc\\:creator, creator")?.textContent || "Unknown",
-    description: opfDoc.querySelector("dc\\:description, description")?.textContent || "",
-  };
+  const { metadata } = await parseEpubStructure(epubZip, settings.uiLang);
 
   return await translator.analyzeBook(metadata, undefined, settings.uiLang, feedback);
 }
@@ -199,24 +280,22 @@ export async function processEpub(
       addLog(getLogStr(ui, 'freeTierActive') || "Free Tier Pacing Active (15 RPM)...", 'warning');
   }
 
-  const containerXml = await epubZip.file("META-INF/container.xml")?.async("string");
+  let epubStructure: EpubStructure;
+  try {
+    epubStructure = await parseEpubStructure(epubZip, ui);
+  } catch (err: any) {
+    addLog(err.message, 'error');
+    throw err;
+  }
+  
+  processList = epubStructure.processList;
   const parser = new DOMParser();
-  const containerDoc = parser.parseFromString(containerXml || "", "application/xml");
-  const opfPath = containerDoc.querySelector("rootfile")?.getAttribute("full-path") || "";
-  const opfContent = await epubZip.file(opfPath)?.async("string");
-  const opfDoc = parser.parseFromString(opfContent || "", "application/xml");
-  const opfFolder = opfPath.includes('/') ? opfPath.substring(0, opfPath.lastIndexOf('/')) : '';
 
   // STRATEGY
   if (!strategy) {
     triggerProgress({ status: 'analyzing' });
-    const metadata = {
-      title: opfDoc.querySelector("dc\\:title, title")?.textContent || "Untitled",
-      creator: opfDoc.querySelector("dc\\:creator, creator")?.textContent || "Unknown",
-      description: opfDoc.querySelector("dc\\:description, description")?.textContent || "",
-    };
     try {
-      strategy = await translator.analyzeBook(metadata, undefined, ui);
+      strategy = await translator.analyzeBook(epubStructure.metadata, undefined, ui);
     } catch (err: any) {
         console.warn("Analysis error caught in processEpub:", err);
         strategy = { 
@@ -230,18 +309,6 @@ export async function processEpub(
   }
   
   translator.setStrategy(strategy);
-
-  // MANIFEST / SPINE
-  const manifestItems = Array.from(opfDoc.querySelectorAll("manifest > item"));
-  const idToHref: Record<string, string> = {};
-  manifestItems.forEach(item => idToHref[item.getAttribute("id") || ""] = item.getAttribute("href") || "");
-
-  const spineItems = Array.from(opfDoc.querySelectorAll("spine > itemref"));
-  processList = spineItems.map(item => {
-    const href = idToHref[item.getAttribute("idref") || ""];
-    const path = opfFolder ? `${opfFolder}/${href}` : href;
-    return decodeURIComponent(path);
-  }).filter(p => epubZip.file(p)) as string[];
 
   // --- CRITICAL RESTORATION PHASE ---
   // If resuming, we have loaded a fresh 'epubZip' from the source file. 
