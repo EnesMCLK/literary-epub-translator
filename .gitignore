@@ -22,11 +22,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-
-# Ignore images to prevent corruption on GitHub sync
-img/
-./img
-/img
-./img/
-/img/
-untracked_images/

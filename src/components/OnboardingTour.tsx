@@ -38,7 +38,7 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, onClose,
     <div className="flex items-center justify-center w-20 h-20">
         {!imgError ? (
             <img 
-                src="untracked_images/favicon.png" 
+                src="img/favicon.png" 
                 alt="App Logo" 
                 className="w-full h-full object-contain drop-shadow-xl" 
                 onError={() => setImgError(true)}
