@@ -1,5 +1,5 @@
 
-import { GoogleGenAI, HarmCategory, HarmBlockThreshold, GenerateContentResponse } from "@google/genai";
+import { GoogleGenAI, HarmCategory, HarmBlockThreshold, GenerateContentResponse, Type } from "@google/genai";
 import { UILanguage, UsageStats, BookStrategy, STORAGE_KEY_API } from "../design";
 import { getSystemInstruction, getAnalysisPrompt } from "../prompts";
 
@@ -16,14 +16,14 @@ export class GeminiTranslator {
     totalTokens: 0
   };
 
-  private readonly REQUEST_DELAY_MS = 4100;
+  private readonly REQUEST_DELAY_MS = 4500;
   private readonly MAX_CHUNK_LENGTH = 3500; 
 
   constructor(
     temperature: number = 0.3, 
     sourceLanguage: string = 'Auto', 
     targetLanguage: string = 'Turkish',
-    modelId: string = 'gemini-2.0-flash'
+    modelId: string = 'gemini-2.5-flash'
   ) {
     this.temperature = temperature;
     this.sourceLanguage = sourceLanguage;
@@ -64,7 +64,7 @@ export class GeminiTranslator {
   }
 
   private isPaidModel(): boolean {
-    return this.modelName.includes('gemini-3') || this.modelName.includes('pro');
+    return this.modelName.includes('pro');
   }
 
   private chunkHtmlContent(text: string): string[] {
@@ -141,9 +141,9 @@ export class GeminiTranslator {
     const apiKey = this.getApiKey();
     const ai = new GoogleGenAI({ apiKey });
     
-    // Fallback to gemini-2.0-flash if current model is paid/custom to avoid costing user tokens for analysis if possible, 
+    // Fallback to gemini-2.5-flash if current model is paid/custom to avoid costing user tokens for analysis if possible, 
     // or to ensure a stable model for the structured JSON task.
-    let analysisModelName = this.isPaidModel() ? this.modelName : 'gemini-2.0-flash';
+    let analysisModelName = this.modelName;
     const prompt = getAnalysisPrompt(this.sourceLanguage, this.targetLanguage, metadata, uiLang, feedback);
     
     let attempt = 0;
@@ -158,6 +158,26 @@ export class GeminiTranslator {
                 contents: prompt,
                 config: { 
                     responseMimeType: "application/json",
+                    responseSchema: {
+                        type: Type.OBJECT,
+                        properties: {
+                            genre_en: { type: Type.STRING },
+                            tone_en: { type: Type.STRING },
+                            author_style_en: { type: Type.STRING },
+                            strategy_en: { type: Type.STRING },
+                            genre_translated: { type: Type.STRING },
+                            tone_translated: { type: Type.STRING },
+                            author_style_translated: { type: Type.STRING },
+                            strategy_translated: { type: Type.STRING },
+                            literary_fidelity_note: { type: Type.STRING },
+                            detected_creativity_level: { type: Type.NUMBER }
+                        },
+                        required: [
+                            "genre_en", "tone_en", "author_style_en", "strategy_en",
+                            "genre_translated", "tone_translated", "author_style_translated", "strategy_translated",
+                            "literary_fidelity_note", "detected_creativity_level"
+                        ]
+                    },
                     safetySettings: [
                         { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
                         { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
@@ -216,9 +236,9 @@ export class GeminiTranslator {
             }
 
             // If 404 (model not found) and we aren't already on the stable fallback, switch to it.
-            if ((isNotFound || msg.includes('500') || msg.includes('internal')) && analysisModelName !== 'gemini-2.0-flash') {
-                console.log("Downgrading analysis model to gemini-2.0-flash for stability.");
-                analysisModelName = 'gemini-2.0-flash';
+            if ((isNotFound || msg.includes('500') || msg.includes('internal')) && analysisModelName !== 'gemini-2.5-flash') {
+                console.log("Downgrading analysis model to gemini-2.5-flash for stability.");
+                analysisModelName = 'gemini-2.5-flash';
                 attempt = 0; 
                 continue; 
             }
@@ -365,7 +385,15 @@ export class GeminiTranslator {
                 await new Promise(resolve => setTimeout(resolve, delay));
                 continue; 
             } else {
-                if (errMsg.includes('429')) throw new Error("API_QUOTA_EXCEEDED"); 
+                if (errMsg.includes('429')) {
+                    if (attempt <= maxRetries) {
+                        console.warn(`Free Tier Quota Hit (Attempt ${attempt}). Waiting 10s...`);
+                        await new Promise(resolve => setTimeout(resolve, 10000));
+                        continue;
+                    } else {
+                        throw new Error("API_QUOTA_EXCEEDED");
+                    }
+                }
                 
                 if (attempt <= maxRetries) {
                     await new Promise(resolve => setTimeout(resolve, 1000 * attempt));

@@ -20,7 +20,7 @@ export const STRINGS_UI: Record<string, any> = {
     reAnalyze: "YENİDEN ANALİZ ET", changeModel: "MODEL DEĞİŞTİR", analyzedWith: "ANALİZ EDİLEN MODEL",
     themeLight: "AYDINLIK", themeDark: "KARANLIK", autoDetect: "Otomatik",
     analyzingBtn: "ANALİZ EDİLİYOR...", noAnalysisData: "Analiz verisi bulunamadı.",
-    modelDescFree: "Hızlı ve Akıllı", modelDescBalanced: "Hızlı ve Dengeli", modelDescExpert: "Uzman", modelDescNewFast: "Yeni ve Hızlı", modelDescNewExpert: "Yeni ve Uzman",
+    modelDescFree: "Hızlı ve Akıllı", modelDescPricePerf: "Hızlı, Fiyat ve Performans", modelDescBalanced: "Hızlı ve Dengeli", modelDescExpert: "Uzman", modelDescNewFast: "Yeni ve Hızlı", modelDescNewExpert: "Yeni ve Uzman",
     statsTitle: "ANALİZ VE İSTATİSTİKLER", statsTabStats: "İSTATİSTİKLER", statsTabAnalysis: "YAPAY ZEKA STRATEJİSİ",
     analysisGenre: "TÜR", analysisTone: "TON", analysisStyle: "ÜSLUP", analysisStrategy: "ÇEVİRİ STRATEJİSİ",
     feedbackLabel: "GERİ BİLDİRİM VE YENİDEN OLUŞTURMA", feedbackPlaceholder: "Örn: Bu bir hiciv kitabıdır, dili daha esprili hale getir...",
@@ -66,7 +66,7 @@ export const STRINGS_UI: Record<string, any> = {
     reAnalyze: "RE-ANALYZE", changeModel: "CHANGE MODEL", analyzedWith: "ANALYZED WITH",
     themeLight: "LIGHT", themeDark: "DARK", autoDetect: "Automatic",
     analyzingBtn: "ANALYZING...", noAnalysisData: "No analysis data available.",
-    modelDescFree: "Fast & Smart", modelDescBalanced: "Fast & Balanced", modelDescExpert: "Expert", modelDescNewFast: "New & Fast", modelDescNewExpert: "New & Expert",
+    modelDescFree: "Fast & Smart", modelDescPricePerf: "Fast, Price & Performance", modelDescBalanced: "Fast & Balanced", modelDescExpert: "Expert", modelDescNewFast: "New & Fast", modelDescNewExpert: "New & Expert",
     statsTitle: "ANALYSIS & STATISTICS", statsTabStats: "STATISTICS", statsTabAnalysis: "AI STRATEGY",
     analysisGenre: "GENRE", analysisTone: "TONE", analysisStyle: "STYLE", analysisStrategy: "TRANSLATION STRATEGY",
     feedbackLabel: "FEEDBACK & REGENERATE", feedbackPlaceholder: "E.g. This is a satire, make the tone more humorous...",
@@ -96,7 +96,7 @@ export const STRINGS_UI: Record<string, any> = {
 
 const PARTIAL_TRANSLATIONS: Record<string, any> = {
   fr: {
-    modelDescFree: "Rapide & Intelligent", modelDescBalanced: "Rapide & Équilibré", modelDescExpert: "Expert", modelDescNewFast: "Nouveau & Rapide", modelDescNewExpert: "Nouveau & Expert",
+    modelDescFree: "Rapide & Intelligent", modelDescPricePerf: "Rapide, Prix & Performance", modelDescBalanced: "Rapide & Équilibré", modelDescExpert: "Expert", modelDescNewFast: "Nouveau & Rapide", modelDescNewExpert: "Nouveau & Expert",
     tokens: "JETONS", speed: "VITESSE", eta: "RESTANT", waiting: "ATTENTE", wordsPerSec: "m/s",
     title: "Traducteur EPUB Littéraire", description: "Moteur de Traduction Littéraire Professionnel",
     historyTitle: "HISTORIQUE", clearHistory: "Effacer tout", noHistory: "Aucun enregistrement",
@@ -136,7 +136,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     ]
   },
   de: {
-    modelDescFree: "Schnell & Intelligent", modelDescBalanced: "Schnell & Ausgewogen", modelDescExpert: "Experte", modelDescNewFast: "Neu & Schnell", modelDescNewExpert: "Neu & Experte",
+    modelDescFree: "Schnell & Intelligent", modelDescPricePerf: "Schnell, Preis & Leistung", modelDescBalanced: "Schnell & Ausgewogen", modelDescExpert: "Experte", modelDescNewFast: "Neu & Schnell", modelDescNewExpert: "Neu & Experte",
     tokens: "TOKEN", speed: "TEMPO", eta: "VERBLEIBEND", waiting: "WARTEN", wordsPerSec: "W/s",
     title: "Literarischer EPUB-Übersetzer", description: "Professionelle Literarische Übersetzungsmaschine",
     historyTitle: "VERLAUF", clearHistory: "Alles löschen", noHistory: "Keine Einträge",
@@ -176,7 +176,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     ]
   },
   es: {
-    modelDescFree: "Rápido e Inteligente", modelDescBalanced: "Rápido y Equilibrado", modelDescExpert: "Experto", modelDescNewFast: "Nuevo y Rápido", modelDescNewExpert: "Nuevo y Experto",
+    modelDescFree: "Rápido e Inteligente", modelDescPricePerf: "Rápido, Precio y Rendimiento", modelDescBalanced: "Rápido y Equilibrado", modelDescExpert: "Experto", modelDescNewFast: "Nuevo y Rápido", modelDescNewExpert: "Nuevo y Experto",
     tokens: "TOKENS", speed: "VELOCIDAD", eta: "RESTANTE", waiting: "ESPERANDO", wordsPerSec: "pal/s",
     title: "Traductor Literario EPUB", description: "Motor de Traducción Literaria Profesional",
     historyTitle: "HISTORIAL", clearHistory: "Borrar todo", noHistory: "Sin registros",
@@ -216,7 +216,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     ]
   },
   it: {
-    modelDescFree: "Veloce & Intelligente", modelDescBalanced: "Veloce & Equilibrato", modelDescExpert: "Esperto", modelDescNewFast: "Nuovo & Veloce", modelDescNewExpert: "Nuovo & Esperto",
+    modelDescFree: "Veloce & Intelligente", modelDescPricePerf: "Veloce, Prezzo e Prestazioni", modelDescBalanced: "Veloce & Equilibrato", modelDescExpert: "Esperto", modelDescNewFast: "Nuovo & Veloce", modelDescNewExpert: "Nuovo & Esperto",
     tokens: "TOKEN", speed: "VELOCITÀ", eta: "RIMANENTE", waiting: "ATTESA", wordsPerSec: "par/s",
     title: "Traduttore Letterario EPUB", description: "Motore di Traduzione Letteraria Professionale",
     historyTitle: "CRONOLOGIA", clearHistory: "Cancella tutto", noHistory: "Nessun record",
@@ -256,7 +256,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     ]
   },
   ru: {
-    modelDescFree: "Быстрый и Умный", modelDescBalanced: "Быстрый и Сбалансированный", modelDescExpert: "Эксперт", modelDescNewFast: "Новый и Быстрый", modelDescNewExpert: "Новый и Эксперт",
+    modelDescFree: "Быстрый и Умный", modelDescPricePerf: "Быстрый, Цена и Качество", modelDescBalanced: "Быстрый и Сбалансированный", modelDescExpert: "Эксперт", modelDescNewFast: "Новый и Быстрый", modelDescNewExpert: "Новый и Эксперт",
     tokens: "ТОКЕНЫ", speed: "СКОРОСТЬ", eta: "ОСТАЛОСЬ", waiting: "ОЖИДАНИЕ", wordsPerSec: "слов/с",
     title: "Литературный EPUB Переводчик", description: "Профессиональный движок перевода",
     historyTitle: "ИСТОРИЯ", clearHistory: "Очистить все", noHistory: "Нет записей",
@@ -296,7 +296,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     ]
   },
   zh: {
-    modelDescFree: "快速且智能", modelDescBalanced: "快速且平衡", modelDescExpert: "专家", modelDescNewFast: "全新且快速", modelDescNewExpert: "全新且专家",
+    modelDescFree: "快速且智能", modelDescPricePerf: "快速，价格与性能", modelDescBalanced: "快速且平衡", modelDescExpert: "专家", modelDescNewFast: "全新且快速", modelDescNewExpert: "全新且专家",
     tokens: "代币", speed: "速度", eta: "剩余", waiting: "等待", wordsPerSec: "字/秒",
     title: "文学 EPUB 翻译器", description: "专业文学翻译引擎",
     historyTitle: "翻译历史", clearHistory: "全部清除", noHistory: "无记录",
@@ -336,7 +336,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     ]
   },
   ja: {
-    modelDescFree: "高速＆スマート", modelDescBalanced: "高速＆バランス", modelDescExpert: "エキスパート", modelDescNewFast: "新機能＆高速", modelDescNewExpert: "新機能＆エキスパート",
+    modelDescFree: "高速＆スマート", modelDescPricePerf: "高速、価格とパフォーマンス", modelDescBalanced: "高速＆バランス", modelDescExpert: "エキスパート", modelDescNewFast: "新機能＆高速", modelDescNewExpert: "新機能＆エキスパート",
     tokens: "トークン", speed: "速度", eta: "残り", waiting: "待機中", wordsPerSec: "語/秒",
     title: "文学 EPUB 翻訳機", description: "プロフェッショナル文学翻訳エンジン",
     historyTitle: "翻訳履歴", clearHistory: "すべて消去", noHistory: "記録なし",
@@ -376,7 +376,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     ]
   },
   ko: {
-    modelDescFree: "빠르고 스마트함", modelDescBalanced: "빠르고 균형 잡힘", modelDescExpert: "전문가", modelDescNewFast: "새롭고 빠름", modelDescNewExpert: "새롭고 전문가",
+    modelDescFree: "빠르고 스마트함", modelDescPricePerf: "빠름, 가격 및 성능", modelDescBalanced: "빠르고 균형 잡힘", modelDescExpert: "전문가", modelDescNewFast: "새롭고 빠름", modelDescNewExpert: "새롭고 전문가",
     tokens: "토큰", speed: "속도", eta: "남음", waiting: "대기 중", wordsPerSec: "단어/초",
     title: "문학 EPUB 번역기", description: "전문 문학 번역 엔진",
     historyTitle: "번역 기록", clearHistory: "모두 지우기", noHistory: "기록 없음",
@@ -416,7 +416,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     ]
   },
   pt: {
-    modelDescFree: "Rápido e Inteligente", modelDescBalanced: "Rápido e Equilibrado", modelDescExpert: "Especialista", modelDescNewFast: "Novo e Rápido", modelDescNewExpert: "Novo e Especialista",
+    modelDescFree: "Rápido e Inteligente", modelDescPricePerf: "Rápido, Preço e Desempenho", modelDescBalanced: "Rápido e Equilibrado", modelDescExpert: "Especialista", modelDescNewFast: "Novo e Rápido", modelDescNewExpert: "Novo e Especialista",
     tokens: "TOKENS", speed: "VELOCIDADE", eta: "RESTANTE", waiting: "AGUARDANDO", wordsPerSec: "pal/s",
     title: "Tradutor Literário EPUB", description: "Motor de Tradução Literária Profissional",
     historyTitle: "HISTÓRICO", clearHistory: "Limpar tudo", noHistory: "Sem registros",
@@ -456,7 +456,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     ]
   },
   ar: {
-    modelDescFree: "سريع وذكي", modelDescBalanced: "سريع ومتوازن", modelDescExpert: "خبير", modelDescNewFast: "جديد وسريع", modelDescNewExpert: "جديد وخبير",
+    modelDescFree: "سريع وذكي", modelDescPricePerf: "سريع، السعر والأداء", modelDescBalanced: "سريع ومتوازن", modelDescExpert: "خبير", modelDescNewFast: "جديد وسريع", modelDescNewExpert: "جديد وخبير",
     tokens: "الرموز", speed: "السرعة", eta: "المتبقي", waiting: "انتظار", wordsPerSec: "كلمة/ث",
     title: "مترجم EPUB الأدبي", description: "محرك ترجمة أدبي محترف",
     historyTitle: "سجل الترجمة", clearHistory: "مسح الكل", noHistory: "لا توجد سجلات",
@@ -496,7 +496,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     ]
   },
   nl: {
-    modelDescFree: "Snel & Slim", modelDescBalanced: "Snel & Evenwichtig", modelDescExpert: "Expert", modelDescNewFast: "Nieuw & Snel", modelDescNewExpert: "Nieuw & Expert",
+    modelDescFree: "Snel & Slim", modelDescPricePerf: "Snel, Prijs & Prestatie", modelDescBalanced: "Snel & Evenwichtig", modelDescExpert: "Expert", modelDescNewFast: "Nieuw & Snel", modelDescNewExpert: "Nieuw & Expert",
     tokens: "TOKENS", speed: "SNELHEID", eta: "RESTEREND", waiting: "WACHTEN", wordsPerSec: "w/s",
     title: "Literaire EPUB Vertaler", description: "Professionele Literaire Vertaalmachine",
     historyTitle: "GESCHIEDENIS", clearHistory: "Alles wissen", noHistory: "Geen records",
@@ -530,7 +530,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     ]
   },
   pl: {
-    modelDescFree: "Szybki i Inteligentny", modelDescBalanced: "Szybki i Zrównoważony", modelDescExpert: "Ekspert", modelDescNewFast: "Nowy i Szybki", modelDescNewExpert: "Nowy i Ekspert",
+    modelDescFree: "Szybki i Inteligentny", modelDescPricePerf: "Szybki, Cena i Wydajność", modelDescBalanced: "Szybki i Zrównoważony", modelDescExpert: "Ekspert", modelDescNewFast: "Nowy i Szybki", modelDescNewExpert: "Nowy i Ekspert",
     tokens: "TOKENY", speed: "PRĘDKOŚĆ", eta: "POZOSTAŁO", waiting: "OCZEKIWANIE", wordsPerSec: "sł./s",
     title: "Literacki Tłumacz EPUB", description: "Profesjonalny Silnik Tłumaczeń Literackich",
     historyTitle: "HISTORIA", clearHistory: "Wyczyść wszystko", noHistory: "Brak wpisów",
@@ -564,7 +564,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     ]
   },
   hi: {
-    modelDescFree: "तेज और स्मार्ट", modelDescBalanced: "तेज और संतुलित", modelDescExpert: "विशेषज्ञ", modelDescNewFast: "नया और तेज", modelDescNewExpert: "नया और विशेषज्ञ",
+    modelDescFree: "तेज और स्मार्ट", modelDescPricePerf: "तेज, मूल्य और प्रदर्शन", modelDescBalanced: "तेज और संतुलित", modelDescExpert: "विशेषज्ञ", modelDescNewFast: "नया और तेज", modelDescNewExpert: "नया और विशेषज्ञ",
     tokens: "टोकन", speed: "गति", eta: "शेष", waiting: "प्रतीक्षा", wordsPerSec: "शब्द/से",
     title: "साहित्यिक EPUB अनुवादक", description: "पेशेवर साहित्यिक अनुवाद इंजन",
     historyTitle: "अनुवाद इतिहास", clearHistory: "सभी साफ़ करें", noHistory: "कोई रिकॉर्ड नहीं",
@@ -599,7 +599,7 @@ const PARTIAL_TRANSLATIONS: Record<string, any> = {
     ]
   },
   vi: {
-    modelDescFree: "Nhanh & Thông minh", modelDescBalanced: "Nhanh & Cân bằng", modelDescExpert: "Chuyên gia", modelDescNewFast: "Mới & Nhanh", modelDescNewExpert: "Mới & Chuyên gia",
+    modelDescFree: "Nhanh & Thông minh", modelDescPricePerf: "Nhanh, Giá cả & Hiệu suất", modelDescBalanced: "Nhanh & Cân bằng", modelDescExpert: "Chuyên gia", modelDescNewFast: "Mới & Nhanh", modelDescNewExpert: "Mới & Chuyên gia",
     tokens: "TOKEN", speed: "TỐC ĐỘ", eta: "CÒN LẠI", waiting: "ĐANG CHỜ", wordsPerSec: "từ/s",
     title: "Dịch giả EPUB Văn học", description: "Công cụ dịch thuật văn học chuyên nghiệp",
     historyTitle: "LỊCH SỬ", clearHistory: "Xóa tất cả", noHistory: "Không có bản ghi",

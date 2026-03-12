@@ -273,7 +273,7 @@ export async function processEpub(
     triggerProgress({});
   };
 
-  const isFreeTier = !settings.hasPaidKey && (settings.modelId === 'gemini-2.0-flash' || settings.modelId?.includes('flash-lite'));
+  const isFreeTier = !settings.hasPaidKey && (settings.modelId === 'gemini-2.5-flash' || settings.modelId === 'gemini-3-flash-preview' || settings.modelId?.includes('flash-lite'));
   const minInterval = isFreeTier ? 4000 : 0; 
   
   if (isFreeTier) {

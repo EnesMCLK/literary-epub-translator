@@ -50,7 +50,7 @@ const COUNTRY_TO_LANG: Record<string, UILanguage> = {
   'IN': 'hi', 'VN': 'vi'
 };
 
-const DEFAULT_MODEL_ID = 'gemini-2.0-flash';
+const DEFAULT_MODEL_ID = 'gemini-2.5-flash';
 
 export default function App() {
   const [uiLang, setUiLang] = useState<UILanguage>('en');

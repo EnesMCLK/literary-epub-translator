@@ -46,7 +46,7 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
 
   // Model ID'ye göre çeviri anahtarını eşleştir
   const getModelDesc = (modelId: string) => {
-    if (modelId === 'gemini-2.0-flash' || modelId === 'gemini-flash-lite-latest') return t.modelDescFree || 'Fast & Smart';
+    if (modelId === 'gemini-2.5-flash') return t.modelDescPricePerf || 'Fast, Price & Performance';
     if (modelId === 'gemini-3-flash-preview') return t.modelDescBalanced || 'Fast & Balanced';
     if (modelId === 'gemini-3-pro-preview') return t.modelDescExpert || 'Expert';
     if (modelId === 'gemini-3.1-flash-lite-preview') return t.modelDescNewFast || 'New & Fast';
