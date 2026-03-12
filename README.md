@@ -17,9 +17,9 @@
 <div align="center">
   <a href="https://enesmclk.github.io/literary-epub-translator/" target="_blank">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./img/dark-dashboard.png">
-    <source media="(prefers-color-scheme: light)" srcset="./img/light-dashboard.png">
-    <img alt="Kontrol Paneli (Dashboard) Ekran Görüntüsü" src="./img/light-dashboard.png">
+    <source media="(prefers-color-scheme: dark)" srcset="./untracked_images/dark-dashboard.png">
+    <source media="(prefers-color-scheme: light)" srcset="./untracked_images/light-dashboard.png">
+    <img alt="Kontrol Paneli (Dashboard) Ekran Görüntüsü" src="./untracked_images/light-dashboard.png">
   </picture>
 </div>
 
