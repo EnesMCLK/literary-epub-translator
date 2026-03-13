@@ -3,7 +3,7 @@ import {
   Settings, X, LayoutDashboard, Sun, Moon, Globe, Key, Lock, Unlock, Zap, 
   Eye, EyeOff, Loader2, ShieldCheck, Sliders, Check, ExternalLink, Trash2, Save
 } from 'lucide-react';
-import { TranslationSettings, AI_MODELS, UILanguage } from '../design';
+import { TranslationSettings, AI_MODELS, UILanguage, STORAGE_KEY_TIER } from '../design';
 
 interface SettingsDrawerProps {
   isOpen: boolean;
@@ -22,6 +22,8 @@ interface SettingsDrawerProps {
   onVerifyKey: () => void;
   onConnectAiStudio: () => void;
   onClearKey: () => void;
+  isPaidTier: boolean;
+  setIsPaidTier: (isPaid: boolean) => void;
 }
 
 export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
@@ -40,7 +42,9 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
   isVerifying,
   onVerifyKey,
   onConnectAiStudio,
-  onClearKey
+  onClearKey,
+  isPaidTier,
+  setIsPaidTier
 }) => {
   const [showKey, setShowKey] = useState(false);
 
@@ -153,6 +157,33 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
                         </button>
                     )}
                 </div>
+                {hasPaidKey && (
+                  <div className="mt-4 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">{t.tierToggleLabel || 'API Key Type'}</label>
+                      <button 
+                        onClick={() => {
+                          const newValue = !isPaidTier;
+                          setIsPaidTier(newValue);
+                          localStorage.setItem(STORAGE_KEY_TIER, newValue ? 'paid' : 'free');
+                          if (!newValue && settings.modelId !== 'gemini-2.5-flash') {
+                            onUpdateSettings({ ...settings, modelId: 'gemini-2.5-flash' });
+                          }
+                        }}
+                        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900 ${isPaidTier ? 'bg-indigo-500' : 'bg-slate-300 dark:bg-slate-600'}`}
+                      >
+                        <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${isPaidTier ? 'translate-x-5' : 'translate-x-1'}`} />
+                      </button>
+                    </div>
+                    <div className="flex justify-between text-[9px] font-bold">
+                      <span className={!isPaidTier ? 'text-amber-500' : 'text-slate-400'}>{t.tierFree || 'Free Tier'}</span>
+                      <span className={isPaidTier ? 'text-indigo-500' : 'text-slate-400'}>{t.tierPaid || 'Paid Tier'}</span>
+                    </div>
+                    <p className="text-[9px] text-slate-400 dark:text-slate-500 mt-2 leading-relaxed">
+                      {t.tierToggleDesc || 'Free tier applies rate limits and unlocks only Gemini 2.5 Flash.'}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -164,7 +195,7 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
             </label>
             <div className="grid grid-cols-1 gap-2">
               {AI_MODELS.map(m => {
-                const isLocked = m.locked && !hasPaidKey;
+                const isLocked = m.locked && (!hasPaidKey || (!isPaidTier && m.id !== 'gemini-2.5-flash'));
                 return (
                 <button 
                   key={m.id} 

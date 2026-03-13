@@ -202,15 +202,16 @@ export async function calculateEpubStats(file: File, targetTags: string[], hasUs
 export async function analyzeEpubOnly(
   file: File,
   settings: TranslationSettings,
-  feedback?: string
+  feedback?: string,
+  onLog?: (msg: string, type: 'info' | 'warning' | 'error' | 'success') => void
 ): Promise<BookStrategy> {
-  const translator = new GeminiTranslator(settings.temperature, settings.sourceLanguage, settings.targetLanguage, settings.modelId);
+  const translator = new GeminiTranslator(settings.temperature, settings.sourceLanguage, settings.targetLanguage, settings.modelId, settings.isPaidTier);
   const epubBuffer = await file.arrayBuffer();
   const epubZip = await new JSZip().loadAsync(epubBuffer);
   
   const { metadata } = await parseEpubStructure(epubZip, settings.uiLang);
 
-  return await translator.analyzeBook(metadata, undefined, settings.uiLang, feedback);
+  return await translator.analyzeBook(metadata, undefined, settings.uiLang, feedback, onLog);
 }
 
 export async function processEpub(
@@ -223,7 +224,7 @@ export async function processEpub(
   precomputedStats?: BookStats 
 ): Promise<{ epubBlob: Blob }> {
   const ui = settings.uiLang;
-  const translator = new GeminiTranslator(settings.temperature, settings.sourceLanguage, settings.targetLanguage, settings.modelId);
+  const translator = new GeminiTranslator(settings.temperature, settings.sourceLanguage, settings.targetLanguage, settings.modelId, settings.isPaidTier);
   const epubBuffer = await file.arrayBuffer();
   const epubZip = await new JSZip().loadAsync(epubBuffer);
 
@@ -273,8 +274,8 @@ export async function processEpub(
     triggerProgress({});
   };
 
-  const isFreeTier = !settings.hasPaidKey && (settings.modelId === 'gemini-2.5-flash' || settings.modelId === 'gemini-3-flash-preview' || settings.modelId?.includes('flash-lite'));
-  const minInterval = isFreeTier ? 4000 : 0; 
+  const isFreeTier = !settings.isPaidTier;
+  const minInterval = isFreeTier ? 4500 : 0; 
   
   if (isFreeTier) {
       addLog(getLogStr(ui, 'freeTierActive') || "Free Tier Pacing Active (15 RPM)...", 'warning');
@@ -427,6 +428,7 @@ export async function processEpub(
               node.innerHTML = original;
             } else {
                 console.error("Critical node translation error:", err);
+                addLog(getLogStr(ui, 'error').replace('{0}', err.message || "Unknown error"), 'error');
                 node.innerHTML = original;
             }
           }

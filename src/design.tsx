@@ -22,6 +22,7 @@ export interface TranslationSettings {
   modelId?: string;
   uiLang: UILanguage;
   hasPaidKey?: boolean;
+  isPaidTier?: boolean;
 }
 
 export interface ResumeInfo {
@@ -92,6 +93,7 @@ export interface UsageStats {
 // --- Constants ---
 
 export const STORAGE_KEY_API = 'lit-trans-api-key';
+export const STORAGE_KEY_TIER = 'lit-trans-api-tier';
 export const AVAILABLE_TAGS = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li', 'blockquote', 'div', 'span', 'em', 'strong', 'td', 'th', 'caption', 'figcaption', 'aside', 'section', 'article'];
 export const DEFAULT_TAGS = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li', 'blockquote', 'div', 'td', 'th', 'figcaption', 'aside'];
 

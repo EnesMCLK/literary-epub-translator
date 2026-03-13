@@ -2,6 +2,12 @@
 import { GoogleGenAI, HarmCategory, HarmBlockThreshold, GenerateContentResponse, Type } from "@google/genai";
 import { UILanguage, UsageStats, BookStrategy, STORAGE_KEY_API } from "../design";
 import { getSystemInstruction, getAnalysisPrompt } from "../prompts";
+import { STRINGS_LOGS } from "../lang/logs";
+
+function getLogStr(uiLang: string, key: string): string {
+  const bundle = STRINGS_LOGS[uiLang] || STRINGS_LOGS['en'];
+  return bundle[key] || STRINGS_LOGS['en'][key];
+}
 
 export class GeminiTranslator {
   private modelName: string;
@@ -19,16 +25,20 @@ export class GeminiTranslator {
   private readonly REQUEST_DELAY_MS = 4500;
   private readonly MAX_CHUNK_LENGTH = 3500; 
 
+  private isPaidTier: boolean;
+
   constructor(
     temperature: number = 0.3, 
     sourceLanguage: string = 'Auto', 
     targetLanguage: string = 'Turkish',
-    modelId: string = 'gemini-2.5-flash'
+    modelId: string = 'gemini-2.5-flash',
+    isPaidTier: boolean = false
   ) {
     this.temperature = temperature;
     this.sourceLanguage = sourceLanguage;
     this.targetLanguage = targetLanguage;
     this.modelName = modelId;
+    this.isPaidTier = isPaidTier;
   }
 
   private getApiKey(): string {
@@ -64,7 +74,7 @@ export class GeminiTranslator {
   }
 
   private isPaidModel(): boolean {
-    return this.modelName.includes('pro');
+    return this.isPaidTier;
   }
 
   private chunkHtmlContent(text: string): string[] {
@@ -136,7 +146,8 @@ export class GeminiTranslator {
     metadata: any, 
     sampleText: string | undefined, 
     uiLang: UILanguage = 'en', 
-    feedback?: string
+    feedback?: string,
+    onLog?: (msg: string, type: 'info' | 'warning' | 'error' | 'success') => void
   ): Promise<BookStrategy> {
     const apiKey = this.getApiKey();
     const ai = new GoogleGenAI({ apiKey });
@@ -218,11 +229,13 @@ export class GeminiTranslator {
             
             if (isAuthError) {
                 console.error("Authentication failed. Aborting analysis.");
+                if (onLog) onLog(getLogStr(uiLang, 'error').replace('{0}', 'Authentication failed.'), 'error');
                 break;
             }
 
             if (isPlaceholder) {
                  console.error("No API Key provided.");
+                 if (onLog) onLog(getLogStr(uiLang, 'error').replace('{0}', 'No API Key provided.'), 'error');
                  break;
             }
 
@@ -232,12 +245,14 @@ export class GeminiTranslator {
             
             if (attempt > currentMaxRetries) {
                  console.error("All analysis attempts failed.");
+                 if (onLog) onLog(getLogStr(uiLang, 'error').replace('{0}', 'All analysis attempts failed.'), 'error');
                  break;
             }
 
             // If 404 (model not found) and we aren't already on the stable fallback, switch to it.
             if ((isNotFound || msg.includes('500') || msg.includes('internal')) && analysisModelName !== 'gemini-2.5-flash') {
                 console.log("Downgrading analysis model to gemini-2.5-flash for stability.");
+                if (onLog) onLog(getLogStr(uiLang, 'error').replace('{0}', 'Model error. Downgrading to gemini-2.5-flash...'), 'warning');
                 analysisModelName = 'gemini-2.5-flash';
                 attempt = 0; 
                 continue; 
@@ -246,10 +261,12 @@ export class GeminiTranslator {
             if (isQuota) {
                 const waitTime = 2000 * Math.pow(2, attempt); 
                 console.log(`Quota hit during analysis. Waiting ${waitTime}ms...`);
+                if (onLog) onLog(getLogStr(uiLang, 'quotaExceeded'), 'warning');
                 await new Promise(resolve => setTimeout(resolve, waitTime));
                 continue;
             }
 
+            if (onLog) onLog(getLogStr(uiLang, 'error').replace('{0}', err.message), 'warning');
             await new Promise(resolve => setTimeout(resolve, 2000));
         }
     }

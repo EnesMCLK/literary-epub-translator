@@ -37,6 +37,7 @@ export const STRINGS_UI: Record<string, any> = {
     analysisQuotaExceededDesc: "Varsayılan strateji kullanılıyor. Çeviriye devam edebilirsiniz.",
     tourNext: "İLERİ", tourPrev: "GERİ", tourSkip: "GEÇ", tourFinish: "BAŞLA",
     getApiKeyBtn: "ÜCRETSİZ ANAHTAR AL",
+    tierFree: "Ücretsiz Sürüm", tierPaid: "Ücretli Sürüm", tierToggleLabel: "API Anahtarı Türü", tierToggleDesc: "Ücretsiz sürümde hız sınırı uygulanır ve sadece Gemini 2.5 Flash kullanılabilir.",
     tipApiKey: "İPUCU: Hızı ~4 kat artırmak için kendi API Anahtarınızı ekleyin!",
     localMemory: "YEREL HAFIZA", booksCached: "{0} kitap önbellekte",
     tourSteps: [
@@ -83,6 +84,7 @@ export const STRINGS_UI: Record<string, any> = {
     analysisQuotaExceededDesc: "Using default strategy. You can still translate.",
     tourNext: "NEXT", tourPrev: "PREV", tourSkip: "SKIP", tourFinish: "GET STARTED",
     getApiKeyBtn: "GET FREE API KEY",
+    tierFree: "Free Tier", tierPaid: "Paid Tier", tierToggleLabel: "API Key Type", tierToggleDesc: "Free tier applies rate limits and unlocks only Gemini 2.5 Flash.",
     tipApiKey: "TIP: Add your own API Key to speed this up by ~4x!",
     localMemory: "LOCAL MEMORY", booksCached: "{0} books cached",
     tourSteps: [

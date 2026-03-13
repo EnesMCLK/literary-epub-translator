@@ -18,7 +18,7 @@ import { StatsModal } from './components/StatsModal';
 import { OnboardingTour } from './components/OnboardingTour';
 import { 
     UILanguage, TranslationSettings, HistoryItem, 
-    LANGUAGES_DATA, DEFAULT_TAGS, LANG_CODE_TO_LABEL, AI_MODELS, BookStats, STORAGE_KEY_API, BookStrategy
+    LANGUAGES_DATA, DEFAULT_TAGS, LANG_CODE_TO_LABEL, AI_MODELS, BookStats, STORAGE_KEY_API, STORAGE_KEY_TIER, BookStrategy
 } from './design';
 import { STRINGS_UI } from './lang/ui';
 import { STRINGS_LOGS } from './lang/logs';
@@ -70,6 +70,9 @@ export default function App() {
   const [isLangModalOpen, setIsLangModalOpen] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
   const [hasPaidKey, setHasPaidKey] = useState(false);
+  const [isPaidTier, setIsPaidTier] = useState(() => {
+    return localStorage.getItem(STORAGE_KEY_TIER) === 'paid';
+  });
   const [isVerifying, setIsVerifying] = useState(false);
   const [manualKey, setManualKey] = useState('');
   const [isLeftDrawerOpen, setIsLeftDrawerOpen] = useState(false);
@@ -246,6 +249,8 @@ export default function App() {
     (window as any).manualApiKey = null;
     setManualKey('');
     setHasPaidKey(false);
+    setIsPaidTier(false);
+    localStorage.setItem(STORAGE_KEY_TIER, 'free');
     setSettings(prev => ({ ...prev, modelId: DEFAULT_MODEL_ID }));
   };
 
@@ -283,10 +288,15 @@ export default function App() {
     setBookStats(null);
     
     try {
-      const effectiveSettings = { ...settings, modelId: settings.modelId, uiLang, hasPaidKey };
+      const effectiveSettings = { ...settings, modelId: settings.modelId, uiLang, hasPaidKey, isPaidTier };
 
       const [strategy, stats] = await Promise.all([
-          analyzeEpubOnly(file, effectiveSettings),
+          analyzeEpubOnly(file, effectiveSettings, undefined, (msg, type) => {
+              setProgress(prev => ({
+                  ...prev,
+                  logs: [...prev.logs, { timestamp: new Date().toLocaleTimeString(), text: msg, type }]
+              }));
+          }),
           calculateEpubStats(file, settings.targetTags, hasPaidKey)
       ]);
       
@@ -317,7 +327,12 @@ export default function App() {
     if (!file) return;
     setIsAnalyzing(true);
     try {
-      const strategy = await analyzeEpubOnly(file, { ...settings, uiLang, hasPaidKey }, feedback);
+      const strategy = await analyzeEpubOnly(file, { ...settings, uiLang, hasPaidKey, isPaidTier }, feedback, (msg, type) => {
+          setProgress(prev => ({
+              ...prev,
+              logs: [...prev.logs, { timestamp: new Date().toLocaleTimeString(), text: msg, type }]
+          }));
+      });
       setProgress(prev => ({ ...prev, strategy: strategy }));
       if (strategy && strategy.detected_creativity_level) {
         setSettings(s => ({ ...s, temperature: strategy.detected_creativity_level }));
@@ -378,8 +393,8 @@ export default function App() {
     progressRef.current = null; 
     
     const effectiveSettings = isResuming && resumeData 
-      ? { ...resumeData.settings, hasPaidKey, modelId: resumeData.settings.modelId } 
-      : { ...settings, modelId: settings.modelId, uiLang, hasPaidKey };
+      ? { ...resumeData.settings, hasPaidKey, isPaidTier, modelId: resumeData.settings.modelId } 
+      : { ...settings, modelId: settings.modelId, uiLang, hasPaidKey, isPaidTier };
 
     try {
       const { epubBlob } = await processEpub(
@@ -668,6 +683,8 @@ export default function App() {
         onVerifyKey={() => verifyApiKey()}
         onConnectAiStudio={handleConnectAiStudio}
         onClearKey={handleClearKey}
+        isPaidTier={isPaidTier}
+        setIsPaidTier={setIsPaidTier}
       />
 
       <Navigation 
