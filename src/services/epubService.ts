@@ -275,7 +275,8 @@ export async function processEpub(
   };
 
   const isFreeTier = !settings.isPaidTier;
-  const minInterval = isFreeTier ? 4500 : 0; 
+  let minInterval = isFreeTier ? 4500 : 0; 
+  let currentConcurrency = isFreeTier ? 1 : 5;
   
   if (isFreeTier) {
       addLog(getLogStr(ui, 'freeTierActive') || "Free Tier Pacing Active (15 RPM)...", 'warning');
@@ -343,6 +344,10 @@ export async function processEpub(
   // --- END RESTORATION ---
 
   addLog(getLogStr(ui, 'found').replace('{0}', processList.length.toString()), 'success');
+  
+  // Hareketli ortalama (Moving Average) için son X işlemin sürelerini ve cümle sayılarını tutalım
+  const recentSpeeds: { sentences: number, timeMs: number }[] = [];
+  const MAX_RECENT_SPEEDS = 20; // Son 20 batch'i hatırla
 
   for (let zipIdx = processedFilesCount; zipIdx < processList.length; zipIdx++) {
     const path = processList[zipIdx];
@@ -359,108 +364,151 @@ export async function processEpub(
       if (!translatedNodes[path]) translatedNodes[path] = [];
       const startNodeIdx = (resumeFrom && zipIdx === resumeFrom.zipPathIndex) ? resumeFrom.nodeIndex : 0;
 
-      for (let nodeIdx = startNodeIdx; nodeIdx < nodes.length; nodeIdx++) {
+      for (let batchStart = startNodeIdx; batchStart < nodes.length; batchStart += currentConcurrency) {
         if (signal.aborted) throw new Error("Stopped.");
         
         const stepStart = Date.now(); 
-        const node = nodes[nodeIdx];
-        const original = node.innerHTML.trim();
-        if (!original) continue;
-
-        const nodeSentences = countSentences(original);
-
-        // Even though we restored above, we check here for the *current* resuming file logic.
-        if (translatedNodes[path][nodeIdx]) {
-          node.innerHTML = translatedNodes[path][nodeIdx];
-        } else {
-          try {
-            const trans = await translator.translateSingle(original);
-            node.innerHTML = trans;
-            translatedNodes[path][nodeIdx] = trans;
-            totalWords += (node.textContent || "").split(/\s+/).length;
-          } catch (err: any) {
-            if (err.message && err.message.includes("VALIDATION_FAILED")) {
-                 addLog(getLogStr(ui, 'repairing'), 'warning');
-            }
-            else if (err.message === "API_QUOTA_EXCEEDED" || err.message?.includes('429')) {
-              // 429 Durumu: Akıllı Geri Sayım
-              // Bu blokta 65 saniye boyunca döngü kurup her saniye UI güncelleyeceğiz.
-              const waitSeconds = 65;
-              addLog(getLogStr(ui, 'quotaExceeded'), 'warning');
-              
-              for (let i = waitSeconds; i > 0; i--) {
-                  if (signal.aborted) break;
-                  
-                  // Aktif işleme süresi (toplam süre - bekleme süresi)
-                  const currentActiveTimeMs = (Date.now() - startTime) - totalWaitTimeMs;
-                  const activeSeconds = Math.max(1, currentActiveTimeMs / 1000);
-                  const wps = totalWords / activeSeconds;
-                  
-                  // ETA Hesabı: (Kalan Cümle * Cümle Başına Süre) + (Şu anki Geri Sayım)
-                  // Bekleme anında ETA'nın artması normaldir.
-                  let tempEta = 0;
-                  if (totalBookSentences > 0) {
-                      const avgTimePerSentence = activeSeconds / (Math.max(1, accumulatedSentences - (resumeFrom?.totalProcessedSentences || 0)));
-                      const remainingSentences = totalBookSentences - accumulatedSentences;
-                      tempEta = Math.round(remainingSentences * avgTimePerSentence);
-                  }
-                  
-                  // Kullanıcıya "Bekliyorum... X sn" göster
-                  triggerProgress({
-                      status: 'waiting',
-                      waitCountdown: i,
-                      etaSeconds: tempEta + i, // Kalan süreye bekleme süresini ekle
-                      wordsPerSecond: wps
-                  });
-                  
-                  await new Promise(r => setTimeout(r, 1000));
-                  totalWaitTimeMs += 1000;
-              }
-              
-              if (signal.aborted) throw new Error("Stopped.");
-              
-              // Geri sayım bitti, aynı node'u tekrar dene
-              nodeIdx--; 
-              continue; 
-              
-            } else if (err.message === "API_KEY_INVALID") {
-              console.warn("Translation failed due to invalid/missing key.");
-              node.innerHTML = original;
-            } else {
-                console.error("Critical node translation error:", err);
-                addLog(getLogStr(ui, 'error').replace('{0}', err.message || "Unknown error"), 'error');
-                node.innerHTML = original;
-            }
-          }
-        }
+        const batchEnd = Math.min(batchStart + currentConcurrency, nodes.length);
+        const batchIndices = Array.from({ length: batchEnd - batchStart }, (_, i) => batchStart + i);
         
-        accumulatedSentences += nodeSentences;
+        let batchSentences = 0;
+        let hasQuotaError = false;
+
+        const tasks = batchIndices.map(async (nodeIdx) => {
+            const node = nodes[nodeIdx];
+            const original = node.innerHTML.trim();
+            if (!original) return { nodeIdx, original, trans: original, sentences: 0, success: false };
+
+            const nodeSentences = countSentences(original);
+
+            if (translatedNodes[path][nodeIdx]) {
+                return { nodeIdx, original, trans: translatedNodes[path][nodeIdx], sentences: nodeSentences, success: false, cached: true };
+            }
+
+            try {
+                const trans = await translator.translateSingle(original);
+                return { nodeIdx, original, trans, sentences: nodeSentences, success: true };
+            } catch (err: any) {
+                return { nodeIdx, original, trans: original, sentences: nodeSentences, success: false, error: err };
+            }
+        });
+
+        const results = await Promise.all(tasks);
+
+        for (const res of results) {
+            const node = nodes[res.nodeIdx];
+            if (res.error) {
+                if (res.error.message && res.error.message.includes("VALIDATION_FAILED")) {
+                     addLog(getLogStr(ui, 'repairing'), 'warning');
+                } else if (res.error.message === "API_QUOTA_EXCEEDED" || res.error.message?.includes('429')) {
+                    hasQuotaError = true;
+                } else if (res.error.message === "API_KEY_INVALID") {
+                    console.warn("Translation failed due to invalid/missing key.");
+                } else {
+                    console.error("Critical node translation error:", res.error);
+                    addLog(getLogStr(ui, 'error').replace('{0}', res.error.message || "Unknown error"), 'error');
+                }
+                node.innerHTML = res.original;
+            } else {
+                node.innerHTML = res.trans;
+                if (res.success) {
+                    translatedNodes[path][res.nodeIdx] = res.trans;
+                    totalWords += (node.textContent || "").split(/\s+/).length;
+                }
+            }
+            batchSentences += res.sentences;
+        }
+
+        if (hasQuotaError) {
+            const waitSeconds = 65;
+            addLog(getLogStr(ui, 'quotaExceeded'), 'warning');
+            
+            // Eğer Paid Tier olarak işaretlendiyse ama kota hatası alıyorsa (muhtemelen Free Key kullanıyor),
+            // hızı otomatik olarak Free Tier seviyesine düşür.
+            if (!isFreeTier && (currentConcurrency > 1 || minInterval < 4500)) {
+                addLog("Auto-downgrading to Free Tier pacing to prevent further quota errors.", 'warning');
+                currentConcurrency = 1;
+                minInterval = 4500;
+            }
+            
+            for (let i = waitSeconds; i > 0; i--) {
+                if (signal.aborted) break;
+                
+                const currentActiveTimeMs = (Date.now() - startTime) - totalWaitTimeMs;
+                const activeSeconds = Math.max(1, currentActiveTimeMs / 1000);
+                const wps = totalWords / activeSeconds;
+                
+                let tempEta = 0;
+                if (totalBookSentences > 0) {
+                    const avgTimePerSentence = activeSeconds / (Math.max(1, accumulatedSentences - (resumeFrom?.totalProcessedSentences || 0)));
+                    const remainingSentences = totalBookSentences - accumulatedSentences;
+                    tempEta = Math.round(remainingSentences * avgTimePerSentence);
+                }
+                
+                triggerProgress({
+                    status: 'waiting',
+                    waitCountdown: i,
+                    etaSeconds: tempEta + i,
+                    wordsPerSecond: wps
+                });
+                
+                await new Promise(r => setTimeout(r, 1000));
+                totalWaitTimeMs += 1000;
+            }
+            
+            if (signal.aborted) throw new Error("Stopped.");
+            
+            batchStart -= currentConcurrency; 
+            continue; 
+        }
+
+        accumulatedSentences += batchSentences;
 
         const stepEnd = Date.now();
         const elapsed = stepEnd - stepStart;
 
-        // SMART THROTTLING (Ücretsiz Mod Hız Sınırı)
-        if (isFreeTier && minInterval > 0) {
+        if (minInterval > 0) {
             const delay = Math.max(0, minInterval - elapsed);
             if (delay > 0) {
                  await new Promise(r => setTimeout(r, delay));
-                 // Bu "kasıtlı" yavaşlatmayı bekleme süresi olarak saymıyoruz, 
-                 // çünkü bu işlem hızının bir parçası.
             }
         }
         
-        // Hız ve ETA Hesaplama
         const currentActiveTimeMs = (Date.now() - startTime) - totalWaitTimeMs;
         const activeSeconds = Math.max(0.1, currentActiveTimeMs / 1000);
         const wps = totalWords / activeSeconds;
         
+        // Hareketli ortalamayı güncelle
+        if (batchSentences > 0) {
+            recentSpeeds.push({ sentences: batchSentences, timeMs: Date.now() - stepStart });
+            if (recentSpeeds.length > MAX_RECENT_SPEEDS) {
+                recentSpeeds.shift();
+            }
+        }
+
         let eta = 0;
-        if (totalBookSentences > 0 && accumulatedSentences > 10) {
-            const avgTimePerSentence = activeSeconds / (accumulatedSentences - (resumeFrom?.totalProcessedSentences || 0));
+        if (totalBookSentences > 0) {
             const remainingSentences = totalBookSentences - accumulatedSentences;
-            eta = Math.max(0, Math.round(remainingSentences * avgTimePerSentence));
+            
+            if (recentSpeeds.length > 5) {
+                // Yeterli veri varsa hareketli ortalama kullan
+                const totalRecentSentences = recentSpeeds.reduce((sum, item) => sum + item.sentences, 0);
+                const totalRecentTimeMs = recentSpeeds.reduce((sum, item) => sum + item.timeMs, 0);
+                const avgTimePerSentenceMs = totalRecentTimeMs / Math.max(1, totalRecentSentences);
+                eta = Math.max(0, Math.round((remainingSentences * avgTimePerSentenceMs) / 1000));
+            } else if (accumulatedSentences > 10) {
+                // Genel ortalama (fallback)
+                const avgTimePerSentence = activeSeconds / (accumulatedSentences - (resumeFrom?.totalProcessedSentences || 0));
+                eta = Math.max(0, Math.round(remainingSentences * avgTimePerSentence));
+            } else {
+                // Başlangıç tahmini (Tier bazlı)
+                // Free tier: ~4.5 sn / cümle (minInterval nedeniyle)
+                // Paid tier: ~0.5 sn / cümle (Concurrency 5 nedeniyle)
+                const baselineSecondsPerSentence = isFreeTier ? 4.5 : 0.5;
+                eta = Math.max(0, Math.round(remainingSentences * baselineSecondsPerSentence));
+            }
         } else {
-             const currentProgressFrac = (zipIdx + (nodeIdx / nodes.length)) / processList.length;
+             const currentProgressFrac = (zipIdx + (batchEnd / nodes.length)) / processList.length;
              if(currentProgressFrac > 0.01) {
                 const totalEstimatedTime = activeSeconds / currentProgressFrac;
                 eta = Math.max(0, Math.round(totalEstimatedTime - activeSeconds));
@@ -471,9 +519,9 @@ export async function processEpub(
             wordsPerSecond: wps,
             etaSeconds: eta,
             lastZipPathIndex: zipIdx,
-            lastNodeIndex: nodeIdx,
+            lastNodeIndex: batchEnd - 1,
             status: 'processing',
-            waitCountdown: undefined // Geri sayımı temizle
+            waitCountdown: undefined
         });
       }
       

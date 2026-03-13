@@ -47,9 +47,9 @@ export class GeminiTranslator {
     if (stored) return stored;
     try {
         // @ts-ignore
-        if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
-            // @ts-ignore
-            return process.env.API_KEY;
+        const p = typeof process !== 'undefined' ? process : (window as any).process;
+        if (p && p.env && p.env.API_KEY) {
+            return p.env.API_KEY;
         }
     } catch (e) {}
     try {
@@ -85,8 +85,9 @@ export class GeminiTranslator {
     const chunks: string[] = [];
     let currentChunk = '';
     
-    // Regex matches closing tags of blocks or sentence endings followed by space
-    const splitRegex = /(<\/p>|<\/div>|<\/blockquote>|<\/li>|<br\s*\/?>|[.!?]\s)(?=(?:[^<]*>|[^<>]*$))/g;
+    // Daha güvenli bölme: Sadece blok etiketlerinin sonundan veya cümle sonu işaretlerinden (nokta, ünlem, soru işareti) sonra boşluk varsa böl.
+    // HTML etiketlerinin içini bölmemek için lookahead kullanıyoruz.
+    const splitRegex = /(<\/p>|<\/div>|<\/blockquote>|<\/li>|<br\s*\/?>|[.!?]\s+)(?=(?:[^<]*>|[^<>]*$))/g;
     
     let lastIndex = 0;
     let match;
@@ -304,28 +305,39 @@ export class GeminiTranslator {
     const chunks = this.chunkHtmlContent(trimmed);
     let finalTranslation = "";
 
-    for (let i = 0; i < chunks.length; i++) {
-        const chunk = chunks[i];
-        
-        if (!chunk.replace(/<[^>]*>/g, '').trim()) {
-            finalTranslation += chunk;
-            continue;
-        }
+    if (this.isPaidModel()) {
+        const tasks = chunks.map(async (chunk, i) => {
+            if (!chunk.replace(/<[^>]*>/g, '').trim()) {
+                return chunk;
+            }
+            try {
+                return await this.translateChunkWithRetry(chunk, forceRetryMode);
+            } catch (e) {
+                console.error(`Chunk ${i} translation FATAL error on Paid Model.`, e);
+                throw e; 
+            }
+        });
+        const results = await Promise.all(tasks);
+        finalTranslation = results.join("");
+    } else {
+        for (let i = 0; i < chunks.length; i++) {
+            const chunk = chunks[i];
+            
+            if (!chunk.replace(/<[^>]*>/g, '').trim()) {
+                finalTranslation += chunk;
+                continue;
+            }
 
-        if (i > 0 && !this.isPaidModel()) {
-            await new Promise(resolve => setTimeout(resolve, this.REQUEST_DELAY_MS));
-        }
+            if (i > 0) {
+                await new Promise(resolve => setTimeout(resolve, this.REQUEST_DELAY_MS));
+            }
 
-        try {
-            const result = await this.translateChunkWithRetry(chunk, forceRetryMode);
-            finalTranslation += result;
-        } catch (e) {
-            if (this.isPaidModel()) {
-                 console.error(`Chunk ${i} translation FATAL error on Paid Model.`, e);
-                 throw e; 
-            } else {
-                 console.warn(`Chunk ${i} translation failed (Free Tier), keeping original.`, e);
-                 finalTranslation += chunk; 
+            try {
+                const result = await this.translateChunkWithRetry(chunk, forceRetryMode);
+                finalTranslation += result;
+            } catch (e) {
+                console.warn(`Chunk ${i} translation failed (Free Tier), keeping original.`, e);
+                finalTranslation += chunk; 
             }
         }
     }
@@ -343,7 +355,8 @@ export class GeminiTranslator {
     const isPaid = this.isPaidModel();
     
     let attempt = 0;
-    const maxRetries = isPaid ? Number.MAX_SAFE_INTEGER : 2;
+    // Kalite ve kararlılık öncelikli olduğu için hata durumunda deneme sayısını artırıyoruz
+    const maxRetries = isPaid ? 5 : 3;
 
     while (attempt <= maxRetries) {
         try {

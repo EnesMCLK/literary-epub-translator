@@ -192,7 +192,8 @@ export default function App() {
     } else {
         try {
             // @ts-ignore
-            if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+            const p = typeof process !== 'undefined' ? process : (window as any).process;
+            if (p && p.env && p.env.API_KEY) {
                 setHasPaidKey(true);
                 foundKey = true;
             }
@@ -218,13 +219,17 @@ export default function App() {
     let envKey = '';
     try {
         // @ts-ignore
-        if (typeof process !== 'undefined' && process.env && process.env.API_KEY) envKey = process.env.API_KEY;
+        const p = typeof process !== 'undefined' ? process : (window as any).process;
+        if (p && p.env && p.env.API_KEY) envKey = p.env.API_KEY;
     } catch(e) {}
     
-    const finalKey = keyToTest || envKey;
+    // If user explicitly provided a key (via input or parameter), use it.
+    // Otherwise fallback to the environment key.
+    const finalKey = keyToTest ? keyToTest : envKey;
 
     if (!finalKey) { setIsVerifying(false); return; }
     
+    setManualKey(finalKey);
     (window as any).manualApiKey = finalKey;
     localStorage.setItem(STORAGE_KEY_API, finalKey);
 
@@ -259,7 +264,20 @@ export default function App() {
       try {
         await (window as any).aistudio.openSelectKey();
         if (await (window as any).aistudio.hasSelectedApiKey()) {
-            await verifyApiKey(); 
+            let envKey = '';
+            try {
+                // @ts-ignore
+                const p = typeof process !== 'undefined' ? process : (window as any).process;
+                if (p && p.env && p.env.API_KEY) {
+                    envKey = p.env.API_KEY;
+                }
+            } catch(e) {}
+            
+            if (envKey) {
+                await verifyApiKey(envKey);
+            } else {
+                await verifyApiKey();
+            }
         }
       } catch (err) { console.error(err); }
     }
