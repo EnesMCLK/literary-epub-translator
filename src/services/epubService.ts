@@ -14,6 +14,7 @@ export interface TranslationProgress {
   strategy?: BookStrategy;
   usage?: UsageStats;
   wordsPerSecond?: number;
+  tokensPerSecond?: number;
   totalProcessedWords?: number;
   lastZipPathIndex?: number;
   lastNodeIndex?: number;
@@ -437,19 +438,29 @@ export async function processEpub(
                 const currentActiveTimeMs = (Date.now() - startTime) - totalWaitTimeMs;
                 const activeSeconds = Math.max(1, currentActiveTimeMs / 1000);
                 const wps = totalWords / activeSeconds;
+                const currentUsage = translator.getUsage();
+                const tps = currentUsage.totalTokens / activeSeconds;
                 
                 let tempEta = 0;
                 if (totalBookSentences > 0) {
-                    const avgTimePerSentence = activeSeconds / (Math.max(1, accumulatedSentences - (resumeFrom?.totalProcessedSentences || 0)));
                     const remainingSentences = totalBookSentences - accumulatedSentences;
-                    tempEta = Math.round(remainingSentences * avgTimePerSentence);
+                    if (recentSpeeds.length > 5) {
+                        const totalRecentSentences = recentSpeeds.reduce((sum, item) => sum + item.sentences, 0);
+                        const totalRecentTimeMs = recentSpeeds.reduce((sum, item) => sum + item.timeMs, 0);
+                        const avgTimePerSentenceMs = totalRecentTimeMs / Math.max(1, totalRecentSentences);
+                        tempEta = Math.max(0, Math.round((remainingSentences * avgTimePerSentenceMs) / 1000));
+                    } else {
+                        const avgTimePerSentence = activeSeconds / (Math.max(1, accumulatedSentences - (resumeFrom?.totalProcessedSentences || 0)));
+                        tempEta = Math.round(remainingSentences * avgTimePerSentence);
+                    }
                 }
                 
                 triggerProgress({
                     status: 'waiting',
                     waitCountdown: i,
                     etaSeconds: tempEta + i,
-                    wordsPerSecond: wps
+                    wordsPerSecond: wps,
+                    tokensPerSecond: tps
                 });
                 
                 await new Promise(r => setTimeout(r, 1000));
@@ -477,6 +488,8 @@ export async function processEpub(
         const currentActiveTimeMs = (Date.now() - startTime) - totalWaitTimeMs;
         const activeSeconds = Math.max(0.1, currentActiveTimeMs / 1000);
         const wps = totalWords / activeSeconds;
+        const currentUsage = translator.getUsage();
+        const tps = currentUsage.totalTokens / activeSeconds;
         
         // Hareketli ortalamayı güncelle
         if (batchSentences > 0) {
@@ -502,9 +515,7 @@ export async function processEpub(
                 eta = Math.max(0, Math.round(remainingSentences * avgTimePerSentence));
             } else {
                 // Başlangıç tahmini (Tier bazlı)
-                // Free tier: ~4.5 sn / cümle (minInterval nedeniyle)
-                // Paid tier: ~0.5 sn / cümle (Concurrency 5 nedeniyle)
-                const baselineSecondsPerSentence = isFreeTier ? 4.5 : 0.5;
+                const baselineSecondsPerSentence = (minInterval > 0 ? minInterval / 1000 : 0.5) / currentConcurrency;
                 eta = Math.max(0, Math.round(remainingSentences * baselineSecondsPerSentence));
             }
         } else {
@@ -517,6 +528,7 @@ export async function processEpub(
 
         triggerProgress({
             wordsPerSecond: wps,
+            tokensPerSecond: tps,
             etaSeconds: eta,
             lastZipPathIndex: zipIdx,
             lastNodeIndex: batchEnd - 1,

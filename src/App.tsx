@@ -111,7 +111,7 @@ export default function App() {
 
   const [progress, setProgress] = useState<TranslationProgress>({
     currentFile: 0, totalFiles: 0, currentPercent: 0, status: 'idle',
-    logs: [], wordsPerSecond: 0, totalProcessedWords: 0
+    logs: [], wordsPerSecond: 0, tokensPerSecond: 0, totalProcessedWords: 0
   });
   
   const progressRef = useRef<TranslationProgress | null>(null);
@@ -722,7 +722,18 @@ export default function App() {
                     <span className="text-[8px] md:text-[10px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">{hasPaidKey ? t.paidMode : t.freeMode}</span>
                   </div>
                   <div className="h-3 md:h-4 w-px bg-slate-200 dark:bg-slate-800"></div>
-                  <div className="flex items-center gap-1.5 md:gap-2"><BarChart3 size={12} className="text-indigo-500 md:w-3.5 md:h-3.5" /><span className="text-[8px] md:text-[9px] font-black text-slate-400 uppercase">{t.tokens}:</span><span className="text-[10px] md:text-xs font-black italic whitespace-nowrap">{progress.usage?.totalTokens.toLocaleString() || 0}</span></div>
+                  <div className="flex items-center gap-1.5 md:gap-2">
+                    <BarChart3 size={12} className="text-indigo-500 md:w-3.5 md:h-3.5" />
+                    <span className="text-[8px] md:text-[9px] font-black text-slate-400 uppercase">{t.tokens}:</span>
+                    <span className="text-[10px] md:text-xs font-black italic whitespace-nowrap">
+                      {progress.usage?.totalTokens.toLocaleString() || 0}
+                      {(isProcessing || isWaiting) && progress.tokensPerSecond ? (
+                        <span className="text-slate-400 font-medium text-[8px] md:text-[10px] ml-1">
+                          ({progress.tokensPerSecond.toFixed(1)} tok/s)
+                        </span>
+                      ) : null}
+                    </span>
+                  </div>
               </div>
               <div className="flex items-center gap-3 md:gap-6 shrink-0">
                   <div className="flex items-center gap-1.5 md:gap-2">

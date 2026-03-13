@@ -1,86 +1,75 @@
 <div align="center">  
   <h1 align="center">📖 Literary EPUB Translator</h1>
   
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg?style=flat-square)
-![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)
-![React](https://img.shields.io/badge/React-19-61DAFB.svg?style=flat-square&logo=react&logoColor=black)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6.svg?style=flat-square&logo=typescript&logoColor=white)
-![Gemini AI](https://img.shields.io/badge/Google-Gemini_AI-8E75B2.svg?style=flat-square&logo=google&logoColor=white)
+  <p align="center">
+    <strong>A professional, AI-powered book translation engine that preserves the soul of literature.</strong>
+  </p>
 
-**A professional, client-side book translation engine powered by Google Gemini.**  
-*Translates EPUBs while preserving literary style, author's voice, and formatting.*
+  <p align="center">
+    <b>English</b> | <a href="README-tr.md">Türkçe</a> | <a href="README-es.md">Español</a> | <a href="README-fr.md">Français</a> | <a href="README-de.md">Deutsch</a> | <a href="README-ja.md">日本語</a> | <a href="README-zh.md">中文</a> | <a href="README-ru.md">Русский</a>
+  </p>
 
-[Features](#-key-features) •
-[How It Works](#%EF%B8%8F-how-it-works) •
-[Tech Stack](#%EF%B8%8F-tech-stack)
+  <br />
 
-<div align="center">
+  <a href="https://enesmclk.github.io/literary-epub-translator/" target="_blank">
+    <img src="https://img.shields.io/badge/🚀_USE_THE_APP_NOW-Click_Here-blue?style=for-the-badge&color=6366f1" alt="Use the App Now" />
+  </a>
+
+  <br /><br />
+
   <a href="https://enesmclk.github.io/literary-epub-translator/" target="_blank">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://drive.google.com/uc?export=view&id=19nae5AP1ETpWTrhyhSFCROtGGj2l4yeA">
     <source media="(prefers-color-scheme: light)" srcset="https://drive.google.com/uc?export=view&id=1IhQUiFLpjN_dr6WTOolYtxHYgZyWrHd3">
-    <img alt="Kontrol Paneli (Dashboard) Ekran Görüntüsü" src="https://drive.google.com/uc?export=view&id=1IhQUiFLpjN_dr6WTOolYtxHYgZyWrHd3">
+    <img alt="Dashboard Screenshot" src="https://drive.google.com/uc?export=view&id=1IhQUiFLpjN_dr6WTOolYtxHYgZyWrHd3" width="800" style="border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
   </picture>
-</div>
-
-  
+  </a>
 </div>
 
 ---
 
-## 🚀 Overview
+## 🌍 Welcome to the Future of Book Translation
 
-**Literary EPUB Translator** is a sophisticated Single Page Application (SPA) designed to bridge the gap between machine translation and literary art. Unlike standard translators that often produce robotic or literal output, this tool analyzes the book's genre, tone, and author's style before translation begins.
+**Literary EPUB Translator** is not just another machine translation tool. It is a sophisticated, AI-driven engine designed specifically for book lovers, publishers, and readers who want to experience literature in their native language without losing the author's original voice.
 
-It runs entirely in your browser using **Google Gemini API**. No file is ever uploaded to a backend server, ensuring privacy and speed.
+Instead of robotic, word-for-word translations, our engine uses **Google Gemini AI** to analyze the book's genre, tone, and literary style *before* translating a single word. 
 
-## ✨ Key Features
+👉 **[Start Translating Your Books Now](https://enesmclk.github.io/literary-epub-translator/)**
 
-### 🧠 AI-Powered Analysis
-*   **Style Detection:** Before translating, the AI analyzes the book to detect the genre (e.g., Satire, Noir), tone (e.g., Melancholic, Witty), and writing style.
-*   **Adaptive Strategy:** Automatically adjusts the "Temperature" (creativity) of the model based on the complexity of the text.
-*   **Context Awareness:** Preserves the author's voice across chapters.
+---
 
-### 🛡️ Privacy & Security
-*   **Client-Side Processing:** All EPUB parsing (`JSZip`) and regeneration happen locally in your browser.
-*   **Direct API Calls:** Your API key is used directly to communicate with Google's servers; no middleman.
+## ✨ Why Choose Literary EPUB Translator?
 
-### ⚡ Performance & UX
-*   **Streaming Translation:** Watch the translation happen in real-time with a terminal-like System Monitor.
-*   **Resumable Sessions:** translation interrupted? The app saves your progress locally. Pick up exactly where you left off.
-*   **PWA Support:** Installable as a native app on iOS, Android, and Desktop.
-*   **Smart Quota Management:** Handles API rate limits (429 errors) gracefully with auto-wait and retry logic.
+### 🎭 Preserves the Author's Voice
+Standard translators destroy the art of writing. Our AI detects whether the book is a dark noir thriller, a witty satire, or a melancholic romance, and adjusts its "creativity" and vocabulary to match the original masterpiece.
 
-### 🎨 Modern UI
-*   **Glassmorphism Design:** Built with Tailwind CSS for a sleek, dark-mode compatible interface.
-*   **Internationalization:** Fully localized UI (English, Turkish, French, German, Spanish, Japanese, and more).
-*   **Stats Dashboard:** View estimated costs (tokens), duration, and word counts before you start.
+### 🔒 100% Private & Secure
+Your books belong to you. **No files are ever uploaded to our servers.** The entire translation process happens locally in your browser. The app communicates directly with the AI, ensuring your personal library remains completely private.
 
-## ⚙️ How It Works
+### 🎨 Flawless Formatting
+Don't lose your chapter headings, italics, bold text, or images. The engine carefully extracts the text, translates it, and injects it back into the exact same HTML structure. You get a perfectly formatted EPUB ready for your Kindle, Apple Books, or Kobo.
 
-1.  **Parsing:** The app unzips the `.epub` file and identifies HTML/XHTML content nodes.
-2.  **Analysis:** It sends metadata (Title, Author) to Gemini to formulate a "Translation Strategy".
-3.  **Chunking:** Text is broken down into semantic chunks to fit within AI context windows.
-4.  **Translation:** Each chunk is translated using the strategy, preserving HTML tags (`<em>`, `<strong>`, etc.).
-5.  **Reassembly:** The translated HTML is injected back into the EPUB structure.
-6.  **Download:** A new, valid EPUB file is generated for download.
+### ⚡ Smart & Resumable
+Internet dropped? Closed the tab by mistake? No problem. The app saves your progress locally in real-time. When you return, you can pick up the translation exactly where you left off.
 
-## 🛠️ Tech Stack
+---
 
-*   **Framework:** React 19 (Vite)
-*   **Language:** TypeScript
-*   **AI Integration:** `@google/genai` SDK
-*   **Styling:** Tailwind CSS + Lucide React (Icons)
-*   **File Handling:** `jszip`
-*   **State Management:** React Hooks + LocalStorage
-*   **PWA:** `vite-plugin-pwa`
+## 🛠️ How It Works (In 3 Simple Steps)
 
-## 📄 License
+1. **Upload your EPUB:** Select any DRM-free `.epub` file from your device.
+2. **Set your Language:** Choose your target language. The AI will automatically detect the source language and analyze the book's literary style.
+3. **Translate & Download:** Watch the real-time progress as the AI translates your book chapter by chapter. Once finished, download your new EPUB instantly.
 
-Distributed under the MIT License. See `LICENSE` for more information.
+<div align="center">
+  <br />
+  <a href="https://enesmclk.github.io/literary-epub-translator/" target="_blank">
+    <img src="https://img.shields.io/badge/🌐_OPEN_WEB_APP-Start_Translating-black?style=for-the-badge&color=0f172a" alt="Open Web App" />
+  </a>
+</div>
 
 ---
 
 <div align="center">
+  <p><i>Empowering readers to explore global literature without language barriers.</i></p>
   <p>Made with ❤️ by <a href="https://github.com/EnesMCLK">EnesMCLK</a></p>
 </div>
