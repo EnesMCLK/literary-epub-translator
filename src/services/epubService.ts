@@ -148,7 +148,6 @@ export async function parseEpubStructure(epubZip: JSZip, uiLang: string = 'en'):
 export async function calculateEpubStats(file: File, targetTags: string[], hasUserKey: boolean): Promise<BookStats> {
   const epubBuffer = await file.arrayBuffer();
   const epubZip = await new JSZip().loadAsync(epubBuffer);
-  const parser = new DOMParser();
 
   const { processList } = await parseEpubStructure(epubZip, 'en');
 
@@ -157,30 +156,46 @@ export async function calculateEpubStats(file: File, targetTags: string[], hasUs
   let totalSentences = 0;
   const fileSentenceCounts: number[] = [];
 
-  for (const path of processList) {
+  for (let i = 0; i < processList.length; i++) {
+    const path = processList[i];
     const content = await epubZip.file(path)?.async("string");
     if (!content) {
         fileSentenceCounts.push(0);
         continue;
     }
     
-    const doc = parser.parseFromString(content, "text/html");
-    const nodes = Array.from(doc.querySelectorAll(targetTags.join(',')));
+    // Fast path: remove scripts/styles, strip tags, and count
+    const contentWithoutScripts = content.replace(/<(script|style)[^>]*>[\s\S]*?<\/\1>/gi, '');
+    const cleanText = contentWithoutScripts.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
     
-    let fileSentences = 0;
-    nodes.forEach(node => {
-        const text = node.innerHTML.trim();
-        if (text.length > 0) {
-            const cleanText = node.textContent || "";
-            totalChars += cleanText.length;
-            totalWords += cleanText.split(/\s+/).length;
-            
-            const sCount = countSentences(text);
-            fileSentences += sCount;
-            totalSentences += sCount;
+    if (cleanText.length > 0) {
+        totalChars += cleanText.length;
+        
+        // Fast word count
+        let wordCount = 0;
+        let inWord = false;
+        for (let j = 0; j < cleanText.length; j++) {
+            if (cleanText.charCodeAt(j) > 32) {
+                if (!inWord) { wordCount++; inWord = true; }
+            } else {
+                inWord = false;
+            }
         }
-    });
-    fileSentenceCounts.push(fileSentences);
+        totalWords += wordCount;
+        
+        // Fast sentence count
+        const matches = cleanText.match(/[.!?]+/g);
+        const fileSentences = matches ? matches.length : 1;
+        totalSentences += fileSentences;
+        fileSentenceCounts.push(fileSentences);
+    } else {
+        fileSentenceCounts.push(0);
+    }
+
+    // Yield to event loop every 10 files to keep UI responsive
+    if (i % 10 === 0) {
+        await new Promise(resolve => setTimeout(resolve, 0));
+    }
   }
 
   const estimatedTokens = Math.ceil(totalChars / 3.5); 
@@ -424,12 +439,22 @@ export async function processEpub(
             const waitSeconds = 65;
             addLog(getLogStr(ui, 'quotaExceeded'), 'warning');
             
-            // Eğer Paid Tier olarak işaretlendiyse ama kota hatası alıyorsa (muhtemelen Free Key kullanıyor),
-            // hızı otomatik olarak Free Tier seviyesine düşür.
-            if (!isFreeTier && (currentConcurrency > 1 || minInterval < 4500)) {
-                addLog("Auto-downgrading to Free Tier pacing to prevent further quota errors.", 'warning');
-                currentConcurrency = 1;
-                minInterval = 4500;
+            if (!isFreeTier) {
+                // Paid tier hit a limit. Just wait and maybe slightly reduce concurrency, but don't drop to free tier.
+                if (currentConcurrency > 2) {
+                    currentConcurrency -= 1;
+                    addLog(`Rate limit hit. Reducing concurrency to ${currentConcurrency}.`, 'warning');
+                } else {
+                    addLog("Rate limit hit. Waiting for quota to reset...", 'warning');
+                }
+            } else {
+                // Eğer Paid Tier olarak işaretlenmediyse (Free Key kullanıyor),
+                // hızı otomatik olarak Free Tier seviyesine düşür.
+                if (currentConcurrency > 1 || minInterval < 4500) {
+                    addLog("Auto-downgrading to Free Tier pacing to prevent further quota errors.", 'warning');
+                    currentConcurrency = 1;
+                    minInterval = 4500;
+                }
             }
             
             for (let i = waitSeconds; i > 0; i--) {

@@ -23,7 +23,7 @@ export const getAnalysisPrompt = (
     2. Identify the Tone (e.g. Humorous, Dark).
     3. Identify the Writing Style (e.g. Concise, Flowery).
     4. Define a Translation Strategy.
-    5. Determine a Creativity Level (0.0 to 1.0).
+    5. Determine a Creativity Level (0.2 to 0.3). Use 0.2 for scientific/technical/factual books, and 0.3 for literary/artistic/fiction books.
 
     OUTPUT FORMAT:
     Return ONLY a valid JSON object. Do not use Markdown code blocks. Keys must be exactly as below:

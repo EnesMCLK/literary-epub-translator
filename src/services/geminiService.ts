@@ -23,7 +23,7 @@ export class GeminiTranslator {
   };
 
   private readonly REQUEST_DELAY_MS = 4500;
-  private readonly MAX_CHUNK_LENGTH = 3500; 
+  private readonly MAX_CHUNK_LENGTH = 6000; 
 
   private isPaidTier: boolean;
 
@@ -34,7 +34,7 @@ export class GeminiTranslator {
     modelId: string = 'gemini-2.5-flash',
     isPaidTier: boolean = false
   ) {
-    this.temperature = temperature;
+    this.temperature = Math.max(0.2, Math.min(0.3, temperature));
     this.sourceLanguage = sourceLanguage;
     this.targetLanguage = targetLanguage;
     this.modelName = modelId;
@@ -65,7 +65,7 @@ export class GeminiTranslator {
   setStrategy(strategy: BookStrategy) {
     this.bookStrategy = strategy;
     if (strategy.detected_creativity_level !== undefined) {
-      this.temperature = strategy.detected_creativity_level;
+      this.temperature = Math.max(0.2, Math.min(0.3, strategy.detected_creativity_level));
     }
   }
 

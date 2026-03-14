@@ -151,63 +151,84 @@ export default function App() {
   };
 
   const initializeApp = async () => {
-    let langToUse: UILanguage = 'en';
+    try {
+      let langToUse: UILanguage = 'en';
 
-    const storedLang = localStorage.getItem('lit-trans-ui-lang') as UILanguage;
-    if (storedLang && STRINGS_UI[storedLang]) {
-      langToUse = storedLang;
-    } else {
-      const ipLang = await detectLanguageFromIP();
-      if (ipLang) {
-        langToUse = ipLang;
+      let storedLang: UILanguage | null = null;
+      try {
+        storedLang = localStorage.getItem('lit-trans-ui-lang') as UILanguage;
+      } catch (e) {}
+
+      if (storedLang && STRINGS_UI[storedLang]) {
+        langToUse = storedLang;
       } else {
-         const browserLang = navigator.language.split('-')[0] as UILanguage;
-         if (STRINGS_UI[browserLang]) langToUse = browserLang;
-      }
-    }
-    setUiLang(langToUse);
-
-    const savedHistory = localStorage.getItem(STORAGE_KEY_HISTORY);
-    if (savedHistory) {
-        try {
-            setHistory(JSON.parse(savedHistory));
-        } catch (e) {
-            console.error("Failed to parse history", e);
-            localStorage.removeItem(STORAGE_KEY_HISTORY);
+        const ipLang = await detectLanguageFromIP();
+        if (ipLang) {
+          langToUse = ipLang;
+        } else {
+           try {
+             const browserLang = (navigator.language || 'en').split('-')[0] as UILanguage;
+             if (STRINGS_UI[browserLang]) langToUse = browserLang;
+           } catch (e) {}
         }
-    }
-    
-    // Check local storage for quick resume (legacy or last session)
-    const savedResume = localStorage.getItem(STORAGE_KEY_RESUME);
-    if (savedResume) {
-      try { setResumeData(JSON.parse(savedResume)); } catch {}
-    }
+      }
+      setUiLang(langToUse);
 
-    let foundKey = false;
-    const localKey = localStorage.getItem(STORAGE_KEY_API);
-    if (localKey) {
-        setManualKey(localKey);
-        setHasPaidKey(true);
-        foundKey = true;
-    } else {
-        try {
-            // @ts-ignore
-            const p = typeof process !== 'undefined' ? process : (window as any).process;
-            if (p && p.env && p.env.API_KEY) {
-                setHasPaidKey(true);
-                foundKey = true;
+      try {
+        const savedHistory = localStorage.getItem(STORAGE_KEY_HISTORY);
+        if (savedHistory) {
+            try {
+                setHistory(JSON.parse(savedHistory));
+            } catch (e) {
+                console.error("Failed to parse history", e);
+                localStorage.removeItem(STORAGE_KEY_HISTORY);
             }
-        } catch(e) {}
-    }
+        }
+      } catch (e) {}
+      
+      try {
+        // Check local storage for quick resume (legacy or last session)
+        const savedResume = localStorage.getItem(STORAGE_KEY_RESUME);
+        if (savedResume) {
+          try { setResumeData(JSON.parse(savedResume)); } catch {}
+        }
+      } catch (e) {}
 
-    const tourSeen = localStorage.getItem(STORAGE_KEY_TOUR);
-    if (!tourSeen) {
-      setTimeout(() => setIsTourOpen(true), 1000);
-    }
+      let foundKey = false;
+      try {
+        const localKey = localStorage.getItem(STORAGE_KEY_API);
+        if (localKey) {
+            setManualKey(localKey);
+            setHasPaidKey(true);
+            foundKey = true;
+        }
+      } catch (e) {}
 
-    setSettings(prev => ({ ...prev, modelId: DEFAULT_MODEL_ID }));
-    fileStorage.init().catch(console.error);
-    setIsInitializing(false);
+      if (!foundKey) {
+          try {
+              // @ts-ignore
+              const p = typeof process !== 'undefined' ? process : (window as any).process;
+              if (p && p.env && p.env.API_KEY) {
+                  setHasPaidKey(true);
+                  foundKey = true;
+              }
+          } catch(e) {}
+      }
+
+      try {
+        const tourSeen = localStorage.getItem(STORAGE_KEY_TOUR);
+        if (!tourSeen) {
+          setTimeout(() => setIsTourOpen(true), 1000);
+        }
+      } catch (e) {}
+
+      setSettings(prev => ({ ...prev, modelId: DEFAULT_MODEL_ID }));
+      fileStorage.init().catch(console.error);
+    } catch (err) {
+      console.error("Initialization error:", err);
+    } finally {
+      setIsInitializing(false);
+    }
   };
 
   useEffect(() => { initializeApp(); }, []);
@@ -629,6 +650,7 @@ export default function App() {
   const handleFileSelect = (f: File) => {
     setFile(f);
     setDownloadUrl(null);
+    setIsRestoringFile(false);
     
     if (expectedFilename && f.name === expectedFilename) {
         // Matched!
@@ -715,17 +737,17 @@ export default function App() {
 
       {/* Main Content Info Bar */}
       <div className="w-full fixed top-16 md:top-20 left-0 right-0 z-40 bg-white/60 dark:bg-slate-950/60 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 md:px-8 py-2 md:py-3.5 flex items-center justify-center">
-          <div className="w-full max-w-6xl flex items-center justify-between gap-2 md:gap-6 overflow-x-auto no-scrollbar">
-              <div className="flex items-center gap-3 md:gap-4 shrink-0">
-                  <div className="flex items-center gap-1.5 md:gap-2.5">
+          <div className="w-full max-w-6xl flex flex-col md:flex-row items-stretch md:items-center justify-between gap-1.5 md:gap-6">
+              <div className="flex items-center justify-between md:justify-start gap-3 md:gap-4 overflow-hidden">
+                  <div className="flex items-center gap-1.5 md:gap-2.5 shrink-0">
                     <div className={`w-2 md:w-2.5 h-2 md:h-2.5 rounded-full ${hasPaidKey ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]' : 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.4)]'}`}></div>
                     <span className="text-[8px] md:text-[10px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">{hasPaidKey ? t.paidMode : t.freeMode}</span>
                   </div>
-                  <div className="h-3 md:h-4 w-px bg-slate-200 dark:bg-slate-800"></div>
-                  <div className="flex items-center gap-1.5 md:gap-2">
-                    <BarChart3 size={12} className="text-indigo-500 md:w-3.5 md:h-3.5" />
-                    <span className="text-[8px] md:text-[9px] font-black text-slate-400 uppercase">{t.tokens}:</span>
-                    <span className="text-[10px] md:text-xs font-black italic whitespace-nowrap">
+                  <div className="hidden md:block h-3 md:h-4 w-px bg-slate-200 dark:bg-slate-800 shrink-0"></div>
+                  <div className="flex items-center gap-1.5 md:gap-2 min-w-0">
+                    <BarChart3 size={12} className="text-indigo-500 md:w-3.5 md:h-3.5 shrink-0" />
+                    <span className="text-[8px] md:text-[9px] font-black text-slate-400 uppercase shrink-0">{t.tokens}:</span>
+                    <span className="text-[10px] md:text-xs font-black italic whitespace-nowrap truncate">
                       {progress.usage?.totalTokens.toLocaleString() || 0}
                       {(isProcessing || isWaiting) && progress.tokensPerSecond ? (
                         <span className="text-slate-400 font-medium text-[8px] md:text-[10px] ml-1">
@@ -735,20 +757,20 @@ export default function App() {
                     </span>
                   </div>
               </div>
-              <div className="flex items-center gap-3 md:gap-6 shrink-0">
-                  <div className="flex items-center gap-1.5 md:gap-2">
-                     {isWaiting ? <Timer size={12} className="text-amber-500 animate-pulse md:w-3.5 md:h-3.5"/> : <Activity size={12} className="text-blue-500 md:w-3.5 md:h-3.5" />}
-                     <span className={`text-[8px] md:text-[9px] font-black uppercase ${isWaiting ? 'text-amber-500' : 'text-slate-400'}`}>{t.speed}:</span>
-                     <span className={`text-[10px] md:text-xs font-black italic whitespace-nowrap ${isWaiting ? 'text-amber-600 dark:text-amber-400' : ''}`}>
+              <div className="flex items-center justify-between md:justify-end gap-3 md:gap-6 overflow-hidden">
+                  <div className="flex items-center gap-1.5 md:gap-2 min-w-0">
+                     {isWaiting ? <Timer size={12} className="text-amber-500 animate-pulse md:w-3.5 md:h-3.5 shrink-0"/> : <Activity size={12} className="text-blue-500 md:w-3.5 md:h-3.5 shrink-0" />}
+                     <span className={`text-[8px] md:text-[9px] font-black uppercase ${isWaiting ? 'text-amber-500' : 'text-slate-400'} shrink-0`}>{t.speed}:</span>
+                     <span className={`text-[10px] md:text-xs font-black italic whitespace-nowrap truncate ${isWaiting ? 'text-amber-600 dark:text-amber-400' : ''}`}>
                         {isProcessing || isWaiting ? `${progress.wordsPerSecond?.toFixed(1)} ${t.wordsPerSec || 'w/s'}` : '--'}
                      </span>
                   </div>
-                  <div className="flex items-center gap-1.5 md:gap-2">
-                     <Clock size={12} className={`${isWaiting ? 'text-amber-500' : 'text-amber-500'} md:w-3.5 md:h-3.5`} />
-                     <span className={`text-[8px] md:text-[9px] font-black uppercase ${isWaiting ? 'text-amber-500' : 'text-slate-400'}`}>
+                  <div className="flex items-center gap-1.5 md:gap-2 min-w-0">
+                     <Clock size={12} className={`${isWaiting ? 'text-amber-500' : 'text-amber-500'} md:w-3.5 md:h-3.5 shrink-0`} />
+                     <span className={`text-[8px] md:text-[9px] font-black uppercase ${isWaiting ? 'text-amber-500' : 'text-slate-400'} shrink-0`}>
                         {isWaiting ? `${t.waiting || 'WAITING'} (${progress.waitCountdown}s)` : t.eta}:
                      </span>
-                     <span className={`text-[10px] md:text-xs font-black italic whitespace-nowrap ${isWaiting ? 'text-amber-600 dark:text-amber-400' : ''}`}>
+                     <span className={`text-[10px] md:text-xs font-black italic whitespace-nowrap truncate ${isWaiting ? 'text-amber-600 dark:text-amber-400' : ''}`}>
                         {isProcessing || isWaiting ? formatDuration(progress.etaSeconds) : '--'}
                      </span>
                   </div>
@@ -756,7 +778,7 @@ export default function App() {
           </div>
       </div>
 
-      <main className="flex-1 pt-32 md:pt-36 flex flex-col items-center">
+      <main className="flex-1 pt-36 md:pt-36 flex flex-col items-center">
         <div className="w-full max-w-5xl px-6 py-6 md:py-12 space-y-8 md:space-y-12 flex flex-col items-center">
             <section className="w-full bg-white dark:bg-slate-900 rounded-[2rem] md:rounded-[3rem] border border-slate-200 dark:border-slate-800 p-6 md:p-12 space-y-8 md:space-y-10 shadow-xl">
                 <div className="space-y-4">

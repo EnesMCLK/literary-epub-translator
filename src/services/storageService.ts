@@ -15,20 +15,33 @@ export class FileStorageService {
     if (this.db) return;
 
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open(DB_NAME, DB_VERSION);
+      const timeoutId = setTimeout(() => {
+        reject(new Error("IndexedDB initialization timed out."));
+      }, 5000);
 
-      request.onerror = () => reject(request.error);
-      request.onsuccess = () => {
-        this.db = request.result;
-        resolve();
-      };
+      try {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
 
-      request.onupgradeneeded = (event) => {
-        const db = (event.target as IDBOpenDBRequest).result;
-        if (!db.objectStoreNames.contains(STORE_NAME)) {
-          db.createObjectStore(STORE_NAME); // Key is the HistoryItem ID
-        }
-      };
+        request.onerror = () => {
+          clearTimeout(timeoutId);
+          reject(request.error);
+        };
+        request.onsuccess = () => {
+          clearTimeout(timeoutId);
+          this.db = request.result;
+          resolve();
+        };
+
+        request.onupgradeneeded = (event) => {
+          const db = (event.target as IDBOpenDBRequest).result;
+          if (!db.objectStoreNames.contains(STORE_NAME)) {
+            db.createObjectStore(STORE_NAME); // Key is the HistoryItem ID
+          }
+        };
+      } catch (err) {
+        clearTimeout(timeoutId);
+        reject(err);
+      }
     });
   }
 

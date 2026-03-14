@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Settings, X, LayoutDashboard, Sun, Moon, Globe, Key, Lock, Unlock, Zap, 
-  Eye, EyeOff, Loader2, ShieldCheck, Sliders, Check, ExternalLink, Trash2, Save
+  Eye, EyeOff, Loader2, ShieldCheck, Sliders, Check, ExternalLink, Trash2, Save, Info
 } from 'lucide-react';
 import { TranslationSettings, AI_MODELS, UILanguage, STORAGE_KEY_TIER } from '../design';
 
@@ -160,7 +160,13 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
                 {hasPaidKey && (
                   <div className="mt-4 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800">
                     <div className="flex items-center justify-between mb-2">
-                      <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">{t.tierToggleLabel || 'API Key Type'}</label>
+                      <div className="flex items-center gap-1.5 group relative">
+                        <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">{t.tierToggleLabel || 'API Key Type'}</label>
+                        <Info size={12} className="text-slate-400 cursor-help" />
+                        <div className="absolute left-0 top-full mt-2 w-48 p-2 bg-slate-800 text-white text-[9px] rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
+                          {t.tierWarningDesc || "If you select 'Paid Tier' but use a free API key, the system will crash due to quota limits. Only select 'Paid Tier' if you have enabled billing in Google Cloud."}
+                        </div>
+                      </div>
                       <button 
                         onClick={() => {
                           const newValue = !isPaidTier;
@@ -168,6 +174,8 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
                           localStorage.setItem(STORAGE_KEY_TIER, newValue ? 'paid' : 'free');
                           if (!newValue && settings.modelId !== 'gemini-2.5-flash') {
                             onUpdateSettings({ ...settings, modelId: 'gemini-2.5-flash' });
+                          } else if (newValue && settings.modelId === 'gemini-2.5-flash') {
+                            onUpdateSettings({ ...settings, modelId: 'gemini-3.1-flash-lite-preview' });
                           }
                         }}
                         className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900 ${isPaidTier ? 'bg-indigo-500' : 'bg-slate-300 dark:bg-slate-600'}`}
@@ -196,17 +204,31 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
             <div className="grid grid-cols-1 gap-2">
               {AI_MODELS.map(m => {
                 const isLocked = m.locked && (!hasPaidKey || (!isPaidTier && m.id !== 'gemini-2.5-flash'));
+                const isRecommended = isPaidTier ? m.id === 'gemini-3.1-flash-lite-preview' : m.id === 'gemini-2.5-flash';
                 return (
                 <button 
                   key={m.id} 
                   disabled={isLocked} 
                   onClick={() => onUpdateSettings({...settings, modelId: m.id})} 
-                  className={`p-4 rounded-2xl border-2 text-left transition-all relative overflow-hidden ${settings.modelId === m.id ? 'border-indigo-500 bg-indigo-50/20 dark:bg-indigo-900/10' : 'border-slate-100 dark:border-slate-800 hover:border-slate-200 dark:hover:border-slate-700'}`}
+                  className={`p-4 rounded-2xl border-2 text-left transition-all relative overflow-hidden ${
+                    settings.modelId === m.id 
+                      ? 'border-indigo-500 bg-indigo-50/20 dark:bg-indigo-900/10' 
+                      : isRecommended && !isLocked
+                        ? 'border-emerald-500/50 hover:border-emerald-500 bg-emerald-50/10 dark:bg-emerald-900/10'
+                        : 'border-slate-100 dark:border-slate-800 hover:border-slate-200 dark:hover:border-slate-700'
+                  }`}
                 >
                   {isLocked && <div className="absolute inset-0 bg-white/50 dark:bg-slate-900/70 flex items-center justify-center backdrop-blur-[1px]"><Lock size={12} className="text-slate-400 dark:text-slate-500" /></div>}
                   <div className="flex justify-between items-center">
                     <div>
-                        <span className={`text-[10px] font-black block ${settings.modelId === m.id ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-300'}`}>{m.name}</span>
+                        <span className={`text-[10px] font-black block ${settings.modelId === m.id ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-300'}`}>
+                          {m.name}
+                          {isRecommended && !isLocked && settings.modelId !== m.id && (
+                            <span className="ml-2 text-[8px] font-black bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 px-1.5 py-0.5 rounded uppercase tracking-wider">
+                              {t.recommended || 'Recommended'}
+                            </span>
+                          )}
+                        </span>
                         <span className="text-[9px] font-medium text-slate-400">{getModelDesc(m.id)}</span>
                     </div>
                     {settings.modelId === m.id && <Check size={12} className="text-indigo-500" />}
