@@ -159,14 +159,15 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
                 </div>
                 {hasPaidKey && (
                   <div className="mt-4 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-1.5 group relative">
-                        <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">{t.tierToggleLabel || 'API Key Type'}</label>
-                        <Info size={12} className="text-slate-400 cursor-help" />
-                        <div className="absolute left-0 top-full mt-2 w-48 p-2 bg-slate-800 text-white text-[9px] rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
-                          {t.tierWarningDesc || "If you select 'Paid Tier' but use a free API key, the system will crash due to quota limits. Only select 'Paid Tier' if you have enabled billing in Google Cloud."}
-                        </div>
+                    <div className="flex items-center gap-1.5 group relative mb-2">
+                      <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">{t.tierToggleLabel || 'API Key Type'}</label>
+                      <Info size={12} className="text-slate-400 cursor-help" />
+                      <div className="absolute left-0 top-full mt-2 w-48 p-2 bg-slate-800 text-white text-[9px] rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
+                        {t.tierWarningDesc || "If you select 'Paid Tier' but use a free API key, the system will crash due to quota limits. Only select 'Paid Tier' if you have enabled billing in Google Cloud."}
                       </div>
+                    </div>
+                    <div className="flex items-center justify-between gap-4">
+                      <span className={`text-[9px] font-bold ${!isPaidTier ? 'text-amber-500' : 'text-slate-400'}`}>{t.tierFree || 'Free Tier'}</span>
                       <button 
                         onClick={() => {
                           const newValue = !isPaidTier;
@@ -182,10 +183,7 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
                       >
                         <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${isPaidTier ? 'translate-x-5' : 'translate-x-1'}`} />
                       </button>
-                    </div>
-                    <div className="flex justify-between text-[9px] font-bold">
-                      <span className={!isPaidTier ? 'text-amber-500' : 'text-slate-400'}>{t.tierFree || 'Free Tier'}</span>
-                      <span className={isPaidTier ? 'text-indigo-500' : 'text-slate-400'}>{t.tierPaid || 'Paid Tier'}</span>
+                      <span className={`text-[9px] font-bold ${isPaidTier ? 'text-indigo-500' : 'text-slate-400'}`}>{t.tierPaid || 'Paid Tier'}</span>
                     </div>
                     <p className="text-[9px] text-slate-400 dark:text-slate-500 mt-2 leading-relaxed">
                       {t.tierToggleDesc || 'Free tier applies rate limits and unlocks only Gemini 2.5 Flash.'}
@@ -203,7 +201,8 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
             </label>
             <div className="grid grid-cols-1 gap-2">
               {AI_MODELS.map(m => {
-                const isLocked = m.locked && (!hasPaidKey || (!isPaidTier && m.id !== 'gemini-2.5-flash'));
+                const isFreeTierModel = m.id === 'gemini-2.5-flash-lite' || m.id === 'gemini-2.5-flash';
+                const isLocked = !isPaidTier ? !isFreeTierModel : false;
                 const isRecommended = isPaidTier ? m.id === 'gemini-3.1-flash-lite-preview' : m.id === 'gemini-2.5-flash';
                 return (
                 <button 
