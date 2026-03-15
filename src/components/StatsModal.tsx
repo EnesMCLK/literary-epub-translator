@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BookStats, UILanguage, BookStrategy } from '../design';
+import { BookStats, UILanguage, BookStrategy, AI_MODELS } from '../design';
 import { 
   BarChart3, Clock, Check, X, AlertCircle, BookOpen, 
   AlignLeft, Gauge, Zap, BrainCircuit, RefreshCw, MessageSquare
@@ -16,24 +16,72 @@ interface StatsModalProps {
   hasPaidKey: boolean;
   onRegenerateAnalysis: (feedback: string) => void;
   isAnalyzing: boolean;
+  modelId?: string;
+  onModelChange?: (modelId: string) => void;
 }
 
-export const StatsModal: React.FC<StatsModalProps> = ({ 
-  isOpen, onClose, onConfirm, stats, strategy, uiLang, hasPaidKey, onRegenerateAnalysis, isAnalyzing 
+export const StatsModal: React.FC<StatsModalProps & { isPaidTier?: boolean }> = ({ 
+  isOpen, onClose, onConfirm, stats, strategy, uiLang, hasPaidKey, isPaidTier, onRegenerateAnalysis, isAnalyzing, modelId, onModelChange 
 }) => {
-  if (!isOpen || !stats) return null;
-
   const [activeTab, setActiveTab] = useState<'stats' | 'analysis'>('analysis');
   const [feedback, setFeedback] = useState('');
+  
+  if (!isOpen || !stats) return null;
+
   const t = STRINGS_UI[uiLang] || STRINGS_UI['en'];
   
   const fmt = (n: number) => n.toLocaleString(uiLang === 'tr' ? 'tr-TR' : 'en-US');
   
-  // Anahtar varsa kısa süreyi, yoksa uzun süreyi göster
-  const duration = hasPaidKey ? stats.estimatedDurationPro : stats.estimatedDurationFree;
+  // Dinamik olarak seçili modele göre süre ve maliyet hesapla
+  let rpmPaid = 360;
+  let inputPricePerM = 0.075;
+  let outputPricePerM = 0.30;
+
+  switch (modelId) {
+      case 'gemini-2.5-flash-lite':
+      case 'gemini-2.5-flash':
+      case 'gemini-3.1-flash-lite-preview':
+      case 'gemini-3-flash-preview':
+          rpmPaid = (modelId === 'gemini-3-flash-preview' || modelId === 'gemini-3.1-flash-lite-preview') ? 120 : 360;
+          inputPricePerM = 0.075;
+          outputPricePerM = 0.30;
+          break;
+      case 'gemini-3.1-pro-preview':
+          rpmPaid = 60;
+          inputPricePerM = 1.25;
+          outputPricePerM = 5.00;
+          break;
+      default:
+          rpmPaid = 360;
+          inputPricePerM = 0.075;
+          outputPricePerM = 0.30;
+  }
+
+  const dynamicDurationPro = Math.ceil(stats.estimatedChunks / rpmPaid);
+  const isFastTier = hasPaidKey && isPaidTier;
+  const duration = isFastTier ? dynamicDurationPro : stats.estimatedDurationFree;
   
-  // Eğer anahtar yoksa ve süre 5 dakikadan uzunsa uyarı ver
-  const isHighLoad = !hasPaidKey && stats.estimatedDurationFree > 5;
+  const formatDuration = (minutes: number) => {
+    if (minutes < 60) return `${minutes}m`;
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    return m > 0 ? `${h}h${m}m` : `${h}h`;
+  };
+
+  let durationDisplay = `~${formatDuration(duration)}`;
+  if (!isFastTier && stats.estimatedDurationFreeMax) {
+      durationDisplay = `${formatDuration(duration)} ~ ${formatDuration(stats.estimatedDurationFreeMax)}`;
+  }
+
+  const durationTextSize = durationDisplay.length > 8 ? 'text-xs md:text-sm' : 'text-base md:text-lg';
+
+  // Eğer yavaş katmandaysa ve süre 5 dakikadan uzunsa uyarı ver
+  const isHighLoad = !isFastTier && stats.estimatedDurationFree > 5;
+
+  const inputTokensM = stats.estimatedTokens / 1_000_000;
+  const outputTokensM = stats.estimatedTokens / 1_000_000;
+  const dynamicCost = (inputTokensM * inputPricePerM) + (outputTokensM * outputPricePerM);
+  const costDisplay = isFastTier ? `$${dynamicCost.toFixed(4)}` : (t.freeCost || "FREE");
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-slate-950/80 backdrop-blur-xl animate-fade-scale">
@@ -81,12 +129,56 @@ export const StatsModal: React.FC<StatsModalProps> = ({
                           <span className="text-base md:text-lg font-black text-slate-700 dark:text-slate-200">{fmt(stats.estimatedChunks)}</span>
                           <span className="text-[8px] md:text-[9px] font-black uppercase text-slate-400 tracking-wider">{t.statRequests}</span>
                       </div>
-                      <div className={`p-3 md:p-4 rounded-2xl border flex flex-col items-center justify-center gap-1 text-center transition-colors ${hasPaidKey ? 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-800/30' : 'bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800/30'}`}>
-                          <Clock size={18} className={hasPaidKey ? "text-green-500 mb-1" : "text-amber-500 mb-1"}/>
-                          <span className={`text-base md:text-lg font-black ${hasPaidKey ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'}`}>~{duration}m</span>
-                          <span className={`text-[8px] md:text-[9px] font-black uppercase tracking-wider ${hasPaidKey ? 'text-green-400/70' : 'text-amber-400/70'}`}>{t.statDuration}</span>
+                      <div className={`p-3 md:p-4 rounded-2xl border flex flex-col items-center justify-center gap-1 text-center transition-colors ${isFastTier ? 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-800/30' : 'bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800/30'}`}>
+                          <Clock size={18} className={isFastTier ? "text-green-500 mb-1" : "text-amber-500 mb-1"}/>
+                          <span className={`${durationTextSize} font-black ${isFastTier ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'}`}>{durationDisplay}</span>
+                          <span className={`text-[8px] md:text-[9px] font-black uppercase tracking-wider ${isFastTier ? 'text-green-400/70' : 'text-amber-400/70'}`}>{t.statDuration}</span>
                       </div>
                   </div>
+
+                  {dynamicCost !== undefined && (
+                      <div className="p-4 md:p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-200 dark:border-indigo-700/30 flex flex-col md:flex-row gap-4 items-center justify-between">
+                          <div className="flex items-center gap-3 w-full md:w-auto">
+                              <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-xl text-indigo-600"><Zap size={20}/></div>
+                              <div className="flex-1">
+                                  <div className="flex items-center gap-2">
+                                    <h4 className="font-bold text-indigo-700 dark:text-indigo-400 text-sm uppercase">{t.model || 'Model'}:</h4>
+                                    {onModelChange ? (
+                                      <select 
+                                        value={modelId} 
+                                        onChange={(e) => onModelChange(e.target.value)}
+                                        className="bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-700/50 text-indigo-700 dark:text-indigo-400 text-xs font-bold rounded-lg px-2 py-1 outline-none focus:ring-2 focus:ring-indigo-500/50"
+                                      >
+                                        {AI_MODELS.map(m => (
+                                          <option key={m.id} value={m.id}>{m.name}</option>
+                                        ))}
+                                      </select>
+                                    ) : (
+                                      <h4 className="font-bold text-indigo-700 dark:text-indigo-400 text-sm uppercase">{modelId || 'Model'}</h4>
+                                    )}
+                                  </div>
+                                  <p className="text-xs text-indigo-800/80 dark:text-indigo-200/60 mt-1">
+                                      {t.estimatedTokens || "Estimated Tokens"}: <strong>{fmt(stats.estimatedTokens)}</strong>
+                                  </p>
+                              </div>
+                          </div>
+                          {isFastTier ? (
+                            <div className="text-right w-full md:w-auto flex flex-row md:flex-col justify-between md:justify-end items-center md:items-end">
+                                <span className="block text-[9px] font-black uppercase text-indigo-500/70 tracking-wider md:hidden">{t.estimatedCost || "ESTIMATED COST"}</span>
+                                <div className="text-right">
+                                  <span className="text-2xl font-black text-indigo-700 dark:text-indigo-400">{costDisplay}</span>
+                                  <span className="hidden md:block text-[9px] font-black uppercase text-indigo-500/70 tracking-wider">{t.estimatedCost || "ESTIMATED COST"}</span>
+                                </div>
+                            </div>
+                          ) : (
+                            <div className="text-right w-full md:w-auto flex flex-row md:flex-col justify-end items-center md:items-end">
+                                <div className="text-right">
+                                  <span className="text-2xl font-black text-indigo-700 dark:text-indigo-400">{t.freeCost || "FREE"}</span>
+                                </div>
+                            </div>
+                          )}
+                      </div>
+                  )}
 
                   {isHighLoad ? (
                       <div className="p-4 md:p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-700/30 flex flex-col md:flex-row gap-4 animate-pulse-slow">

@@ -146,7 +146,7 @@ export default function App() {
       if (countryCode && COUNTRY_TO_LANG[countryCode]) {
         return COUNTRY_TO_LANG[countryCode];
       }
-    } catch (e) { }
+    } catch (e) { /* ignore */ }
     return null;
   };
 
@@ -157,7 +157,7 @@ export default function App() {
       let storedLang: UILanguage | null = null;
       try {
         storedLang = localStorage.getItem('lit-trans-ui-lang') as UILanguage;
-      } catch (e) {}
+      } catch (e) { /* ignore */ }
 
       if (storedLang && STRINGS_UI[storedLang]) {
         langToUse = storedLang;
@@ -169,7 +169,7 @@ export default function App() {
            try {
              const browserLang = (navigator.language || 'en').split('-')[0] as UILanguage;
              if (STRINGS_UI[browserLang]) langToUse = browserLang;
-           } catch (e) {}
+           } catch (e) { /* ignore */ }
         }
       }
       setUiLang(langToUse);
@@ -184,15 +184,15 @@ export default function App() {
                 localStorage.removeItem(STORAGE_KEY_HISTORY);
             }
         }
-      } catch (e) {}
+      } catch (e) { /* ignore */ }
       
       try {
         // Check local storage for quick resume (legacy or last session)
         const savedResume = localStorage.getItem(STORAGE_KEY_RESUME);
         if (savedResume) {
-          try { setResumeData(JSON.parse(savedResume)); } catch {}
+          try { setResumeData(JSON.parse(savedResume)); } catch { /* ignore */ }
         }
-      } catch (e) {}
+      } catch (e) { /* ignore */ }
 
       let foundKey = false;
       try {
@@ -202,17 +202,17 @@ export default function App() {
             setHasPaidKey(true);
             foundKey = true;
         }
-      } catch (e) {}
+      } catch (e) { /* ignore */ }
 
       if (!foundKey) {
           try {
-              // @ts-ignore
+              // @ts-expect-error process is not defined in browser
               const p = typeof process !== 'undefined' ? process : (window as any).process;
               if (p && p.env && p.env.API_KEY) {
                   setHasPaidKey(true);
                   foundKey = true;
               }
-          } catch(e) {}
+          } catch(e) { /* ignore */ }
       }
 
       try {
@@ -220,7 +220,7 @@ export default function App() {
         if (!tourSeen) {
           setTimeout(() => setIsTourOpen(true), 1000);
         }
-      } catch (e) {}
+      } catch (e) { /* ignore */ }
 
       setSettings(prev => ({ ...prev, modelId: DEFAULT_MODEL_ID }));
       fileStorage.init().catch(console.error);
@@ -231,6 +231,7 @@ export default function App() {
     }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { initializeApp(); }, []);
 
   const verifyApiKey = async (explicitKey?: string) => {
@@ -239,10 +240,10 @@ export default function App() {
     
     let envKey = '';
     try {
-        // @ts-ignore
+        // @ts-expect-error process is not defined in browser
         const p = typeof process !== 'undefined' ? process : (window as any).process;
         if (p && p.env && p.env.API_KEY) envKey = p.env.API_KEY;
-    } catch(e) {}
+    } catch(e) { /* ignore */ }
     
     // If user explicitly provided a key (via input or parameter), use it.
     // Otherwise fallback to the environment key.
@@ -287,12 +288,12 @@ export default function App() {
         if (await (window as any).aistudio.hasSelectedApiKey()) {
             let envKey = '';
             try {
-                // @ts-ignore
+                // @ts-expect-error process is not defined in browser
                 const p = typeof process !== 'undefined' ? process : (window as any).process;
                 if (p && p.env && p.env.API_KEY) {
                     envKey = p.env.API_KEY;
                 }
-            } catch(e) {}
+            } catch(e) { /* ignore */ }
             
             if (envKey) {
                 await verifyApiKey(envKey);
@@ -336,7 +337,7 @@ export default function App() {
                   logs: [...prev.logs, { timestamp: new Date().toLocaleTimeString(), text: msg, type }]
               }));
           }),
-          calculateEpubStats(file, settings.targetTags, hasPaidKey)
+          calculateEpubStats(file, settings.targetTags, hasPaidKey, effectiveSettings.modelId || 'gemini-2.5-flash')
       ]);
       
       setProgress(prev => ({ ...prev, strategy: strategy }));
@@ -693,6 +694,11 @@ export default function App() {
         strategy={progress.strategy}
         uiLang={uiLang}
         hasPaidKey={hasPaidKey}
+        isPaidTier={isPaidTier}
+        modelId={settings.modelId || 'gemini-2.5-flash'}
+        onModelChange={(newModelId) => {
+           setSettings(prev => ({ ...prev, modelId: newModelId }));
+        }}
         onRegenerateAnalysis={handleReAnalyzeWithFeedback}
         isAnalyzing={isAnalyzing}
       />

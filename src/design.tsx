@@ -41,8 +41,10 @@ export interface BookStats {
   estimatedTokens: number;
   estimatedChunks: number;
   estimatedDurationFree: number; // Dakika cinsinden (Worst case)
+  estimatedDurationFreeMax?: number; // Dakika cinsinden (Tamamen zaman aşımı)
   estimatedDurationPro: number; // Dakika cinsinden (Best case)
   fileSentenceCounts?: number[]; // Her dosyanın cümle sayısı (Progress bar hassasiyeti için)
+  estimatedCost?: number; // USD cinsinden tahmini maliyet
 }
 
 export interface BookStrategy {
@@ -115,11 +117,11 @@ export const LANG_CODE_TO_LABEL: Record<string, string> = {
 };
 
 export const AI_MODELS = [
-    { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', desc: 'PricePerf', locked: true },
-    { id: 'gemini-3-flash-preview', name: 'Gemini 3 Flash', desc: 'Balanced', locked: true }, 
-    { id: 'gemini-3-pro-preview', name: 'Gemini 3 Pro', desc: 'Expert', locked: true },
-    { id: 'gemini-3.1-flash-lite-preview', name: 'Gemini 3.1 Flash-Lite', desc: 'NewFast', locked: true },
-    { id: 'gemini-3.1-pro-preview', name: 'Gemini 3.1 Pro', desc: 'NewExpert', locked: true }
+    { id: 'gemini-2.5-flash-lite', name: 'Gemini 2.5 Flash-Lite', locked: true },
+    { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', locked: true },
+    { id: 'gemini-3.1-flash-lite-preview', name: 'Gemini 3.1 Flash-Lite', locked: true },
+    { id: 'gemini-3-flash-preview', name: 'Gemini 3 Flash', locked: true }, 
+    { id: 'gemini-3.1-pro-preview', name: 'Gemini 3.1 Pro', locked: true }
 ];
 
 // --- Global Interface Extension ---

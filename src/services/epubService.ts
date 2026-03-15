@@ -1,6 +1,7 @@
 
 import JSZip from 'jszip';
-import { GeminiTranslator } from './geminiService';
+import { GeminiTranslator, getApiKey } from './geminiService';
+import { GoogleGenAI } from '@google/genai';
 import { UILanguage, TranslationSettings, ResumeInfo, BookStats, LogEntry, UsageStats, BookStrategy } from '../design';
 import { STRINGS_LOGS } from '../lang/logs';
 
@@ -45,6 +46,7 @@ export interface EpubStructure {
     creator: string;
     description: string;
   };
+  ncxPath?: string;
 }
 
 export function resolveRelativePath(basePath: string, relativePath: string): string {
@@ -120,6 +122,12 @@ export async function parseEpubStructure(epubZip: JSZip, uiLang: string = 'en'):
     throw new Error(getLogStr(uiLang, 'error_spine_missing') || "No reading order (spine) found in OPF.");
   }
 
+  const tocId = opfDoc.querySelector("spine")?.getAttribute("toc");
+  let ncxPath: string | undefined = undefined;
+  if (tocId && idToHref[tocId]) {
+      ncxPath = resolveRelativePath(opfFolder, decodeURIComponent(idToHref[tocId]));
+  }
+
   // 4. Göreceli Yol (Relative Path) Çözümlemesi
   const processList = spineItems.map(item => {
     const idref = item.getAttribute("idref");
@@ -141,11 +149,12 @@ export async function parseEpubStructure(epubZip: JSZip, uiLang: string = 'en'):
     opfPath,
     opfFolder,
     processList,
-    metadata
+    metadata,
+    ncxPath
   };
 }
 
-export async function calculateEpubStats(file: File, targetTags: string[], hasUserKey: boolean): Promise<BookStats> {
+export async function calculateEpubStats(file: File, targetTags: string[], hasUserKey: boolean, modelId: string = 'gemini-2.5-flash'): Promise<BookStats> {
   const epubBuffer = await file.arrayBuffer();
   const epubZip = await new JSZip().loadAsync(epubBuffer);
 
@@ -154,7 +163,9 @@ export async function calculateEpubStats(file: File, targetTags: string[], hasUs
   let totalChars = 0;
   let totalWords = 0;
   let totalSentences = 0;
+  let totalNodes = 0;
   const fileSentenceCounts: number[] = [];
+  let fullTextForTokens = "";
 
   for (let i = 0; i < processList.length; i++) {
     const path = processList[i];
@@ -164,14 +175,23 @@ export async function calculateEpubStats(file: File, targetTags: string[], hasUs
         continue;
     }
     
-    // Fast path: remove scripts/styles, strip tags, and count
     const contentWithoutScripts = content.replace(/<(script|style)[^>]*>[\s\S]*?<\/\1>/gi, '');
+    
+    // Count nodes based on targetTags
+    let nodeCount = 0;
+    targetTags.forEach(tag => {
+        const regex = new RegExp(`<${tag}[\\s>]`, 'gi');
+        const matches = contentWithoutScripts.match(regex);
+        if (matches) nodeCount += matches.length;
+    });
+    totalNodes += nodeCount;
+
     const cleanText = contentWithoutScripts.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
     
     if (cleanText.length > 0) {
         totalChars += cleanText.length;
+        fullTextForTokens += cleanText + "\n";
         
-        // Fast word count
         let wordCount = 0;
         let inWord = false;
         for (let j = 0; j < cleanText.length; j++) {
@@ -183,7 +203,6 @@ export async function calculateEpubStats(file: File, targetTags: string[], hasUs
         }
         totalWords += wordCount;
         
-        // Fast sentence count
         const matches = cleanText.match(/[.!?]+/g);
         const fileSentences = matches ? matches.length : 1;
         totalSentences += fileSentences;
@@ -192,16 +211,73 @@ export async function calculateEpubStats(file: File, targetTags: string[], hasUs
         fileSentenceCounts.push(0);
     }
 
-    // Yield to event loop every 10 files to keep UI responsive
     if (i % 10 === 0) {
         await new Promise(resolve => setTimeout(resolve, 0));
     }
   }
 
-  const estimatedTokens = Math.ceil(totalChars / 3.5); 
-  const estimatedChunks = Math.ceil(totalChars / 500); 
-  const durationFree = Math.ceil(estimatedChunks / 10); 
-  const durationPro = Math.ceil(estimatedChunks / 35); 
+  let estimatedTokens = Math.ceil(totalChars / 3.5);
+  try {
+      const ai = new GoogleGenAI({ apiKey: getApiKey() });
+      const countTokensResponse = await ai.models.countTokens({
+          model: "gemini-2.5-flash",
+          contents: fullTextForTokens,
+      });
+      if (countTokensResponse.totalTokens) {
+          estimatedTokens = countTokensResponse.totalTokens;
+      }
+  } catch (e) {
+      console.warn("Failed to count tokens via API, using fallback estimation.", e);
+  }
+
+  const estimatedChunks = totalNodes > 0 ? totalNodes : Math.ceil(totalChars / 500); 
+  
+  // Free tier is strictly limited to 15 RPM
+  const durationFree = Math.ceil(estimatedChunks / 15); 
+  // Max duration if every request hits a timeout (e.g. 10s extra per request)
+  // Base delay is ~4.5s. If it hits 429 once per request, it adds 10s.
+  // 14.5s per request = ~4 requests per minute.
+  // Let's use 24s per request (4.5s + 10s + 10s) as a worst-case scenario = 2.5 RPM
+  const durationFreeMax = Math.ceil(estimatedChunks * 24 / 60);
+
+  // Paid tier depends on the model's speed
+  let rpmPaid = 360; // default fast (gemini-2.5-flash)
+  if (modelId === 'gemini-3.1-pro-preview') {
+      rpmPaid = 60; // slower expert models
+  } else if (modelId === 'gemini-3-flash-preview' || modelId === 'gemini-3.1-flash-lite-preview') {
+      rpmPaid = 120; // balanced models
+  } else {
+      rpmPaid = 360; // fast models
+  }
+  
+  const durationPro = Math.ceil(estimatedChunks / rpmPaid); 
+
+  // Calculate estimated cost based on the selected model
+  // Input tokens are the original text, output tokens are roughly the same size
+  const inputTokensM = estimatedTokens / 1_000_000;
+  const outputTokensM = estimatedTokens / 1_000_000;
+  
+  let inputPricePerM = 0;
+  let outputPricePerM = 0;
+  
+  switch (modelId) {
+      case 'gemini-2.5-flash-lite':
+      case 'gemini-2.5-flash':
+      case 'gemini-3.1-flash-lite-preview':
+      case 'gemini-3-flash-preview':
+          inputPricePerM = 0.075;
+          outputPricePerM = 0.30;
+          break;
+      case 'gemini-3.1-pro-preview':
+          inputPricePerM = 1.25;
+          outputPricePerM = 5.00;
+          break;
+      default:
+          inputPricePerM = 0.075;
+          outputPricePerM = 0.30;
+  }
+  
+  const estimatedCost = (inputTokensM * inputPricePerM) + (outputTokensM * outputPricePerM);
 
   return {
     totalChars,
@@ -210,8 +286,10 @@ export async function calculateEpubStats(file: File, targetTags: string[], hasUs
     estimatedTokens,
     estimatedChunks,
     estimatedDurationFree: Math.max(1, durationFree), 
+    estimatedDurationFreeMax: Math.max(1, durationFreeMax),
     estimatedDurationPro: Math.max(1, durationPro),
-    fileSentenceCounts 
+    fileSentenceCounts,
+    estimatedCost
   };
 }
 
@@ -253,7 +331,7 @@ export async function processEpub(
   const translatedNodes: Record<string, string[]> = resumeFrom ? { ...resumeFrom.translatedNodes } : {};
   let strategy: BookStrategy | undefined = precomputedStrategy;
 
-  let cumulativeLogs: LogEntry[] = [
+  const cumulativeLogs: LogEntry[] = [
     { timestamp: new Date().toLocaleTimeString(), text: getLogStr(ui, 'analyzing'), type: 'info' }
   ];
 
@@ -327,6 +405,52 @@ export async function processEpub(
   }
   
   translator.setStrategy(strategy);
+
+  // --- METADATA TRANSLATION ---
+  if (!resumeFrom) {
+      addLog(getLogStr(ui, 'translatingMetadata') || "Translating book metadata...", 'info');
+      try {
+          const translatedMeta = await translator.translateMetadata(epubStructure.metadata);
+          
+          // Update OPF file
+          const opfContent = await epubZip.file(epubStructure.opfPath)?.async("string");
+          if (opfContent) {
+              const opfDoc = parser.parseFromString(opfContent, "application/xml");
+              
+              const titleNode = opfDoc.querySelector("dc\\:title, title");
+              if (titleNode && translatedMeta.title) {
+                  titleNode.textContent = translatedMeta.title;
+              }
+              
+              const descNode = opfDoc.querySelector("dc\\:description, description");
+              if (descNode && translatedMeta.description) {
+                  descNode.textContent = translatedMeta.description;
+              }
+              
+              const serializer = new XMLSerializer();
+              epubZip.file(epubStructure.opfPath, serializer.serializeToString(opfDoc));
+          }
+          
+          // Translate NCX file if it exists
+          if (epubStructure.ncxPath) {
+              const ncxContent = await epubZip.file(epubStructure.ncxPath)?.async("string");
+              if (ncxContent) {
+                  const ncxDoc = parser.parseFromString(ncxContent, "application/xml");
+                  const textNodes = Array.from(ncxDoc.querySelectorAll("navLabel > text"));
+                  for (const node of textNodes) {
+                      if (node.textContent && node.textContent.trim() !== "") {
+                          node.textContent = await translator.translateSingle(node.textContent);
+                      }
+                  }
+                  const serializer = new XMLSerializer();
+                  epubZip.file(epubStructure.ncxPath, serializer.serializeToString(ncxDoc));
+              }
+          }
+      } catch (err) {
+          console.warn("Failed to update OPF metadata", err);
+      }
+  }
+  // --- END METADATA TRANSLATION ---
 
   // --- CRITICAL RESTORATION PHASE ---
   // If resuming, we have loaded a fresh 'epubZip' from the source file. 

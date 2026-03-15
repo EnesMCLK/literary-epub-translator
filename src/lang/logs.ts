@@ -16,6 +16,7 @@ export const STRINGS_LOGS: Record<string, any> = {
     verifying: "Çeviri bütünlüğü doğrulanıyor...",
     preComputed: "Önceden hesaplanmış analiz stratejisi kullanılıyor.",
     freeTierActive: "Ücretsiz Kota Aktif: Hız sınırlaması uygulanıyor (15 RPM).",
+    translatingMetadata: "Kitap meta verileri çevriliyor...",
     restoringContent: "Önceki çeviriler kitaba işleniyor...",
     progressRestored: "İlerleme %{0} seviyesinde geri yüklendi. Devam etmeye hazır.",
     error_container_xml_missing: "META-INF/container.xml bulunamadı. Geçersiz EPUB.",
@@ -40,6 +41,7 @@ export const STRINGS_LOGS: Record<string, any> = {
     verifying: "Verifying integrity...",
     preComputed: "Using pre-computed analysis strategy.",
     freeTierActive: "Free Tier Active: Throttling applied (15 RPM).",
+    translatingMetadata: "Translating book metadata...",
     restoringContent: "Restoring previous translations to book...",
     progressRestored: "Progress restored at {0}%. Ready to resume.",
     error_container_xml_missing: "META-INF/container.xml not found. Invalid EPUB.",
@@ -64,6 +66,7 @@ export const STRINGS_LOGS: Record<string, any> = {
     verifying: "Vérification de l'intégrité...",
     preComputed: "Utilisation de la stratégie d'analyse pré-calculée.",
     freeTierActive: "Mode Gratuit : Limitation de vitesse (15 RPM).",
+    translatingMetadata: "Traduction des métadonnées du livre...",
     restoringContent: "Restauration des traductions précédentes...",
     progressRestored: "Progression restaurée à {0}%. Prêt à reprendre."
   },
@@ -81,6 +84,7 @@ export const STRINGS_LOGS: Record<string, any> = {
     verifying: "Integrität wird überprüft...",
     preComputed: "Verwendung der vorberechneten Analysestrategie.",
     freeTierActive: "Kostenloser Modus: Geschwindigkeit begrenzt (15 RPM).",
+    translatingMetadata: "Buch-Metadaten werden übersetzt...",
     restoringContent: "Vorherige Übersetzungen werden wiederhergestellt...",
     progressRestored: "Fortschritt bei {0}% wiederhergestellt. Bereit zum Fortsetzen."
   },
@@ -98,6 +102,7 @@ export const STRINGS_LOGS: Record<string, any> = {
     verifying: "Verificando integridad...",
     preComputed: "Usando estrategia de análisis precalculada.",
     freeTierActive: "Modo Gratuito: Limitación de velocidad (15 RPM).",
+    translatingMetadata: "Traduciendo metadatos del libro...",
     restoringContent: "Restaurando traducciones anteriores...",
     progressRestored: "Progreso restaurado al {0}%. Listo para continuar."
   },

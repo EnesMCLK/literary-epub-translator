@@ -9,6 +9,31 @@ function getLogStr(uiLang: string, key: string): string {
   return bundle[key] || STRINGS_LOGS['en'][key];
 }
 
+export function getApiKey(): string {
+  if ((window as any).manualApiKey) return (window as any).manualApiKey;
+  const stored = localStorage.getItem(STORAGE_KEY_API);
+  if (stored) return stored;
+  try {
+      // @ts-expect-error process is not defined in browser
+      const p = typeof process !== 'undefined' ? process : (window as any).process;
+      if (p && p.env && p.env.API_KEY) {
+          return p.env.API_KEY;
+      }
+  } catch (e) {
+      // ignore
+  }
+  try {
+      // @ts-expect-error import.meta is not defined in older environments
+      if (import.meta && import.meta.env && import.meta.env.VITE_API_KEY) {
+          // @ts-expect-error import.meta is not defined in older environments
+          return import.meta.env.VITE_API_KEY;
+      }
+  } catch (e) {
+      // ignore
+  }
+  return "AI_BROWSER_PLACEHOLDER_KEY";
+}
+
 export class GeminiTranslator {
   private modelName: string;
   private temperature: number;
@@ -42,24 +67,7 @@ export class GeminiTranslator {
   }
 
   private getApiKey(): string {
-    if ((window as any).manualApiKey) return (window as any).manualApiKey;
-    const stored = localStorage.getItem(STORAGE_KEY_API);
-    if (stored) return stored;
-    try {
-        // @ts-ignore
-        const p = typeof process !== 'undefined' ? process : (window as any).process;
-        if (p && p.env && p.env.API_KEY) {
-            return p.env.API_KEY;
-        }
-    } catch (e) {}
-    try {
-        // @ts-ignore
-        if (import.meta && import.meta.env && import.meta.env.VITE_API_KEY) {
-            // @ts-ignore
-            return import.meta.env.VITE_API_KEY;
-        }
-    } catch (e) {}
-    return "AI_BROWSER_PLACEHOLDER_KEY";
+    return getApiKey();
   }
 
   setStrategy(strategy: BookStrategy) {
@@ -161,7 +169,7 @@ export class GeminiTranslator {
     let attempt = 0;
     const baseMaxRetries = 3;
 
-    while (true) {
+    while (attempt <= 5) {
         try {
             if (apiKey === "AI_BROWSER_PLACEHOLDER_KEY") throw new Error("PLACEHOLDER_KEY");
 
@@ -292,6 +300,23 @@ export class GeminiTranslator {
     return `${prefix}-${Math.abs(hash).toString(36)}-${str.length.toString(36)}-${suffix}`;
   }
 
+  async translateMetadata(metadata: any): Promise<any> {
+    const translatedMetadata = { ...metadata };
+    try {
+        if (metadata.title && metadata.title !== "Untitled") {
+            translatedMetadata.title = await this.translateSingle(metadata.title);
+        }
+        if (metadata.description && metadata.description.trim() !== "") {
+            translatedMetadata.description = await this.translateSingle(metadata.description);
+        }
+        // Usually creator (author) names are not translated, but we can try or leave them.
+        // The prompt says "KEEP Author names... intact", so we won't translate creator.
+    } catch (e) {
+        console.warn("Failed to translate metadata", e);
+    }
+    return translatedMetadata;
+  }
+
   async translateSingle(htmlSnippet: string, forceRetryMode: boolean = false): Promise<string> {
     const trimmed = htmlSnippet.trim();
     if (!trimmed || this.shouldSkipTranslation(trimmed)) return htmlSnippet;
@@ -343,7 +368,7 @@ export class GeminiTranslator {
     }
 
     if (finalTranslation && finalTranslation !== trimmed) {
-        try { localStorage.setItem(cacheKey, finalTranslation); } catch (e) {}
+        try { localStorage.setItem(cacheKey, finalTranslation); } catch (e) { /* ignore */ }
     }
 
     return finalTranslation;

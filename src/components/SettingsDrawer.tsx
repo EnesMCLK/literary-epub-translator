@@ -50,11 +50,11 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
 
   // Model ID'ye göre çeviri anahtarını eşleştir
   const getModelDesc = (modelId: string) => {
-    if (modelId === 'gemini-2.5-flash') return t.modelDescPricePerf || 'Fast, Price & Performance';
-    if (modelId === 'gemini-3-flash-preview') return t.modelDescBalanced || 'Fast & Balanced';
-    if (modelId === 'gemini-3-pro-preview') return t.modelDescExpert || 'Expert';
-    if (modelId === 'gemini-3.1-flash-lite-preview') return t.modelDescNewFast || 'New & Fast';
-    if (modelId === 'gemini-3.1-pro-preview') return t.modelDescNewExpert || 'New & Expert';
+    if (modelId === 'gemini-2.5-flash-lite') return t.modelDescFlashLite || 'Fast & Budget-friendly';
+    if (modelId === 'gemini-2.5-flash') return t.modelDescFlash || 'Fast & Economical';
+    if (modelId === 'gemini-3.1-flash-lite-preview') return t.modelDescFlashLitePreview || 'Optimized for translation & simple data processing, most cost-effective';
+    if (modelId === 'gemini-3-flash-preview') return t.modelDescFlashPreview || 'Smartest model designed for speed';
+    if (modelId === 'gemini-3.1-pro-preview') return t.modelDescProPreview || 'Smartest and most performant model';
     return '';
   };
 
@@ -145,7 +145,7 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
                     disabled={isVerifying || !manualKey} 
                     className={`flex-1 py-4 text-white rounded-2xl font-black text-[11px] uppercase flex items-center justify-center gap-2.5 active:scale-[0.98] disabled:opacity-40 transition-all shadow-lg ${hasKeySaved ? 'bg-green-600 hover:bg-green-700' : 'bg-slate-900 dark:bg-indigo-600/90 hover:bg-black dark:hover:bg-indigo-500'}`}
                     >
-                    {isVerifying ? <Loader2 size={16} className="animate-spin" /> : (hasKeySaved ? <Save size={16} /> : <ShieldCheck size={16} />)} {isVerifying ? t.checkKey : (hasKeySaved ? "SAVED" : t.verifyBtn)}
+                    {isVerifying ? <Loader2 size={16} className="animate-spin" /> : (hasKeySaved ? <Save size={16} /> : <ShieldCheck size={16} />)} {isVerifying ? t.checkKey : (hasKeySaved ? (t.savedBtn || "SAVED") : t.verifyBtn)}
                     </button>
                     {(hasPaidKey || manualKey) && (
                         <button 
