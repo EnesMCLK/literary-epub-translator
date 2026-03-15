@@ -141,20 +141,20 @@ export const StatsModal: React.FC<StatsModalProps & { isPaidTier?: boolean }> = 
                           <div className="flex items-center gap-3 w-full md:w-auto">
                               <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-xl text-indigo-600"><Zap size={20}/></div>
                               <div className="flex-1">
-                                  <div className="flex items-center gap-2">
-                                    <h4 className="font-bold text-indigo-700 dark:text-indigo-400 text-sm uppercase">{t.model || 'Model'}:</h4>
+                                  <div className="flex items-center gap-2 w-full">
+                                    <h4 className="font-bold text-indigo-700 dark:text-indigo-400 text-sm uppercase shrink-0">{t.model || 'Model'}:</h4>
                                     {onModelChange ? (
                                       <select 
                                         value={modelId} 
                                         onChange={(e) => onModelChange(e.target.value)}
-                                        className="bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-700/50 text-indigo-700 dark:text-indigo-400 text-xs font-bold rounded-lg px-2 py-1 outline-none focus:ring-2 focus:ring-indigo-500/50"
+                                        className="bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-700/50 text-indigo-700 dark:text-indigo-400 text-xs font-bold rounded-lg px-2 py-1 outline-none focus:ring-2 focus:ring-indigo-500/50 w-full max-w-[140px] md:max-w-none text-ellipsis overflow-hidden"
                                       >
                                         {AI_MODELS.map(m => (
                                           <option key={m.id} value={m.id}>{m.name}</option>
                                         ))}
                                       </select>
                                     ) : (
-                                      <h4 className="font-bold text-indigo-700 dark:text-indigo-400 text-sm uppercase">{modelId || 'Model'}</h4>
+                                      <h4 className="font-bold text-indigo-700 dark:text-indigo-400 text-sm uppercase truncate">{modelId || 'Model'}</h4>
                                     )}
                                   </div>
                                   <p className="text-xs text-indigo-800/80 dark:text-indigo-200/60 mt-1">
@@ -268,12 +268,12 @@ export const StatsModal: React.FC<StatsModalProps & { isPaidTier?: boolean }> = 
         </div>
 
         {/* Footer Actions */}
-        <div className="p-5 md:p-8 pt-4 md:pt-6 border-t border-slate-100 dark:border-slate-800 relative z-10 grid grid-cols-2 gap-3 md:gap-4 shrink-0">
-            <button onClick={onClose} disabled={isAnalyzing} className="py-3 md:py-4 rounded-2xl font-black text-xs uppercase bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors disabled:opacity-50">
+        <div className="p-4 md:p-8 pt-4 md:pt-6 border-t border-slate-100 dark:border-slate-800 relative z-10 flex flex-row gap-3 md:gap-4 shrink-0">
+            <button onClick={onClose} disabled={isAnalyzing} className="flex-1 py-3 md:py-4 rounded-2xl font-black text-[10px] md:text-xs uppercase bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors disabled:opacity-50">
                 {t.statCancel}
             </button>
-            <button onClick={onConfirm} disabled={isAnalyzing} className="py-3 md:py-4 rounded-2xl font-black text-xs uppercase bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-500/30 transition-all flex items-center justify-center gap-2 disabled:opacity-50">
-                {t.statProceed} <Check size={16}/>
+            <button onClick={onConfirm} disabled={isAnalyzing} className="flex-1 py-3 md:py-4 rounded-2xl font-black text-[10px] md:text-xs uppercase bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-500/30 transition-all flex items-center justify-center gap-1 md:gap-2 disabled:opacity-50">
+                <span className="truncate">{t.statProceed}</span> <Check size={16} className="shrink-0"/>
             </button>
         </div>
 
