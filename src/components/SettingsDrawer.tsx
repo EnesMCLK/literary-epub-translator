@@ -220,7 +220,7 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
                 >
                   {isLocked && <div className="absolute inset-0 bg-white/50 dark:bg-slate-900/70 flex items-center justify-center backdrop-blur-[1px]"><Lock size={12} className="text-slate-400 dark:text-slate-500" /></div>}
                   <div className="flex justify-between items-center">
-                    <div>
+                    <div className="pr-2">
                         <span className={`text-[10px] font-black block ${settings.modelId === m.id ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-300'}`}>
                           {m.name}
                           {isRecommended && !isLocked && settings.modelId !== m.id && (
@@ -229,9 +229,9 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
                             </span>
                           )}
                         </span>
-                        <span className="text-[9px] font-medium text-slate-400">{getModelDesc(m.id)}</span>
+                        <span className="block mt-1 text-[9px] font-medium text-slate-400 leading-tight">{getModelDesc(m.id)}</span>
                     </div>
-                    {settings.modelId === m.id && <Check size={12} className="text-indigo-500" />}
+                    {settings.modelId === m.id && <Check size={12} className="text-indigo-500 shrink-0" />}
                   </div>
                 </button>
               )})}
