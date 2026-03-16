@@ -26,7 +26,10 @@ export const STRINGS_LOGS: Record<string, any> = {
     error_opf_file_missing: "OPF dosyası bulunamadı: {0}",
     error_opf_parse: "OPF dosyası ayrıştırılamadı.",
     error_spine_missing: "OPF içinde okuma sırası (spine) bulunamadı.",
-    error_no_html_files: "İşlenecek geçerli HTML/XHTML dosyası bulunamadı."
+    error_no_html_files: "İşlenecek geçerli HTML/XHTML dosyası bulunamadı.",
+    rateLimitReducingConcurrency: "Hız sınırı aşıldı. Eşzamanlılık {0} seviyesine düşürülüyor.",
+    rateLimitWaiting: "Hız sınırı aşıldı. Kotanın sıfırlanması bekleniyor...",
+    autoDowngradingFreeTier: "Daha fazla kota hatasını önlemek için otomatik olarak Ücretsiz Kota hızına düşürülüyor."
   },
   en: { 
     analyzing: "Analyzing...", 
@@ -52,7 +55,10 @@ export const STRINGS_LOGS: Record<string, any> = {
     error_opf_file_missing: "OPF file not found: {0}",
     error_opf_parse: "Failed to parse OPF file.",
     error_spine_missing: "No reading order (spine) found in OPF.",
-    error_no_html_files: "No valid HTML/XHTML files found to process."
+    error_no_html_files: "No valid HTML/XHTML files found to process.",
+    rateLimitReducingConcurrency: "Rate limit hit. Reducing concurrency to {0}.",
+    rateLimitWaiting: "Rate limit hit. Waiting for quota to reset...",
+    autoDowngradingFreeTier: "Auto-downgrading to Free Tier pacing to prevent further quota errors."
   },
   fr: { 
     analyzing: "Analyse en cours...", 
@@ -71,7 +77,10 @@ export const STRINGS_LOGS: Record<string, any> = {
     freeTierActive: "Mode Gratuit : Limitation de vitesse (15 RPM).",
     translatingMetadata: "Traduction des métadonnées du livre...",
     restoringContent: "Restauration des traductions précédentes...",
-    progressRestored: "Progression restaurée à {0}%. Prêt à reprendre."
+    progressRestored: "Progression restaurée à {0}%. Prêt à reprendre.",
+    rateLimitReducingConcurrency: "Limite de vitesse atteinte. Réduction de la simultanéité à {0}.",
+    rateLimitWaiting: "Limite de vitesse atteinte. En attente de la réinitialisation du quota...",
+    autoDowngradingFreeTier: "Rétrogradation automatique vers le rythme du mode gratuit pour éviter d'autres erreurs de quota."
   },
   de: { 
     analyzing: "Analysieren...", 
@@ -90,7 +99,10 @@ export const STRINGS_LOGS: Record<string, any> = {
     freeTierActive: "Kostenloser Modus: Geschwindigkeit begrenzt (15 RPM).",
     translatingMetadata: "Buch-Metadaten werden übersetzt...",
     restoringContent: "Vorherige Übersetzungen werden wiederhergestellt...",
-    progressRestored: "Fortschritt bei {0}% wiederhergestellt. Bereit zum Fortsetzen."
+    progressRestored: "Fortschritt bei {0}% wiederhergestellt. Bereit zum Fortsetzen.",
+    rateLimitReducingConcurrency: "Geschwindigkeitsbegrenzung erreicht. Parallelität wird auf {0} reduziert.",
+    rateLimitWaiting: "Geschwindigkeitsbegrenzung erreicht. Warten auf das Zurücksetzen des Kontingents...",
+    autoDowngradingFreeTier: "Automatisches Downgrade auf das Tempo des kostenlosen Modus, um weitere Kontingentfehler zu vermeiden."
   },
   es: { 
     analyzing: "Analizando...", 
@@ -109,7 +121,10 @@ export const STRINGS_LOGS: Record<string, any> = {
     freeTierActive: "Modo Gratuito: Limitación de velocidad (15 RPM).",
     translatingMetadata: "Traduciendo metadatos del libro...",
     restoringContent: "Restaurando traducciones anteriores...",
-    progressRestored: "Progreso restaurado al {0}%. Listo para continuar."
+    progressRestored: "Progreso restaurado al {0}%. Listo para continuar.",
+    rateLimitReducingConcurrency: "Límite de velocidad alcanzado. Reduciendo la concurrencia a {0}.",
+    rateLimitWaiting: "Límite de velocidad alcanzado. Esperando a que se restablezca la cuota...",
+    autoDowngradingFreeTier: "Degradación automática al ritmo del modo gratuito para evitar más errores de cuota."
   },
   it: { 
     analyzing: "Analisi in corso...", 
@@ -127,7 +142,10 @@ export const STRINGS_LOGS: Record<string, any> = {
     preComputed: "Utilizzo della strategia di analisi pre-calcolata.",
     freeTierActive: "Modalità Gratuita: Limitazione velocità (15 RPM).",
     restoringContent: "Ripristino traduzioni precedenti...",
-    progressRestored: "Avanzamento ripristinato al {0}%. Pronto a riprendere."
+    progressRestored: "Avanzamento ripristinato al {0}%. Pronto a riprendere.",
+    rateLimitReducingConcurrency: "Limite di velocità raggiunto. Riduzione della concorrenza a {0}.",
+    rateLimitWaiting: "Limite di velocità raggiunto. In attesa del ripristino della quota...",
+    autoDowngradingFreeTier: "Declassamento automatico al ritmo della modalità gratuita per evitare ulteriori errori di quota."
   },
   ru: { 
     analyzing: "Анализ...", 
@@ -145,7 +163,10 @@ export const STRINGS_LOGS: Record<string, any> = {
     preComputed: "Используется предварительно вычисленная стратегия.",
     freeTierActive: "Бесплатный режим: Ограничение скорости (15 RPM).",
     restoringContent: "Восстановление предыдущих переводов...",
-    progressRestored: "Прогресс восстановлен на {0}%. Готово к продолжению."
+    progressRestored: "Прогресс восстановлен на {0}%. Готово к продолжению.",
+    rateLimitReducingConcurrency: "Достигнут предел скорости. Снижение параллелизма до {0}.",
+    rateLimitWaiting: "Достигнут предел скорости. Ожидание сброса квоты...",
+    autoDowngradingFreeTier: "Автоматическое понижение до скорости бесплатного режима для предотвращения дальнейших ошибок квоты."
   },
   zh: { 
     analyzing: "正在分析...", 
@@ -163,7 +184,10 @@ export const STRINGS_LOGS: Record<string, any> = {
     preComputed: "使用预先计算的分析策略。",
     freeTierActive: "免费模式：速度限制 (15 RPM)。",
     restoringContent: "正在恢复之前的翻译...",
-    progressRestored: "进度已恢复至 {0}%。准备继续。"
+    progressRestored: "进度已恢复至 {0}%。准备继续。",
+    rateLimitReducingConcurrency: "达到速率限制。将并发降至 {0}。",
+    rateLimitWaiting: "达到速率限制。等待配额重置...",
+    autoDowngradingFreeTier: "自动降级至免费模式速度，以防止进一步的配额错误。"
   },
   ja: { 
     analyzing: "分析中...", 
@@ -181,7 +205,10 @@ export const STRINGS_LOGS: Record<string, any> = {
     preComputed: "事前計算された分析戦略を使用しています。",
     freeTierActive: "無料モード: 速度制限中 (15 RPM)。",
     restoringContent: "以前の翻訳を復元中...",
-    progressRestored: "進捗は {0}% で復元されました。再開準備完了。"
+    progressRestored: "進捗は {0}% で復元されました。再開準備完了。",
+    rateLimitReducingConcurrency: "レート制限に達しました。同時実行数を {0} に減らします。",
+    rateLimitWaiting: "レート制限に達しました。クォータのリセットを待機中...",
+    autoDowngradingFreeTier: "これ以上のクォータエラーを防ぐため、無料モードのペースに自動ダウングレードします。"
   },
   ko: { 
     analyzing: "분석 중...", 
@@ -199,7 +226,10 @@ export const STRINGS_LOGS: Record<string, any> = {
     preComputed: "사전 계산된 분석 전략을 사용 중입니다.",
     freeTierActive: "무료 모드: 속도 제한 중 (15 RPM)。",
     restoringContent: "이전 번역 복원 중...",
-    progressRestored: "진행 상황이 {0}%로 복원되었습니다. 계속할 준비가 되었습니다."
+    progressRestored: "진행 상황이 {0}%로 복원되었습니다. 계속할 준비가 되었습니다.",
+    rateLimitReducingConcurrency: "속도 제한에 도달했습니다. 동시성을 {0}(으)로 줄입니다.",
+    rateLimitWaiting: "속도 제한에 도달했습니다. 할당량이 재설정되기를 기다리는 중...",
+    autoDowngradingFreeTier: "추가 할당량 오류를 방지하기 위해 무료 모드 속도로 자동 다운그레이드합니다."
   },
   ar: { 
     analyzing: "جارٍ التحليل...", 
@@ -217,7 +247,10 @@ export const STRINGS_LOGS: Record<string, any> = {
     preComputed: "استخدام استراتيجية التحليل المحسوبة مسبقًا.",
     freeTierActive: "الوضع المجاني: تقييد السرعة (15 RPM).",
     restoringContent: "استعادة الترجمات السابقة...",
-    progressRestored: "تم استعادة التقدم بنسبة {0}%. جاهز للاستئناف."
+    progressRestored: "تم استعادة التقدم بنسبة {0}%. جاهز للاستئناف.",
+    rateLimitReducingConcurrency: "تم الوصول إلى حد السرعة. تقليل التزامن إلى {0}.",
+    rateLimitWaiting: "تم الوصول إلى حد السرعة. في انتظار إعادة تعيين الحصة...",
+    autoDowngradingFreeTier: "خفض تلقائي إلى وتيرة الوضع المجاني لمنع المزيد من أخطاء الحصة."
   },
   pt: { 
     analyzing: "Analisando...", 
@@ -235,7 +268,10 @@ export const STRINGS_LOGS: Record<string, any> = {
     preComputed: "Usando estratégia de análise pré-calculada.",
     freeTierActive: "Modo Grátis: Velocidade limitada (15 RPM).",
     restoringContent: "Restaurando traduções anteriores...",
-    progressRestored: "Progresso restaurado em {0}%. Pronto para continuar."
+    progressRestored: "Progresso restaurado em {0}%. Pronto para continuar.",
+    rateLimitReducingConcurrency: "Limite de velocidade atingido. Reduzindo a concorrência para {0}.",
+    rateLimitWaiting: "Limite de velocidade atingido. Aguardando a redefinição da cota...",
+    autoDowngradingFreeTier: "Rebaixamento automático para o ritmo do modo gratuito para evitar mais erros de cota."
   },
   nl: { 
     analyzing: "Analyseren...", 
@@ -253,7 +289,10 @@ export const STRINGS_LOGS: Record<string, any> = {
     preComputed: "Gebruik van vooraf berekende analysestrategie.",
     freeTierActive: "Gratis modus: Snelheid beperkt (15 RPM).",
     restoringContent: "Vorige vertalingen herstellen...",
-    progressRestored: "Voortgang hersteld op {0}%. Klaar om te hervatten."
+    progressRestored: "Voortgang hersteld op {0}%. Klaar om te hervatten.",
+    rateLimitReducingConcurrency: "Snelheidslimiet bereikt. Gelijktijdigheid verlagen naar {0}.",
+    rateLimitWaiting: "Snelheidslimiet bereikt. Wachten op reset van quotum...",
+    autoDowngradingFreeTier: "Automatische downgrade naar het tempo van de gratis modus om verdere quotumfouten te voorkomen."
   },
   pl: { 
     analyzing: "Analizowanie...", 
@@ -271,7 +310,10 @@ export const STRINGS_LOGS: Record<string, any> = {
     preComputed: "Używanie wstępnie obliczonej strategii analizy.",
     freeTierActive: "Tryb darmowy: Ograniczenie prędkości (15 RPM).",
     restoringContent: "Przywracanie poprzednich tłumaczeń...",
-    progressRestored: "Postęp przywrócony na poziomie {0}%. Gotowy do wznowienia."
+    progressRestored: "Postęp przywrócony na poziomie {0}%. Gotowy do wznowienia.",
+    rateLimitReducingConcurrency: "Osiągnięto limit prędkości. Zmniejszanie współbieżności do {0}.",
+    rateLimitWaiting: "Osiągnięto limit prędkości. Oczekiwanie na zresetowanie przydziału...",
+    autoDowngradingFreeTier: "Automatyczne obniżenie do tempa trybu darmowego, aby zapobiec kolejnym błędom przydziału."
   },
   hi: { 
     analyzing: "विश्लेषण कर रहा है...", 
@@ -289,7 +331,10 @@ export const STRINGS_LOGS: Record<string, any> = {
     preComputed: "पूर्व-गणना विश्लेषण रणनीति का उपयोग करना।",
     freeTierActive: "निःशुल्क मोड: गति सीमा सक्रिय (15 RPM)।",
     restoringContent: "पिछले अनुवादों को बहाल किया जा रहा है...",
-    progressRestored: "प्रगति {0}% पर बहाल। फिर से शुरू करने के लिए तैयार।"
+    progressRestored: "प्रगति {0}% पर बहाल। फिर से शुरू करने के लिए तैयार।",
+    rateLimitReducingConcurrency: "गति सीमा पार हो गई। समवर्ती को {0} तक कम किया जा रहा है।",
+    rateLimitWaiting: "गति सीमा पार हो गई। कोटा रीसेट होने की प्रतीक्षा की जा रही है...",
+    autoDowngradingFreeTier: "आगे की कोटा त्रुटियों को रोकने के लिए स्वचालित रूप से निःशुल्क मोड की गति पर डाउनग्रेड किया जा रहा है।"
   },
   vi: { 
     analyzing: "Đang phân tích...", 
@@ -307,7 +352,10 @@ export const STRINGS_LOGS: Record<string, any> = {
     preComputed: "Sử dụng chiến lược phân tích đã tính toán.",
     freeTierActive: "Chế độ miễn phí: Giới hạn tốc độ (15 RPM).",
     restoringContent: "Đang khôi phục các bản dịch trước...",
-    progressRestored: "Tiến độ đã khôi phục ở mức {0}%. Sẵn sàng tiếp tục."
+    progressRestored: "Tiến độ đã khôi phục ở mức {0}%. Sẵn sàng tiếp tục.",
+    rateLimitReducingConcurrency: "Đã đạt đến giới hạn tốc độ. Giảm tính đồng thời xuống {0}.",
+    rateLimitWaiting: "Đã đạt đến giới hạn tốc độ. Đang chờ đặt lại hạn ngạch...",
+    autoDowngradingFreeTier: "Tự động hạ cấp xuống tốc độ của chế độ miễn phí để ngăn ngừa thêm lỗi hạn ngạch."
   }
 };
 

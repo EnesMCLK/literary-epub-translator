@@ -61,60 +61,46 @@ export const getSystemInstruction = (
   repairLevel: number = 0
 ): string => {
   const styleContext = bookStrategy 
-    ? `BOOK CONTEXT:
-       - Genre: ${bookStrategy.genre_en}
-       - Tone: ${bookStrategy.tone_en}
-       - Style: ${bookStrategy.author_style_en}`
-    : "Professional literary translation.";
+    ? `KİTAP BAĞLAMI:
+       - Tür: ${bookStrategy.genre_en}
+       - Ton: ${bookStrategy.tone_en}
+       - Yazarın Tarzı: ${bookStrategy.author_style_en}`
+    : "Profesyonel edebi çeviri.";
 
   let modeInstruction = "";
 
   if (repairLevel === 0) {
       // NORMAL MODE
-      modeInstruction = `1. **AUTHOR'S VOICE:** Recreate the specific voice analyzed above. Be faithful to the *effect* and *impact*.`;
+      modeInstruction = `1. **YAZARIN SESİ:** Yukarıda analiz edilen özel sesi yeniden yarat. Etkiye ve duyguya sadık kal.`;
   } else if (repairLevel === 1) {
       // REPAIR MODE (Strict)
-      modeInstruction = `1. **CORRECTION MODE (Force Translation):** 
-      - The previous output was rejected because it was untranslated or empty.
-      - **YOU MUST TRANSLATE** the text into ${targetLanguage}.
-      - Do not just copy the source text.`;
+      modeInstruction = `1. **DÜZELTME MODU (Zorunlu Çeviri):** 
+      - Önceki çıktı çevrilmediği veya boş olduğu için reddedildi.
+      - Metni KESİNLİKLE ${targetLanguage} diline ÇEVİRMELİSİN.
+      - Sadece kaynak metni kopyalama.`;
   } else {
       // LITERAL MODE (Emergency)
-      modeInstruction = `1. **LITERAL EMERGENCY MODE:** 
-      - Forget style. The previous translation failed. 
-      - TRANSLATE WORD-FOR-WORD. 
-      - **ABSOLUTELY NO** repetitions or English output.
-      - If the text is a proper noun, transliterate it if necessary, but prefer translation.`;
+      modeInstruction = `1. **KELİMESİ KELİMESİNE ACİL DURUM MODU:** 
+      - Üslubu unut. Önceki çeviri başarısız oldu. 
+      - KELİMESİ KELİMESİNE ÇEVİR. 
+      - KESİNLİKLE tekrarlara veya orijinal dilde çıktıya izin verilmez.
+      - Eğer metin özel isimse, gerekirse harf çevirisi yap ama çeviriyi tercih et.`;
   }
 
-  return `ACT AS AN EXPERT TRANSLATOR (${sourceLanguage} -> ${targetLanguage}).
+  return `SENİN ROLÜN:
+Sen dünyaca ünlü, ödüllü bir edebiyat çevirmeni ve teknik editörsün. Görevin, sana verilen metin parçalarını, orijinal dosyanın teknik yapısını (HTML/XML) asla bozmadan, edebi ve akıcı bir ${targetLanguage} diline çevirmektir. (${sourceLanguage} -> ${targetLanguage})
+
 ${styleContext}
 
-YOUR MISSION:
+TEMEL KURALLAR:
 ${modeInstruction}
+2. **Üslup:** Çeviri "Google Translate" gibi robotik olmamalı. Cümleleri ${targetLanguage} dilinin yapısına uygun şekilde yeniden kur. Deyimleri ve kültürel öğeleri okuyucuya en doğal gelecek şekilde uyarla.
+3. **Teknik Koruma (ÇOK ÖNEMLİ):** Metin içinde HTML etiketleri (örneğin: <p>, <em>, <span>, class="...") görebilirsin. Bu etiketleri ASLA silme, değiştirme veya tercüme etme. Sadece etiketlerin *arasındaki* metni çevir.
+    * Doğru: <p class="calibre1">Hello world</p> -> <p class="calibre1">Merhaba dünya</p>
+    * Yanlış: <p sınıfı="calibre1">Merhaba dünya</p> (Etiket bozulmuş!)
+4. **Bütünlük:** Özel isimler (Harry, London, Apple vb.) eğer bir anlam taşımıyorsa veya yerelleştirilmesi gerekmiyorsa orijinal bırak.
+5. **Çıktı Formatı:** Giriş metni ne ise, sadece onun çevrilmiş halini ver. "İşte çeviriniz", "Şöyle çevirdim" gibi sohbet ifadeleri kullanma. Sadece işi yap.
 
-2. **TRANSLATE EVERYTHING:**
-   - Translate ALL text content found in paragraphs, table cells, lists, and headings.
-   - Do not skip short sentences or navigational links.
-
-3. **TECHNICAL & STRUCTURAL INTEGRITY (CRITICAL):**
-   - **LaTeX & Formulas:** PRESERVE all LaTeX ($...$), formulas, and variables exactly.
-   - **Code:** PRESERVE programming keywords, variables, and code blocks in ${sourceLanguage}. Translate ONLY comments/instructions.
-   - **HTML Tags:** PRESERVE ALL TAGS (e.g. <span class="calibre1">). Only translate the text *inside* them.
-
-4. **SPECIAL SECTIONS:**
-   - **Tables (td, th):** TRANSLATE the content inside table cells but KEEP the <table>, <tr>, <td> structure exactly as is.
-   - **Table of Contents (TOC):** Translate descriptions (e.g., "Chapter 1", "Introduction") but KEEP numbers and formatting intact.
-   - **Bibliography/References:** 
-     - KEEP Author names, Titles (if standard to keep them), and Years intact.
-     - TRANSLATE descriptive terms like "edited by", "vol.", "retrieved from", "page".
-   - **Footnotes:** Translate the explanation text but KEEP the reference numbers/markers (e.g., [1], *, †) exactly as is.
-
-5. **ABSOLUTE PRESERVATION RULES (DO NOT TRANSLATE):**
-   - **LINKS (<a> tags):** DO NOT TRANSLATE the 'href' attribute. TRANSLATE the link text visible to the user.
-   - **IMAGES & GRAPHICS:** DO NOT TRANSLATE <img> alt text (unless it's a caption), <svg> content.
-
-6. **VERIFICATION RULE:**
-   - **NEVER** return the input text exactly as is. You must translate it.
-   - Return ONLY the translated string. No intro/outro.`;
+GÖREV AKIŞI:
+Kullanıcı sana ham bir metin veya HTML parçası verecek. Sen bunu analiz et, etiketleri koruyarak içeriği mükemmel bir hedef dile (${targetLanguage}) çevirerek değiştir ve geri ver.`;
 };

@@ -557,8 +557,8 @@ export async function processEpub(
         if (hasQuotaError) {
             consecutiveQuotaErrors++;
             
-            if (isFreeTier && consecutiveQuotaErrors >= 3) {
-                const stopMsg = getLogStr(ui, 'quotaExhaustedStop');
+            if (consecutiveQuotaErrors >= (isFreeTier ? 3 : 10)) {
+                const stopMsg = getLogStr(ui, 'quotaExhaustedStop') || "Quota exhausted. Stopping translation.";
                 throw new Error(`QUOTA_EXHAUSTED_STOP|${stopMsg}`);
             }
 
@@ -569,15 +569,15 @@ export async function processEpub(
                 // Paid tier hit a limit. Just wait and maybe slightly reduce concurrency, but don't drop to free tier.
                 if (currentConcurrency > 2) {
                     currentConcurrency -= 1;
-                    addLog(`Rate limit hit. Reducing concurrency to ${currentConcurrency}.`, 'warning');
+                    addLog(getLogStr(ui, 'rateLimitReducingConcurrency').replace('{0}', currentConcurrency.toString()), 'warning');
                 } else {
-                    addLog("Rate limit hit. Waiting for quota to reset...", 'warning');
+                    addLog(getLogStr(ui, 'rateLimitWaiting'), 'warning');
                 }
             } else {
                 // Eğer Paid Tier olarak işaretlenmediyse (Free Key kullanıyor),
                 // hızı otomatik olarak Free Tier seviyesine düşür.
                 if (currentConcurrency > 1 || minInterval < 4500) {
-                    addLog("Auto-downgrading to Free Tier pacing to prevent further quota errors.", 'warning');
+                    addLog(getLogStr(ui, 'autoDowngradingFreeTier'), 'warning');
                     currentConcurrency = 1;
                     minInterval = 4500;
                 }
@@ -697,6 +697,10 @@ export async function processEpub(
   }
 
   addLog(getLogStr(ui, 'saving'), 'info');
+  
+  // Yield to the browser so it can render the "Saving EPUB..." log before the CPU-intensive zip generation
+  await new Promise(resolve => setTimeout(resolve, 100));
+
   const epubBlob = await epubZip.generateAsync({ type: "blob", mimeType: "application/epub+zip", compression: "DEFLATE" });
   
   addLog(getLogStr(ui, 'finished'), 'success');

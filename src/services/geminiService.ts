@@ -173,39 +173,46 @@ export class GeminiTranslator {
         try {
             if (apiKey === "AI_BROWSER_PLACEHOLDER_KEY") throw new Error("PLACEHOLDER_KEY");
 
-            const response: GenerateContentResponse = await ai.models.generateContent({
-                model: analysisModelName, 
-                contents: prompt,
-                config: { 
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: Type.OBJECT,
-                        properties: {
-                            genre_en: { type: Type.STRING },
-                            tone_en: { type: Type.STRING },
-                            author_style_en: { type: Type.STRING },
-                            strategy_en: { type: Type.STRING },
-                            genre_translated: { type: Type.STRING },
-                            tone_translated: { type: Type.STRING },
-                            author_style_translated: { type: Type.STRING },
-                            strategy_translated: { type: Type.STRING },
-                            literary_fidelity_note: { type: Type.STRING },
-                            detected_creativity_level: { type: Type.NUMBER }
+            const timeoutPromise = new Promise<never>((_, reject) => 
+                setTimeout(() => reject(new Error("API_TIMEOUT")), 60000)
+            );
+
+            const response: GenerateContentResponse = await Promise.race([
+                ai.models.generateContent({
+                    model: analysisModelName, 
+                    contents: prompt,
+                    config: { 
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: Type.OBJECT,
+                            properties: {
+                                genre_en: { type: Type.STRING },
+                                tone_en: { type: Type.STRING },
+                                author_style_en: { type: Type.STRING },
+                                strategy_en: { type: Type.STRING },
+                                genre_translated: { type: Type.STRING },
+                                tone_translated: { type: Type.STRING },
+                                author_style_translated: { type: Type.STRING },
+                                strategy_translated: { type: Type.STRING },
+                                literary_fidelity_note: { type: Type.STRING },
+                                detected_creativity_level: { type: Type.NUMBER }
+                            },
+                            required: [
+                                "genre_en", "tone_en", "author_style_en", "strategy_en",
+                                "genre_translated", "tone_translated", "author_style_translated", "strategy_translated",
+                                "literary_fidelity_note", "detected_creativity_level"
+                            ]
                         },
-                        required: [
-                            "genre_en", "tone_en", "author_style_en", "strategy_en",
-                            "genre_translated", "tone_translated", "author_style_translated", "strategy_translated",
-                            "literary_fidelity_note", "detected_creativity_level"
+                        safetySettings: [
+                            { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+                            { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+                            { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+                            { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
                         ]
-                    },
-                    safetySettings: [
-                        { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-                        { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-                        { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-                        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-                    ]
-                }
-            });
+                    }
+                }),
+                timeoutPromise
+            ]);
 
             if (response.usageMetadata) {
                 this.usage.promptTokens += response.usageMetadata.promptTokenCount || 0;
@@ -361,8 +368,8 @@ export class GeminiTranslator {
                 const result = await this.translateChunkWithRetry(chunk, forceRetryMode);
                 finalTranslation += result;
             } catch (e) {
-                console.warn(`Chunk ${i} translation failed (Free Tier), keeping original.`, e);
-                finalTranslation += chunk; 
+                console.error(`Chunk ${i} translation FATAL error on Free Tier.`, e);
+                throw e; 
             }
         }
     }
@@ -397,20 +404,27 @@ export class GeminiTranslator {
                 repairLevel
             );
 
-            const response: GenerateContentResponse = await ai.models.generateContent({
-                model: this.modelName,
-                contents: chunk,
-                config: { 
-                    systemInstruction: sysInstruction, 
-                    temperature: currentTemp,
-                    safetySettings: [
-                        { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-                        { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-                        { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-                        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-                    ]
-                }
-            });
+            const timeoutPromise = new Promise<never>((_, reject) => 
+                setTimeout(() => reject(new Error("API_TIMEOUT")), 60000)
+            );
+
+            const response: GenerateContentResponse = await Promise.race([
+                ai.models.generateContent({
+                    model: this.modelName,
+                    contents: chunk,
+                    config: { 
+                        systemInstruction: sysInstruction, 
+                        temperature: currentTemp,
+                        safetySettings: [
+                            { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+                            { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+                            { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+                            { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+                        ]
+                    }
+                }),
+                timeoutPromise
+            ]);
 
             if (response.usageMetadata) {
                 this.usage.promptTokens += response.usageMetadata.promptTokenCount || 0;
@@ -436,6 +450,9 @@ export class GeminiTranslator {
             
             if (isPaid) {
                 console.warn(`Paid Model Error (Attempt ${attempt}): ${errMsg}. Retrying...`);
+                if (attempt > maxRetries) {
+                    throw error;
+                }
                 const delay = Math.min(1000 * Math.pow(1.5, attempt), 10000); 
                 await new Promise(resolve => setTimeout(resolve, delay));
                 continue; 
@@ -453,7 +470,7 @@ export class GeminiTranslator {
                 if (attempt <= maxRetries) {
                     await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
                 } else {
-                    break; 
+                    throw error; 
                 }
             }
         }
