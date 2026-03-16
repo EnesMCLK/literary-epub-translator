@@ -68,10 +68,7 @@ export const StatsModal: React.FC<StatsModalProps & { isPaidTier?: boolean }> = 
     return m > 0 ? `${h}h${m}m` : `${h}h`;
   };
 
-  let durationDisplay = `~${formatDuration(duration)}`;
-  if (!isFastTier && stats.estimatedDurationFreeMax) {
-      durationDisplay = `${formatDuration(duration)} ~ ${formatDuration(stats.estimatedDurationFreeMax)}`;
-  }
+  const durationDisplay = `~${formatDuration(duration)}`;
 
   const durationTextSize = durationDisplay.length > 8 ? 'text-xs md:text-sm' : 'text-base md:text-lg';
 
@@ -131,7 +128,14 @@ export const StatsModal: React.FC<StatsModalProps & { isPaidTier?: boolean }> = 
                       </div>
                       <div className={`p-3 md:p-4 rounded-2xl border flex flex-col items-center justify-center gap-1 text-center transition-colors ${isFastTier ? 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-800/30' : 'bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800/30'}`}>
                           <Clock size={18} className={isFastTier ? "text-green-500 mb-1" : "text-amber-500 mb-1"}/>
-                          <span className={`${durationTextSize} font-black ${isFastTier ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'}`}>{durationDisplay}</span>
+                          <div className="flex flex-col items-center">
+                            <span className={`${durationTextSize} font-black ${isFastTier ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'}`}>{durationDisplay}</span>
+                            {!isFastTier && stats.estimatedDurationFreeMax && (
+                              <span className="text-[7px] md:text-[8px] font-bold text-amber-500/80 -mt-1">
+                                {t.statDurationMaxLabel || "maximum"} ~{formatDuration(stats.estimatedDurationFreeMax)}
+                              </span>
+                            )}
+                          </div>
                           <span className={`text-[8px] md:text-[9px] font-black uppercase tracking-wider ${isFastTier ? 'text-green-400/70' : 'text-amber-400/70'}`}>{t.statDuration}</span>
                       </div>
                   </div>
