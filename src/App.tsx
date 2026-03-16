@@ -115,6 +115,7 @@ export default function App() {
   });
   
   const progressRef = useRef<TranslationProgress | null>(null);
+  const lastSaveTimeRef = useRef<number>(0);
 
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [error, setError] = useState<{title: string, message: string} | null>(null);
@@ -452,8 +453,10 @@ export default function App() {
             return { ...p, logs: p.logs.length > 0 ? p.logs : prev.logs };
           });
           
-          // Update Resume Data in LocalStorage (Fast access)
-          if (p.lastZipPathIndex !== undefined && p.lastNodeIndex !== undefined && p.translatedNodes) {
+          // Update Resume Data in LocalStorage (Fast access) - Throttled to 5 seconds
+          const now = Date.now();
+          if (p.lastZipPathIndex !== undefined && p.lastNodeIndex !== undefined && p.translatedNodes && (now - lastSaveTimeRef.current > 5000)) {
+             lastSaveTimeRef.current = now;
              const res = { 
                  sessionId, // Important for linking
                  filename: file.name, 
@@ -461,9 +464,14 @@ export default function App() {
                  nodeIndex: p.lastNodeIndex, 
                  translatedNodes: p.translatedNodes, 
                  settings: effectiveSettings,
-                 totalProcessedSentences: p.totalProcessedSentences 
+                 totalProcessedSentences: p.totalProcessedSentences,
+                 isErrorStop: false
              };
-             localStorage.setItem(STORAGE_KEY_RESUME, JSON.stringify(res));
+             try {
+                 localStorage.setItem(STORAGE_KEY_RESUME, JSON.stringify(res));
+             } catch (e) {
+                 console.warn("LocalStorage full, skipping fast resume save", e);
+             }
           }
         }, 
         abortControllerRef.current.signal,
@@ -508,8 +516,23 @@ export default function App() {
     } catch (err: any) {
       const isAborted = err.name === 'AbortError' || err.message === 'Stopped.';
       const status = isAborted ? 'partial' : 'failed';
-      const errorMsg = isAborted ? 'Stopped by user' : (err.message || "Unknown error");
+      let errorMsg = isAborted ? 'Stopped by user' : (err.message || "Unknown error");
       
+      if (errorMsg.includes('QUOTA_EXHAUSTED_STOP')) {
+          const msgParts = errorMsg.split('|');
+          errorMsg = msgParts[1] || msgParts[0];
+      }
+
+      setProgress(prev => ({
+          ...prev,
+          status: status,
+          logs: [...prev.logs, { 
+              timestamp: new Date().toLocaleTimeString(), 
+              text: isAborted ? (t.stopBtn ? `[${t.stopBtn}]` : "Stopped") : errorMsg, 
+              type: isAborted ? 'warning' : 'error' 
+          }]
+      }));
+
       // CRITICAL: Save Resume Data to IndexedDB for long-term storage
       if (progressRef.current && progressRef.current.translatedNodes) {
          const fullResumeState = {
@@ -519,12 +542,15 @@ export default function App() {
              nodeIndex: progressRef.current.lastNodeIndex,
              translatedNodes: progressRef.current.translatedNodes,
              settings: effectiveSettings,
-             totalProcessedSentences: progressRef.current.totalProcessedSentences
+             totalProcessedSentences: progressRef.current.totalProcessedSentences,
+             isErrorStop: !isAborted
          };
          try {
              // Save JSON as a Blob to reuse the file storage service
              const resumeBlob = new Blob([JSON.stringify(fullResumeState)], { type: 'application/json' });
              await fileStorage.saveFile(sessionId + '_resume', resumeBlob);
+             setResumeData(fullResumeState);
+             localStorage.setItem(STORAGE_KEY_RESUME, JSON.stringify(fullResumeState));
          } catch(e) { console.error("Failed to save resume data", e); }
       }
 
@@ -548,6 +574,9 @@ export default function App() {
       if (!isAborted) {
         if (err.message === "MISSING_KEY_REDIRECT") {
             handleMissingKey();
+        } else if (err.message?.includes('QUOTA_EXHAUSTED_STOP')) {
+            const msgParts = err.message.split('|');
+            setError({ title: t.error, message: msgParts[1] || msgParts[0] });
         } else if (err.message?.includes('429') || err.message?.includes('quota')) {
           setError({ title: t.error, message: t.quotaError });
         } else {
@@ -830,9 +859,16 @@ export default function App() {
                   {!isProcessing && !downloadUrl && (
                     <div className="w-full flex flex-col gap-4">
                         {canResume ? (
-                           <button onClick={() => startTranslation(true)} className="w-full py-5 md:py-7 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl md:rounded-[2rem] font-black text-lg md:text-xl shadow-2xl shadow-indigo-500/30 active:scale-95 transition-all flex items-center justify-center gap-3">
-                              <StepForward size={24}/> {t.resumeBtn} ({progress.currentPercent}%)
-                           </button>
+                           <>
+                             <button onClick={() => startTranslation(true)} className={`w-full py-5 md:py-7 text-white rounded-2xl md:rounded-[2rem] font-black text-lg md:text-xl shadow-2xl active:scale-95 transition-all flex items-center justify-center gap-3 ${resumeData.isErrorStop ? 'bg-amber-500 hover:bg-amber-600 shadow-amber-500/30' : 'bg-indigo-600 hover:bg-indigo-700 shadow-indigo-500/30'}`}>
+                                <StepForward size={24}/> {t.resumeBtn} ({progress.currentPercent}%)
+                             </button>
+                             {resumeData.isErrorStop && (
+                               <p className="text-center text-xs font-bold text-amber-600 dark:text-amber-400 mt-2">
+                                 {t.resumeFeedback || "Please wait a while before trying again."}
+                               </p>
+                             )}
+                           </>
                         ) : (
                            <button 
                              onClick={handleMainAction} 

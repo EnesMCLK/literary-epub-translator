@@ -338,6 +338,7 @@ export async function processEpub(
   const totalBookSentences = precomputedStats?.totalSentences || 0;
   let totalWaitTimeMs = 0; // Toplam bekleme süresi (Hız hesaplamasından düşmek için)
   const startTime = Date.now();
+  let consecutiveQuotaErrors = 0;
 
   const triggerProgress = (updates: Partial<TranslationProgress>) => {
     let percent = 0;
@@ -376,13 +377,7 @@ export async function processEpub(
       addLog(getLogStr(ui, 'freeTierActive') || "Free Tier Pacing Active (15 RPM)...", 'warning');
   }
 
-  let epubStructure: EpubStructure;
-  try {
-    epubStructure = await parseEpubStructure(epubZip, ui);
-  } catch (err: any) {
-    addLog(err.message, 'error');
-    throw err;
-  }
+  const epubStructure: EpubStructure = await parseEpubStructure(epubZip, ui);
   
   processList = epubStructure.processList;
   const parser = new DOMParser();
@@ -560,6 +555,13 @@ export async function processEpub(
         }
 
         if (hasQuotaError) {
+            consecutiveQuotaErrors++;
+            
+            if (isFreeTier && consecutiveQuotaErrors >= 3) {
+                const stopMsg = getLogStr(ui, 'quotaExhaustedStop');
+                throw new Error(`QUOTA_EXHAUSTED_STOP|${stopMsg}`);
+            }
+
             const waitSeconds = 65;
             addLog(getLogStr(ui, 'quotaExceeded'), 'warning');
             
@@ -620,6 +622,8 @@ export async function processEpub(
             
             batchStart -= currentConcurrency; 
             continue; 
+        } else {
+            consecutiveQuotaErrors = 0;
         }
 
         accumulatedSentences += batchSentences;
