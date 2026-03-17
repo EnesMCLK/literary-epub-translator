@@ -7,6 +7,8 @@ interface NavigationProps {
   onOpenTour: () => void;
   title: string;
   description: string;
+  tourTooltip: string;
+  githubTooltip: string;
 }
 
 export const Navigation: React.FC<NavigationProps> = ({ 
@@ -14,7 +16,9 @@ export const Navigation: React.FC<NavigationProps> = ({
   onOpenRightDrawer,
   onOpenTour,
   title, 
-  description 
+  description,
+  tourTooltip,
+  githubTooltip
 }) => {
   return (
     <nav className="h-16 md:h-20 border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl fixed top-0 w-full z-50 flex items-center px-4 md:px-6">
@@ -43,7 +47,7 @@ export const Navigation: React.FC<NavigationProps> = ({
         <button 
           onClick={onOpenTour}
           className="hidden sm:flex p-2 md:p-3 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl md:rounded-2xl transition-all text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 active:scale-90 shrink-0"
-          title="Help / Tour"
+          title={tourTooltip}
         >
           <HelpCircle size={20} className="md:w-6 md:h-6" />
         </button>
@@ -52,7 +56,7 @@ export const Navigation: React.FC<NavigationProps> = ({
           target="_blank"
           rel="noopener noreferrer"
           className="hidden sm:flex p-2 md:p-3 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl md:rounded-2xl transition-all text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 active:scale-90 shrink-0"
-          title="View on GitHub"
+          title={githubTooltip}
         >
           <Github size={20} className="md:w-6 md:h-6" />
         </a>

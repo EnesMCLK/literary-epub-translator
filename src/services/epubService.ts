@@ -216,19 +216,7 @@ export async function calculateEpubStats(file: File, targetTags: string[], hasUs
     }
   }
 
-  let estimatedTokens = Math.ceil(totalChars / 3.5);
-  try {
-      const ai = new GoogleGenAI({ apiKey: getApiKey() });
-      const countTokensResponse = await ai.models.countTokens({
-          model: "gemini-2.5-flash",
-          contents: fullTextForTokens,
-      });
-      if (countTokensResponse.totalTokens) {
-          estimatedTokens = countTokensResponse.totalTokens;
-      }
-  } catch (e) {
-      console.warn("Failed to count tokens via API, using fallback estimation.", e);
-  }
+  const estimatedTokens = Math.ceil(totalChars / 3.5);
 
   const estimatedChunks = totalNodes > 0 ? totalNodes : Math.ceil(totalChars / 500); 
   

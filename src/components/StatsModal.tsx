@@ -5,6 +5,7 @@ import {
   AlignLeft, Gauge, Zap, BrainCircuit, RefreshCw, MessageSquare
 } from 'lucide-react';
 import { STRINGS_UI } from '../lang/ui';
+import { calculateDynamicStats, formatDuration } from '../utils/statsCalculator';
 
 interface StatsModalProps {
   isOpen: boolean;
@@ -13,6 +14,7 @@ interface StatsModalProps {
   stats: BookStats | null;
   strategy?: BookStrategy;
   uiLang: UILanguage;
+  targetLang?: string;
   hasPaidKey: boolean;
   onRegenerateAnalysis: (feedback: string) => void;
   isAnalyzing: boolean;
@@ -21,7 +23,7 @@ interface StatsModalProps {
 }
 
 export const StatsModal: React.FC<StatsModalProps & { isPaidTier?: boolean }> = ({ 
-  isOpen, onClose, onConfirm, stats, strategy, uiLang, hasPaidKey, isPaidTier, onRegenerateAnalysis, isAnalyzing, modelId, onModelChange 
+  isOpen, onClose, onConfirm, stats, strategy, uiLang, targetLang, hasPaidKey, isPaidTier, onRegenerateAnalysis, isAnalyzing, modelId, onModelChange 
 }) => {
   const [activeTab, setActiveTab] = useState<'stats' | 'analysis'>('analysis');
   const [feedback, setFeedback] = useState('');
@@ -32,53 +34,24 @@ export const StatsModal: React.FC<StatsModalProps & { isPaidTier?: boolean }> = 
   
   const fmt = (n: number) => n.toLocaleString(uiLang === 'tr' ? 'tr-TR' : 'en-US');
   
-  // Dinamik olarak seçili modele göre süre ve maliyet hesapla
-  let rpmPaid = 360;
-  let inputPricePerM = 0.075;
-  let outputPricePerM = 0.30;
-
-  switch (modelId) {
-      case 'gemini-2.5-flash-lite':
-      case 'gemini-2.5-flash':
-      case 'gemini-3.1-flash-lite-preview':
-      case 'gemini-3-flash-preview':
-          rpmPaid = (modelId === 'gemini-3-flash-preview' || modelId === 'gemini-3.1-flash-lite-preview') ? 120 : 360;
-          inputPricePerM = 0.075;
-          outputPricePerM = 0.30;
-          break;
-      case 'gemini-3.1-pro-preview':
-          rpmPaid = 60;
-          inputPricePerM = 1.25;
-          outputPricePerM = 5.00;
-          break;
-      default:
-          rpmPaid = 360;
-          inputPricePerM = 0.075;
-          outputPricePerM = 0.30;
-  }
-
-  const dynamicDurationPro = Math.ceil(stats.estimatedChunks / rpmPaid);
-  const isFastTier = hasPaidKey && isPaidTier;
-  const duration = isFastTier ? dynamicDurationPro : stats.estimatedDurationFree;
+  const dynamicStats = calculateDynamicStats(stats, targetLang, modelId, hasPaidKey, isPaidTier || false, t.freeCost || "FREE");
   
-  const formatDuration = (minutes: number) => {
-    if (minutes < 60) return `${minutes}m`;
-    const h = Math.floor(minutes / 60);
-    const m = minutes % 60;
-    return m > 0 ? `${h}h${m}m` : `${h}h`;
-  };
-
-  const durationDisplay = `~${formatDuration(duration)}`;
+  if (!dynamicStats) return null;
+  
+  const {
+    dynamicEstimatedTokens,
+    dynamicDurationFree,
+    dynamicDurationFreeMax,
+    isFastTier,
+    durationDisplay,
+    costDisplay,
+    dynamicCost
+  } = dynamicStats;
 
   const durationTextSize = durationDisplay.length > 8 ? 'text-xs md:text-sm' : 'text-base md:text-lg';
 
   // Eğer yavaş katmandaysa ve süre 5 dakikadan uzunsa uyarı ver
-  const isHighLoad = !isFastTier && stats.estimatedDurationFree > 5;
-
-  const inputTokensM = stats.estimatedTokens / 1_000_000;
-  const outputTokensM = stats.estimatedTokens / 1_000_000;
-  const dynamicCost = (inputTokensM * inputPricePerM) + (outputTokensM * outputPricePerM);
-  const costDisplay = isFastTier ? `$${dynamicCost.toFixed(4)}` : (t.freeCost || "FREE");
+  const isHighLoad = !isFastTier && dynamicDurationFree > 5;
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-slate-950/80 backdrop-blur-xl animate-fade-scale">
@@ -130,9 +103,9 @@ export const StatsModal: React.FC<StatsModalProps & { isPaidTier?: boolean }> = 
                           <Clock size={18} className={isFastTier ? "text-green-500 mb-1" : "text-amber-500 mb-1"}/>
                           <div className="flex flex-col items-center">
                             <span className={`${durationTextSize} font-black ${isFastTier ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'}`}>{durationDisplay}</span>
-                            {!isFastTier && stats.estimatedDurationFreeMax && (
+                            {!isFastTier && dynamicDurationFreeMax && (
                               <span className="text-[7px] md:text-[8px] font-bold text-amber-500/80 -mt-1">
-                                {t.statDurationMaxLabel || "maximum"} ~{formatDuration(stats.estimatedDurationFreeMax)}
+                                {t.statDurationMaxLabel || "maximum"} ~{formatDuration(dynamicDurationFreeMax)}
                               </span>
                             )}
                           </div>
@@ -158,11 +131,16 @@ export const StatsModal: React.FC<StatsModalProps & { isPaidTier?: boolean }> = 
                                         ))}
                                       </select>
                                     ) : (
-                                      <h4 className="font-bold text-indigo-700 dark:text-indigo-400 text-sm uppercase truncate">{modelId || 'Model'}</h4>
+                                      <h4 className="font-bold text-indigo-700 dark:text-indigo-400 text-sm uppercase truncate">
+                                        {AI_MODELS.find(m => m.id === modelId)?.name || modelId || 'Model'}
+                                      </h4>
                                     )}
+                                    <span className="px-2 py-0.5 rounded-md bg-indigo-200/50 dark:bg-indigo-800/50 text-[9px] font-black text-indigo-700 dark:text-indigo-300 ml-2">
+                                      {isFastTier ? 'PRO' : t.freeCost || 'FREE'}
+                                    </span>
                                   </div>
                                   <p className="text-xs text-indigo-800/80 dark:text-indigo-200/60 mt-1">
-                                      {t.estimatedTokens || "Estimated Tokens"}: <strong>{fmt(stats.estimatedTokens)}</strong>
+                                      {t.estimatedTokens || "Estimated Tokens"}: <strong>{fmt(dynamicEstimatedTokens)}</strong>
                                   </p>
                               </div>
                           </div>

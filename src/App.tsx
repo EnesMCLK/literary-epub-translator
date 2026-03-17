@@ -16,6 +16,7 @@ import { SettingsDrawer } from './components/SettingsDrawer';
 import { DownloadActions } from './components/DownloadActions';
 import { StatsModal } from './components/StatsModal';
 import { OnboardingTour } from './components/OnboardingTour';
+import { calculateDynamicStats } from './utils/statsCalculator';
 import { 
     UILanguage, TranslationSettings, HistoryItem, 
     LANGUAGES_DATA, DEFAULT_TAGS, LANG_CODE_TO_LABEL, AI_MODELS, BookStats, STORAGE_KEY_API, STORAGE_KEY_TIER, BookStrategy
@@ -124,6 +125,7 @@ export default function App() {
   useEffect(() => {
     const targetLabel = LANG_CODE_TO_LABEL[uiLang] || 'Turkish';
     setSettings(prev => ({ ...prev, uiLang, targetLanguage: targetLabel }));
+    document.documentElement.lang = uiLang;
   }, [uiLang]);
 
   useEffect(() => {
@@ -701,6 +703,15 @@ export default function App() {
 
   if (isInitializing) return <div className="h-screen flex items-center justify-center dark:bg-slate-950"><Loader2 className="animate-spin text-indigo-500" size={40} /></div>;
 
+  const dynamicStats = calculateDynamicStats(
+    bookStats, 
+    settings.targetLanguage, 
+    settings.modelId || 'gemini-2.5-flash', 
+    hasPaidKey, 
+    isPaidTier, 
+    t.freeCost || "FREE"
+  );
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-all duration-300 flex flex-col relative overflow-hidden">
       {(isLeftDrawerOpen || isRightDrawerOpen) && (
@@ -722,6 +733,7 @@ export default function App() {
         stats={bookStats}
         strategy={progress.strategy}
         uiLang={uiLang}
+        targetLang={settings.targetLanguage}
         hasPaidKey={hasPaidKey}
         isPaidTier={isPaidTier}
         modelId={settings.modelId || 'gemini-2.5-flash'}
@@ -768,6 +780,8 @@ export default function App() {
         onOpenTour={() => setIsTourOpen(true)}
         title={t.title}
         description={t.description}
+        tourTooltip={t.tourTooltip}
+        githubTooltip={t.githubTooltip}
       />
 
       {/* Main Content Info Bar */}
@@ -775,8 +789,11 @@ export default function App() {
           <div className="w-full max-w-6xl flex flex-col md:flex-row items-stretch md:items-center justify-between gap-1.5 md:gap-6">
               <div className="flex items-center justify-between md:justify-start gap-3 md:gap-4 overflow-hidden">
                   <div className="flex items-center gap-1.5 md:gap-2.5 shrink-0">
-                    <div className={`w-2 md:w-2.5 h-2 md:h-2.5 rounded-full ${hasPaidKey ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]' : 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.4)]'}`}></div>
-                    <span className="text-[8px] md:text-[10px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">{hasPaidKey ? t.paidMode : t.freeMode}</span>
+                    <div className={`w-2 md:w-2.5 h-2 md:h-2.5 rounded-full ${hasPaidKey && isPaidTier ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]' : 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.4)]'}`}></div>
+                    <span className="text-[8px] md:text-[10px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">
+                      {AI_MODELS.find(m => m.id === (settings.modelId || 'gemini-2.5-flash'))?.name || 'AI'} 
+                      <span className="opacity-60 ml-1">({hasPaidKey && isPaidTier ? t.tierPaid || 'PRO' : hasPaidKey ? t.tierFree || 'FREE' : t.freeMode})</span>
+                    </span>
                   </div>
                   <div className="hidden md:block h-3 md:h-4 w-px bg-slate-200 dark:bg-slate-800 shrink-0"></div>
                   <div className="flex items-center gap-1.5 md:gap-2 min-w-0">
@@ -923,11 +940,32 @@ export default function App() {
                     <div className="space-y-4 md:space-y-5 animate-fade-scale">
                         <div className="flex flex-wrap gap-2 items-center">
                           <div className="px-4 md:px-5 py-2 md:py-2.5 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl md:rounded-2xl inline-block border border-indigo-100 shadow-sm"><p className="text-[9px] md:text-[11px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">{progress.strategy.genre_translated}</p></div>
-                          {analyzedModelId && (
-                             <div className="px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl md:rounded-2xl inline-block border border-slate-200 dark:border-slate-700"><p className="text-[8px] md:text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest flex items-center gap-1"><BrainCircuit size={10}/> {AI_MODELS.find(m => m.id === analyzedModelId)?.name || 'AI'}</p></div>
-                          )}
+                          <div className="px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl md:rounded-2xl inline-block border border-slate-200 dark:border-slate-700">
+                             <p className="text-[8px] md:text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                                <BrainCircuit size={10}/> 
+                                {AI_MODELS.find(m => m.id === (settings.modelId || 'gemini-2.5-flash'))?.name || 'AI'}
+                                <span className="opacity-60 ml-0.5">({(hasPaidKey && isPaidTier) ? 'PRO' : t.freeCost || 'FREE'})</span>
+                             </p>
+                          </div>
                         </div>
                         <p className="text-xs md:text-sm italic text-slate-500 dark:text-slate-400 leading-relaxed text-justify serif">"{progress.strategy.strategy_translated}"</p>
+                        
+                        {dynamicStats && (
+                          <div className="grid grid-cols-3 gap-2 mt-4">
+                             <div className="bg-slate-50 dark:bg-slate-800/50 p-2 md:p-3 rounded-xl border border-slate-100 dark:border-slate-700/50 flex flex-col items-center justify-center text-center">
+                                <span className="text-xs md:text-sm font-black text-indigo-600 dark:text-indigo-400">{dynamicStats.dynamicEstimatedTokens.toLocaleString(uiLang === 'tr' ? 'tr-TR' : 'en-US')}</span>
+                                <span className="text-[7px] md:text-[8px] font-bold uppercase text-slate-400 tracking-wider mt-1">{t.estimatedTokens || "TOKENS"}</span>
+                             </div>
+                             <div className="bg-slate-50 dark:bg-slate-800/50 p-2 md:p-3 rounded-xl border border-slate-100 dark:border-slate-700/50 flex flex-col items-center justify-center text-center">
+                                <span className="text-xs md:text-sm font-black text-green-600 dark:text-green-400">{dynamicStats.durationDisplay}</span>
+                                <span className="text-[7px] md:text-[8px] font-bold uppercase text-slate-400 tracking-wider mt-1">{t.statDuration || "DURATION"}</span>
+                             </div>
+                             <div className="bg-slate-50 dark:bg-slate-800/50 p-2 md:p-3 rounded-xl border border-slate-100 dark:border-slate-700/50 flex flex-col items-center justify-center text-center">
+                                <span className="text-xs md:text-sm font-black text-amber-600 dark:text-amber-400">{dynamicStats.costDisplay}</span>
+                                <span className="text-[7px] md:text-[8px] font-bold uppercase text-slate-400 tracking-wider mt-1">{t.estimatedCost || "COST"}</span>
+                             </div>
+                          </div>
+                        )}
                     </div>
                     ) : (
                         <div className="flex flex-col items-center gap-4 md:gap-5 opacity-20 py-8 md:py-10">
@@ -937,9 +975,9 @@ export default function App() {
                     )}
                 </div>
               </section>
-              <section className="md:col-span-7 bg-white dark:bg-slate-900 rounded-[2rem] md:rounded-[3rem] border border-slate-200 dark:border-slate-800 p-8 md:p-10 flex flex-col h-[300px] md:h-[360px] shadow-sm">
+              <section className="md:col-span-7 bg-white dark:bg-slate-900 rounded-[2rem] md:rounded-[3rem] border border-slate-200 dark:border-slate-800 p-8 md:p-10 flex flex-col h-full min-h-[300px] md:min-h-[360px] shadow-sm">
                 <div className="flex items-center gap-3 text-slate-400 mb-4 md:mb-6 border-b border-slate-50 dark:border-slate-800 pb-4 md:pb-5"><Activity size={18}/> <h3 className="text-[10px] md:text-[12px] font-black uppercase tracking-[0.2em]">{t.systemMonitor}</h3></div>
-                <div className="flex-1 overflow-y-auto custom-scrollbar"><LogViewer logs={progress.logs} readyText={t.systemLogsReady} /></div>
+                <div className="flex-1 min-h-0"><LogViewer logs={progress.logs} readyText={t.systemLogsReady} /></div>
               </section>
             </div>
 
